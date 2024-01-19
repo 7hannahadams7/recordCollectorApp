@@ -74,7 +74,7 @@ struct PersonRowView: View {
 
     var body: some View {
         HStack{
-            Image(uiImage:record.photo!).resizable()
+            Image(uiImage:record.photo).resizable()
             /*.aspectRatio(contentMode:.fit)*/.padding(/*@START_MENU_TOKEN@*/.all, 5.0/*@END_MENU_TOKEN@*/).frame(width:75,height:75).scaledToFill().clipped()
             VStack(alignment: .leading, spacing: 3) {
                 HStack{

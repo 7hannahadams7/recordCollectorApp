@@ -47,7 +47,7 @@ struct ShowRecordView: View {
                                         .frame(width:200,height: 200).padding(.all,10).clipped()
                                 }else if record.photo != nil{
                                     // If photo already in db, show
-                                    Image(uiImage: record.photo!)
+                                    Image(uiImage: record.photo)
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width:200,height: 200).clipped().padding(.all,10)
@@ -226,11 +226,11 @@ struct ShowRecordView: View {
 }
 
 
-
-struct ShowRecordViewPageView_Previews: PreviewProvider {
-    static var previews: some View {
-        ShowRecordView(viewModel:LibraryViewModel(),
-                       record:RecordItem(id: "E764B192-685B-4CA2-91DB-C21113A81CC7", name: "AA", artist: "C", releaseYear: 2005))
-    }
-}
+//
+//struct ShowRecordViewPageView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ShowRecordView(viewModel:LibraryViewModel(),
+//                       record:RecordItem(id: "E764B192-685B-4CA2-91DB-C21113A81CC7", name: "AA", artist: "C", releaseYear: 2005))
+//    }
+//}
 

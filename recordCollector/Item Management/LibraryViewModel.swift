@@ -52,9 +52,15 @@ class LibraryViewModel: ObservableObject {
         isImagePickerPresented = false
     }
     
+    func fetchPhotoByID(id: String) -> UIImage? {
+        if let recordItem = recordDictionaryByID[id] {
+            return recordItem.photo
+        }
+        return UIImage(named:"MenuUp")  // Return defaultIm if the ID is not found
+    }
     
     func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, photo: UIImage? = UIImage(named:"MenuUp")) {
-        let newItem = RecordItem(id: id, name: name, artist: artist, photo:photo, releaseYear: releaseYear)
+        let newItem = RecordItem(id: id, name: name, artist: artist, photo:photo!, releaseYear: releaseYear)
         recordLibrary.append(newItem)
         recordDictionaryByID[id] = newItem
     }

@@ -11,7 +11,7 @@ import FirebaseDatabase
 
 class StatsViewModel: ObservableObject {
     @ObservedObject var viewModel: LibraryViewModel
-    @Published var topArtists: [(artist: String, count: Int, records: [String])] = []
+    @Published var topArtists: [(artist: String, amount: Int, records: [String])] = []
 
     func fetchTopArtists() {
         // Firebase query to get top artists and their record counts
