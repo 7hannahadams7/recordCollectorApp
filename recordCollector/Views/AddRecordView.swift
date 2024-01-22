@@ -14,9 +14,14 @@ struct AddRecordView: View {
     @State private var recordName = ""
     @State private var artistName = ""
     @State private var releaseYear: Int = 2024
-    @State private var selectedImage: UIImage? = nil
     @State private var isImagePickerPresented: Bool = false
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) var presentationModeAddItem
+    
+    @State private var editingMode: Bool = true
+    @State private var newPhoto: Bool = false
+    
+    @ObservedObject var genreManager = GenreManager()
+    @State private var newGenre = ""
     
     var ref: DatabaseReference! = Database.database().reference()
     
@@ -25,69 +30,14 @@ struct AddRecordView: View {
         ZStack(alignment:.center) {
             Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
             VStack{
-                ZStack{
-                    Button(action:{viewModel.capturePhoto()}) {
-                        // Show the photo capture screen
-                        if let capturedImage = viewModel.capturedImage {
-                            Image(uiImage: capturedImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width:100,height: 100)
-                                .padding(.trailing,10)
-                        }else{
-                            ZStack{
-                                RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                                Rectangle().fill(decorWhite).padding(.all,10)
-                                Image(systemName:"camera").font(.system(size: 40)).foregroundStyle(iconWhite)
-                            }.frame(width:200,height: 200)
-
-                        }
-                    }
-                    .sheet(isPresented: $viewModel.isImagePickerPresented) {
-                        ImagePicker(isPresented: $viewModel.isImagePickerPresented, imageCallback: viewModel.imagePickerCallback)
-                    }
-                    
-                }.padding(.top,50)
-
-                VStack{
-
-                    
-                    HStack{
-                        HStack{
-                            Text("Name: ")
-                            Spacer()
-                        }.frame(width:screenWidth/4)
-                        TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
-                        Spacer()
-                    }
-                    HStack{
-                        HStack{
-                            Text("Artist: ")
-                            Spacer()
-                        }.frame(width:screenWidth/4)
-                        TextField("Artist", text: $artistName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2).aspectRatio(contentMode: .fill)
-                        Spacer()
-                    }
-                    HStack{
-                        HStack{
-                            Text("Release Year: ")
-                            Spacer()
-                        }.frame(width:screenWidth/4)
-                        Picker("Year", selection: $releaseYear) {
-                            ForEach((1500..<Int(Date.now.formatted(.dateTime.year()))!+1).reversed(), id:\.self) { year in
-                                Text(String(year)).tag(year)
-                            }
-                        }
-                        .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
-                        Spacer()
-                    }
-                    
-                }.padding(.all, 20).background(lightWoodBrown).clipShape(RoundedRectangle(cornerRadius: 10)).padding(20)
+                RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
+                
+                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear)
                 
                 Button(action:{
-                    viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear)
+                    viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
 
-                    presentationMode.wrappedValue.dismiss() // Dismiss the AddItemView
+                    presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
                 }) {
                     
                     Text("Add Record").foregroundStyle(iconWhite)
@@ -100,6 +50,7 @@ struct AddRecordView: View {
             
         }.onDisappear(){
             viewModel.resetPhoto()
+            viewModel.refreshData()
         }
         .onAppear {
             UITableView.appearance().backgroundView = UIImageView(image: UIImage(named: "Page-Background"))
@@ -109,7 +60,6 @@ struct AddRecordView: View {
     
     
 }
-
 
 
 struct AddRecordViewPageView_Previews: PreviewProvider {

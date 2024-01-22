@@ -12,6 +12,8 @@ struct MyLibraryView: View {
     @State private var sortingFactor: String = "Artist"
     @State private var sortingDirection: Bool = true
     
+    let genreManager = GenreManager()
+    
     var body: some View {
         
         NavigationView{
@@ -56,7 +58,7 @@ struct MyLibraryView: View {
                     ScrollView {
                         ForEach(sortingDirection ? viewModel.recordLibrary: viewModel.recordLibrary.reversed()) {
                             record in
-                            NavigationLink(destination: ShowRecordView(viewModel:viewModel, record:record)) {
+                            NavigationLink(destination: ShowRecordView(viewModel:viewModel, record:record, genreManager: genreManager)) {
                                 PersonRowView(record:record)
                             }
                         }
@@ -64,6 +66,9 @@ struct MyLibraryView: View {
                     
                 }.padding().padding(.top,35)
             }
+        }
+        .onAppear{
+            viewModel.refreshData()
         }
     }
 }

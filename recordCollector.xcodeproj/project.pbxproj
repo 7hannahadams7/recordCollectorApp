@@ -18,6 +18,8 @@
 		BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */; };
 		BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */; };
 		BB3BAD6E2B547A9F00A5397C /* DatabaseTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */; };
+		BB93D6392B5ED4F400D700BC /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D6382B5ED4F400D700BC /* RecordView.swift */; };
+		BB93D63B2B5EF4A600D700BC /* AddRecordView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D63A2B5EF4A600D700BC /* AddRecordView2.swift */; };
 		BBA0BCAC2B597A4E0035C05A /* ShowRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */; };
 		BBA0BCAE2B597FF60035C05A /* EditRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */; };
 		BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */; };
@@ -45,6 +47,8 @@
 		BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseTesting.swift; sourceTree = "<group>"; };
+		BB93D6382B5ED4F400D700BC /* RecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
+		BB93D63A2B5EF4A600D700BC /* AddRecordView2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddRecordView2.swift; sourceTree = "<group>"; };
 		BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRecordView.swift; sourceTree = "<group>"; };
 		BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditRecordView.swift; sourceTree = "<group>"; };
 		BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -141,7 +145,9 @@
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
 				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
 				BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */,
+				BB93D63A2B5EF4A600D700BC /* AddRecordView2.swift */,
 				BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */,
+				BB93D6382B5ED4F400D700BC /* RecordView.swift */,
 				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
 				BBF813362B52647C00654DAA /* Stats Page Files */,
 			);
@@ -295,6 +301,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB93D63B2B5EF4A600D700BC /* AddRecordView2.swift in Sources */,
 				BBF813342B523FCC00654DAA /* ArtistViews.swift in Sources */,
 				BBF813382B53251E00654DAA /* DecadeViews.swift in Sources */,
 				BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */,
@@ -303,6 +310,7 @@
 				BBA0BCAE2B597FF60035C05A /* EditRecordView.swift in Sources */,
 				BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */,
 				BBA0BCAC2B597A4E0035C05A /* ShowRecordView.swift in Sources */,
+				BB93D6392B5ED4F400D700BC /* RecordView.swift in Sources */,
 				BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */,
 				BB2FEF992B4C570A00F0DFBB /* RecordItem.swift in Sources */,
 				BB2FEF8B2B4C56EC00F0DFBB /* ContentView.swift in Sources */,
