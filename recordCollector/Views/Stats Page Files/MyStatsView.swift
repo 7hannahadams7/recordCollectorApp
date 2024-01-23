@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MyStatsView: View {
-    @State private var displayTag = 1
+    @State private var displayTag = 2
     @ObservedObject var viewModel: LibraryViewModel
     
     var body: some View {

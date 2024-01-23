@@ -12,6 +12,9 @@ import FirebaseDatabase
 class StatsViewModel: ObservableObject {
     @ObservedObject var viewModel: LibraryViewModel
     @Published var topArtists: [(artist: String, amount: Int, records: [String])] = []
+    @Published var topGenres: [(genre: String, amount: Int, records: [String])] = []
+    @Published var topDecades: [(decade: Int, amount: Int, records: [String])] = []
+    @Published var topYears: [(year: Int, amount: Int, records: [String])] = []
 
     func fetchTopArtists() {
         // Firebase query to get top artists and their record counts
@@ -41,6 +44,99 @@ class StatsViewModel: ObservableObject {
             // Sort artists by count in descending order
             self.topArtists = artistData.sorted { $0.1 > $1.1 }
         }
+    }
+    
+    func fetchTopGenres(){
+        // Firebase query to get top artists and their record counts
+        let recordsRef = Database.database().reference().child("Records")
+
+        recordsRef.observeSingleEvent(of: .value) { snapshot in
+            var genreData: [(String, Int, [String])] = []
+
+            for child in snapshot.children {
+                let snap = child as! DataSnapshot
+                let elementDict = snap.value as! [String: Any]
+
+                let recordID = snap.key
+
+                // Check if "genres" key exists in the dictionary
+                if let genresDict = elementDict["genres"] as? [String: Bool] {
+                    // Iterate through the keys of the genres dictionary
+                    for (genre, value) in genresDict {
+                        // Check if the value is true
+                        if value {
+                            if let index = genreData.firstIndex(where: { $0.0 == genre }) {
+                                // Genre already exists in the array, update count and add record ID
+                                genreData[index].1 += 1
+                                genreData[index].2.append(recordID)
+                            } else {
+                                // New artist, add to the array
+                                genreData.append((genre, 1, [recordID]))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Sort artists by count in descending order
+            self.topGenres = genreData.sorted { $0.1 > $1.1 }
+        }
+
+    }
+    
+    func fetchTopYears(){
+        // Firebase query to get top years and record counts
+        let recordsRef = Database.database().reference().child("Records")
+
+        recordsRef.observeSingleEvent(of: .value) { snapshot in
+            var decadeData: [(Int, Int, [String])] = []
+            var yearlyData: [(Int, Int, [String])] = []
+
+            for child in snapshot.children {
+                let snap = child as! DataSnapshot
+                let elementDict = snap.value as! [String: Any]
+
+                if let releaseYear = elementDict["releaseYear"] as? Int{
+                    let recordID = snap.key
+                    if let index = yearlyData.firstIndex(where: { $0.0 == releaseYear}){
+//                        Artist already exists in the array, update count and add record ID
+                        yearlyData[index].1 += 1
+                        yearlyData[index].2.append(recordID)
+                    } else {
+                        // New artist, add to the array
+                        yearlyData.append((releaseYear, 1, [recordID]))
+                    }
+                    
+                    let decade = (releaseYear/10)*10
+                    if let index = decadeData.firstIndex(where: { $0.0 == decade}){
+//                         Artist already exists in the array, update count and add record ID
+                        decadeData[index].1 += 1
+                        decadeData[index].2.append(recordID)
+                        //                        artistData[index].2.append(recordID)
+                    } else {
+                        // New artist, add to the array
+                        decadeData.append((decade, 1, [recordID]))
+                    }
+                    
+                }
+
+            }
+            
+            decadeData.append((2000, 6,[]))
+            decadeData.append((2010, 4,[]))
+            decadeData.append((1990, 1,[]))
+            decadeData.append((1950, 2,[]))
+
+            // Sort artists by count in descending order
+            self.topDecades = decadeData.sorted { $0.1 > $1.1 }
+            self.topYears = yearlyData.sorted { $0.1 > $1.1 }
+            
+            print("DECADES: ", self.topDecades.prefix(6))
+            print("TEST: ", String(self.topDecades[0].decade))
+            print("YEARS: ", self.topYears)
+            
+        }
+        
     }
     
     var genreTotalData: [DistributionItem] = [
@@ -132,6 +228,8 @@ class StatsViewModel: ObservableObject {
     init(viewModel: LibraryViewModel) {
             self.viewModel = viewModel
             fetchTopArtists()
+            fetchTopGenres()
+            fetchTopYears()
     }
     
 }

@@ -70,11 +70,7 @@ class LibraryViewModel: ObservableObject {
             let path = "\(genre)"
             ref.child("Records").child(id).child("genres").child(path).setValue(true)
         }
-        
-//        // Create new item in current library model (with no photo)
-//        self.addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres:genres)
 
-        // Attempt to upload photo, uploadPhoto adds the photo to the database if possible, also adds photo to recordItem in library model
         uploadPhoto(id: id, image: self.capturedImage)
         
         print("Added New Record, ID #: ", id)

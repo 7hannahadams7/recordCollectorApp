@@ -145,7 +145,6 @@
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
 				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
 				BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */,
-				BB93D63A2B5EF4A600D700BC /* AddRecordView2.swift */,
 				BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */,
 				BB93D6382B5ED4F400D700BC /* RecordView.swift */,
 				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
@@ -167,6 +166,7 @@
 		BBF813352B52645200654DAA /* ARCHIVE */ = {
 			isa = PBXGroup;
 			children = (
+				BB93D63A2B5EF4A600D700BC /* AddRecordView2.swift */,
 				BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */,
 			);
 			path = ARCHIVE;

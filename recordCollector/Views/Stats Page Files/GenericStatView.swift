@@ -16,7 +16,7 @@ let typeToImages = [
 
 struct GenericStatView: View {
     @ObservedObject var viewModel: StatsViewModel
-    @State private var isTabExpanded = false
+    @State private var isTabExpanded = true
     var viewType: String
     
     var body: some View {

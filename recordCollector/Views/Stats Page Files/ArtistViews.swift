@@ -31,14 +31,7 @@ struct ArtistRecordShelf: View {
                     if index < artistBarData.count {
                         let recordID = artistBarData[index].records.first
                         let photo = viewModel.viewModel.fetchPhotoByID(id: recordID!)
-//                        let recordItem: RecordItem = viewModel.viewModel.recordDictionaryByID[recordID!]!
-//                        let photo = recordItem.photo
-//                        image = Image("DavidBowie")
                         image = Image(uiImage: photo!)
-//                        image = Image(uiImage: photo!) ?? Image("DavidBowie")
-                        
-//                        let imageName = artistBarData[index].records.first ?? "DavidBowie"
-//                        image = Image(imageName)
                     } else {
                         image = Image("DavidBowie")
                     }
@@ -147,16 +140,6 @@ struct ArtistInfoChart: View {
 
     }
     
-    private func fractionalShift(for amount: Int, top: Int, bottom: Int) -> CGFloat{
-        
-//        guard topArtists.count > 0 else{
-//            return 0.0
-//        }
-//        let bottom = topArtists.last!.amount
-        
-        return 0.0
-    }
-    
     private func fractionalValue(for index: Int, totalCount: Int) -> CGFloat {
         guard totalCount > 0 else {
             return 0.0
@@ -207,7 +190,6 @@ struct ArtistRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(artistItem.records, id:\.self){recordID in
-//                            let recordItem: RecordItem = viewModel.viewModel.recordDictionaryByID[recordID]!
                             let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
                             Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
                         }

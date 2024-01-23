@@ -60,106 +60,156 @@ struct DecadeBottomChart: View {
     @State private var selectedBar: Int?
     
     var body: some View {
-        let decadeTotalData = viewModel.decadeData
-        let decadeTopData = viewModel.decadeTotalData.prefix(6)
-        let yearlyData = viewModel.yearlyTotalData
+        let decadeBarData = viewModel.topDecades.prefix(4)
 
         GeometryReader{geometry in
-            if !isTabExpanded{
-                ZStack{
-                    Chart{
-                        ForEach(decadeTopData.indices, id:\.self){
-                            index in
-                            let amount = decadeTopData[index].amount
-                            let name = decadeTopData[index].name
-                            BarMark(
-                                x: .value("Year", name),
-                                y: .value("Amount", amount)
-                            )
-                            .cornerRadius(5)
-                            .foregroundStyle(smallDisplayColors[index])
-                            .annotation(position: .top, alignment:.center) {
-                                Text(name).foregroundStyle(recordBlack).padding(5)
+            VStack{
+                if !isTabExpanded{
+                    ZStack{
+                        HStack{
+                            let total = decadeBarData.count
+                            let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
+                            let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
+                            ForEach(decadeBarData.indices, id:\.self){index in
+                                let item = decadeBarData[index]
+                                DecadeBarItem(decade: item.decade, amount: item.amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
                             }
-                            .annotation(position: .overlay, alignment: .top) {
-                                Text(String(amount)).foregroundStyle(iconWhite).padding(5)
+                        }
+                    }.padding().frame(width:geometry.size.width,height:geometry.size.height)
+                        .background(isTabExpanded ? Color.clear: decorWhite)
+                        .id(1)
+                        .animation(.easeInOut(duration:0.5).delay(0.05))
+                        .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .leading)))
+                }else{
+                    VStack(alignment:.center){
+                        Picker("", selection: $selectedTab) {
+                            Text("Decades").tag(1)
+                            Text("Years").tag(2)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding().frame(width:geometry.size.width/2)
+                        ZStack{
+                            if selectedTab == 1{
+                                DecadeScrollView(viewModel: viewModel)
+                            }else{
+                                YearScrollView(viewModel: viewModel)
+                            }
+                        }.padding()
+                    }.padding()
+                }
+            }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
+        }
+    }
+}
+
+struct YearScrollView: View{
+    var viewModel: StatsViewModel
+    
+    var body: some View{
+            let decadeBarData = viewModel.topYears.sorted { $0.0
+                < $1.0 }
+            VStack{
+                GeometryReader{geometry in
+                    
+                ScrollView(.horizontal){
+                    
+                        HStack{
+                            let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
+                            let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
+                            ForEach(decadeBarData.indices, id:\.self){index in
+                                let item = decadeBarData[index]
+                                let proportionalSize = CGFloat(item.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.height - 100)+50
+                                ZStack(alignment:.bottom){
+                                    VStack{
+                                        Spacer()
+                                        
+                                        VStack{
+                                            Text(String(item.amount))
+                                                RoundedRectangle(cornerRadius: 25.0).fill(fullDisplayColors[index%totalDisplayColors])
+                                        }.frame(width:80,height:proportionalSize).padding(5)
+                                        
+                                    }
+                                    VStack{
+                                        Text(String(item.year)).bold().padding()
+                                    }.frame(width:80,height:30).background(iconWhite)
+                                }
                                 
                             }
                         }
-                        
                     }
-                    .chartXAxis(.hidden)
-                        .chartYAxis(.hidden)
-                        .chartYScale(domain:[0,decadeTopData[0].amount])
-                        .padding(.horizontal,15).padding(.top,35)
-                        .frame(width:geometry.size.width,height:geometry.size.height)
-                        .aspectRatio(contentMode: .fit)
+                }.clipped()
+            }.padding(.horizontal).background(iconWhite)
+    }
+}
+
+struct DecadeScrollView: View{
+    var viewModel: StatsViewModel
+    
+    var body: some View{
+        let decadeBarData = viewModel.topDecades.sorted { $0.0
+                < $1.0 }
+        let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
+        let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
+        VStack{
+            GeometryReader{geometry in
                     
-                }.frame(width:geometry.size.width,height:geometry.size.height)
-            }else{
-                VStack(alignment:.center){
-                    Picker("", selection: $selectedTab) {
-                        Text("Decades").tag(1)
-                        Text("Years").tag(2)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding().frame(width:geometry.size.width/2)
-                    ZStack{
-                        if selectedTab == 1 {
-                            Chart{
-                                ForEach(decadeTotalData.sorted(by: >), id: \.key){
-                                    decade, amount in
-                                    let index = decade/10%totalDisplayColors
-                                    let displayToggle: Bool = (index<=5)
-                                    BarMark(
-                                        x: .value("Year", decade+5),
-                                        y: .value("Amount", amount),
-                                        width:MarkDimension(floatLiteral: geometry.size.width/6)
-                                    )
-                                    .cornerRadius(5)
-                                    .foregroundStyle(fullDisplayColors[index])
-                                    .annotation(position: .overlay, alignment:.top){
-                                        Text(String(decade)).foregroundStyle(displayToggle ? iconWhite: recordBlack)
-                                    }.annotation(position: .top, alignment:.center){
-                                        Text(String(amount)).foregroundStyle(recordBlack)
-                                    }
+                ScrollView(.horizontal){
+                        
+                    HStack{
+                        ForEach(decadeBarData.indices, id:\.self){index in
+                            let item = decadeBarData[index]
+                            let proportionalSize = CGFloat(item.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.height - 100)+50
+                            ZStack(alignment:.bottom){
+                                VStack{
+                                    Spacer()
+                                    
+                                    VStack{
+                                        Text(String(item.amount))
+                                        RoundedRectangle(cornerRadius: 25.0).fill(fullDisplayColors[index%totalDisplayColors])
+                                    }.frame(width:80,height:proportionalSize).padding(5)
+                                    
                                 }
+                                VStack{
+                                    Text(String(item.decade)).bold().padding()
+                                }.frame(width:80,height:30).background(iconWhite)
                             }
-                            .chartScrollableAxes(.horizontal)
-                                .chartXScale(domain:[1860,2030])
-                                .chartYScale(domain:[0,30])
-                                .chartXVisibleDomain(length: 40)
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width:geometry.size.width,height:2*geometry.size.height/3)
-                        } else if selectedTab == 2 {
-                            Chart{
-                                ForEach(yearlyData.sorted(by: >), id: \.key){
-                                    year, amount in
-                                    let index = year%totalDisplayColors
-                                    BarMark(
-                                        x: .value("Year", year),
-                                        y: .value("Amount", amount),
-                                        width:MarkDimension(floatLiteral: geometry.size.width/10)
-                                    )
-                                    .cornerRadius(5)
-                                    .foregroundStyle(fullDisplayColors[index])
-//                                    if let selectedBar{
-//                                        RuleMark(x: .value("Year",selectedBar))
-//                                            .foregroundStyle(grayBlue).zIndex(-10)
-//                                    }
-                                }
-                            }
-//                            .chartXSelection(value: $selectedBar)
-                            .chartScrollableAxes(.horizontal)
-                                .chartXScale(domain:[1969,2025])
-                                .chartYScale(domain:[0,10])
-                                .chartXVisibleDomain(length: 5)
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width:geometry.size.width,height:2*geometry.size.height/3)
+                            
                         }
-                    }.aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                }.frame(width:geometry.size.width,height:geometry.size.height)
-            }
-        }
+                    }
+                }
+            }.clipped()
+        }.padding(.horizontal).background(iconWhite)
+    }
+}
+
+struct DecadeBarItem: View{
+    var decade: Int
+    var amount: Int
+    var color: Color
+    var total: Int
+    var minAmount: Int
+    var maxAmount: Int
+    
+    var body: some View{
+        GeometryReader{geometry in
+
+            let proportionalSize = CGFloat(amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.height - 100)+100
+            ZStack(alignment:.bottom){
+                VStack{
+                    Spacer()
+                    VStack{
+                        Text("\(amount)")
+                        RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .top) {
+                            Text("\(decade%100)s").bold().foregroundStyle(iconWhite).padding()
+                        }
+
+                    }.frame(width:geometry.size.width,height:proportionalSize)
+                }.frame(height:geometry.size.height).background(decorWhite)
+                VStack{
+                    Spacer()
+                }.frame(width:geometry.size.width,height:30).background(decorWhite)
+            }.padding(.bottom,30)
+        }.clipped()
+
     }
 }
