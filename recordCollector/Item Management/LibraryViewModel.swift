@@ -29,12 +29,6 @@ class LibraryViewModel: ObservableObject {
         case releaseYear = "Release Year"
         case album = "Album"
     }
-//    
-//    init() {
-//        fetchData {
-//            self.sortRecords()
-//        }
-//    }
     
     // MARK: - Photo Actions
     func resetPhoto(){
@@ -258,7 +252,8 @@ class LibraryViewModel: ObservableObject {
         if let recordItem = recordDictionaryByID[id] {
             return recordItem.photo
         }
-        return UIImage(named:"MenuUp")  // Return defaultIm if the ID is not found
+        print("Couldn't find id in dictionary")
+        return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
     }
     
     func refreshData(){

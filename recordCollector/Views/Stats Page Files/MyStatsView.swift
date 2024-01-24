@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct MyStatsView: View {
-    @State private var displayTag = 2
+    @State private var displayTag = 0
     @ObservedObject var viewModel: LibraryViewModel
     
     var body: some View {
-        var genresView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Genres")
-        var artistsView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
-        var decadesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Decades")
-        var storesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
-        var historyView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
+        let genresView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Genres")
+        let artistsView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
+        let decadesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Decades")
+        let storesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
+        let historyView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
         
             //Background Decor
             ZStack{

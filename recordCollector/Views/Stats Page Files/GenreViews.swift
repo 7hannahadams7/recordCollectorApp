@@ -63,7 +63,9 @@ struct GenrePieChart: View {
 
 struct GenreInfoChart: View {
     @ObservedObject var viewModel: StatsViewModel //
-    var isTabExpanded: Bool
+    @Binding var isTabExpanded: Bool
+    
+    @State private var offset = 0.0
     
     var body: some View {
         let genrePieData = viewModel.topGenres.prefix(6)
@@ -110,9 +112,16 @@ struct GenreInfoChart: View {
                     }.padding(.vertical,30)
                         .id(2)
                         .animation(.easeInOut(duration:0.5))
-                        .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .leading)))
+                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                 }
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
+                .offset(x:offset)
+                .onAppear(perform: {
+                    offset = -screenWidth
+                    withAnimation(.easeOut(duration: 0.5).delay(0.4)){
+                        offset = 0.0
+                    }
+                })
 
         }
     }

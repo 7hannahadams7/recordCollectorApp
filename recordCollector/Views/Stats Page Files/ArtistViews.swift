@@ -31,7 +31,11 @@ struct ArtistRecordShelf: View {
                     if index < artistBarData.count {
                         let recordID = artistBarData[index].records.first
                         let photo = viewModel.viewModel.fetchPhotoByID(id: recordID!)
-                        image = Image(uiImage: photo!)
+                        if photo != UIImage(named:"TakePhoto"){
+                            image = Image(uiImage: photo!)
+                        }else{
+                            image = Image("DavidBowie")
+                        }
                     } else {
                         image = Image("DavidBowie")
                     }
@@ -119,7 +123,7 @@ struct ArtistInfoChart: View {
                     }.frame(width:geometry.size.width,height:geometry.size.height)
                         .background(isTabExpanded ? Color.clear: decorWhite)
                         .id(1)
-                        .animation(.easeInOut(duration:0.5).delay(0.05))
+                        .animation(.easeInOut(duration:0.5).delay(0.05),value:isTabExpanded)
                         .transition( .move(edge: .leading))
                 }else{
                     ScrollView{
@@ -135,6 +139,13 @@ struct ArtistInfoChart: View {
                 }
                 
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
+                .offset(x:offset)
+                .onAppear(perform: {
+                    offset = -screenWidth
+                    withAnimation(.easeOut(duration: 0.5).delay(0.4)){
+                        offset = 0.0
+                    }
+                })
             
         }
 
@@ -168,7 +179,7 @@ struct ArtistBarItem: View{
                     }
                     Text(String(amount))
                     Spacer()
-                }.padding(5).frame(width:proportionalSize,height:geometry.size.height).offset(x:-30)
+                }.frame(width:proportionalSize,height:geometry.size.height).offset(x:-30)
                 Spacer()
             }.background(decorWhite)
         }
