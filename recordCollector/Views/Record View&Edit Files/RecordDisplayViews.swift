@@ -9,85 +9,6 @@ import SwiftUI
 import FirebaseDatabase
 import FirebaseStorage
 
-struct ShowRecordView: View {
-    @ObservedObject var viewModel: LibraryViewModel
-    @State private var recordName = ""
-    @State private var artistName = ""
-    var record: RecordItem
-    @State private var releaseYear: Int = 2024
-    
-    @State private var editingMode: Bool = false
-    @State private var newPhoto: Bool = false
-    
-    @ObservedObject var genreManager: GenreManager
-    
-    @State private var newGenre = ""
-    
-    @Environment(\.presentationMode) var presentationModeShowRecord
-    
-    var body: some View {
-        let id = record.id
-        
-            ZStack(alignment:.center) {
-                Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
-                VStack{
-
-                    RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
-                    
-                    RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear)
-                    
-                    if editingMode{
-                        HStack{
-                            Button(action:{
-                                viewModel.resetPhoto()
-                                editingMode.toggle()
-                                genreManager.genres = record.genres
-                            }) {
-                                
-                                Text("Cancel").foregroundStyle(iconWhite)
-                                
-                            }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                            
-                            Button(action:{
-                                viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
-                                viewModel.resetPhoto()
-                                
-                                presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
-                            }) {
-                                
-                                Text("Save Changes").foregroundStyle(iconWhite)
-                                
-                            }.padding(20).background(seaweedGreen).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                            
-                            
-                        }
-                    }else{
-                        Button(action:{
-                            editingMode.toggle()
-                        }) {
-                            
-                            Text("Edit Record").foregroundStyle(iconWhite)
-                            
-                        }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                    }
-                    
-                    Spacer()
-                                
-                }
-                
-            }.onAppear {
-                //Initial set of genres list
-                genreManager.genres = record.genres
-            }.onDisappear{
-                viewModel.refreshData()
-            }
-
-        
-    }
-    
-    
-}
-
 
 struct RecordImageDisplayView: View{
     @ObservedObject var viewModel: LibraryViewModel
@@ -135,7 +56,7 @@ struct RecordImageDisplayView: View{
                     print("Button Enabled? ", editingMode)
                 }
             
-        }.padding(.top,50)
+        }
     }
 }
 
@@ -153,6 +74,16 @@ struct RecordFieldDisplayView: View{
     
     @State private var newGenre = ""
     
+    @Binding var showAlert: Bool
+    
+    var showList: Bool {
+        return !newGenre.isEmpty
+    }
+    
+    var filteredGenres: [String] {
+        return viewModel.fullGenres.filter { $0.lowercased().contains(newGenre.lowercased()) }
+    }
+    
     var body: some View{
         
         VStack{
@@ -168,7 +99,7 @@ struct RecordFieldDisplayView: View{
                             if record != nil{
                                 recordName = record!.name
                             }
-                        }
+                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                 }else{
                     Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
@@ -187,7 +118,7 @@ struct RecordFieldDisplayView: View{
                             if record != nil{
                                 artistName = record!.artist
                             }
-                        }
+                        }.shadow(color:(showAlert && artistName.isEmpty) ? Color.red : Color.clear, radius: 5)
                 }else{
                     Text(record?.artist ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
@@ -226,7 +157,15 @@ struct RecordFieldDisplayView: View{
                     VStack(alignment:.leading){
                         if editingMode{
                             HStack{
-                                TextField("Genre", text: $newGenre).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                                ZStack(alignment: .trailing){
+                                    TextField("Genre", text: $newGenre).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                                    Button(action: {
+                                        print(filteredGenres)
+                                        newGenre = ""
+                                    }){
+                                        Image(systemName: "xmark").foregroundStyle(decorWhite).padding()
+                                    }
+                                }
                                 
                                 Button(action: {
                                     if newGenre != ""{
@@ -235,34 +174,50 @@ struct RecordFieldDisplayView: View{
                                     }
                                 }) {
                                     Image(systemName: "plus").foregroundColor(recordBlack).padding()
-                                }
+                                }.frame(width:15)
                             }
                         }
-                        ScrollView(.horizontal) {
-                            HStack{
-                                ForEach(genreManager.genres.reversed(), id: \.self){genre in
-                                    Button(action: {
-                                        genreManager.removeGenre(genre)
-                                    }, label: {
-                                        ZStack{
-                                            RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
-                                            HStack{
-                                                Text(genre).font(.system(size:15))
-                                                if editingMode{
-                                                    Image(systemName: "xmark")
-                                                }
-                                            }.padding(.horizontal)
-                                        }
-                                    }).disabled(!editingMode)
+                        ZStack(alignment:.leading){
+                            ScrollView(.horizontal) {
+                                HStack{
+                                    ForEach(genreManager.genres.reversed(), id: \.self){genre in
+                                        Button(action: {
+                                            genreManager.removeGenre(genre)
+                                        }, label: {
+                                            ZStack{
+                                                RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
+                                                HStack{
+                                                    Text(genre).font(.system(size:15))
+                                                    if editingMode{
+                                                        Image(systemName: "xmark")
+                                                    }
+                                                }.padding(.horizontal)
+                                            }
+                                        }).disabled(!editingMode).frame(height:30)
+                                    }
                                 }
-                            }.frame(height:30)
+                            }.frame(height:40)
+                            if showList {
+                                    List{
+                                        ForEach(filteredGenres, id: \.self) { genre in
+                                            Button(action: {
+                                                newGenre = genre // Auto-complete the text field with the selected genre
+                                            }) {
+                                                Text(genre).font(.system(size:15)).clipped()
+                                            }/*.listRowInsets(EdgeInsets(top:-20,leading:10,bottom:-20,trailing:10))*/
+                                        }
+                                    }.listStyle(.inset).padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0)).background(iconWhite).frame(height: showList ? 40 : 0)
+                                    
+                            }
                         }
-                    }.padding().background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
+                    }.padding(10).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
                 Spacer()
             }
+            .onChange(of: editingMode) {
+                newGenre = ""
+            }
             
-            
-        }.padding(.all, 20).background(lightWoodBrown).clipShape(RoundedRectangle(cornerRadius: 10)).padding(20)
+        }.padding(.all, 20).background(lightWoodBrown).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20).padding(.top,15).padding(.bottom,5)
         
     }
     

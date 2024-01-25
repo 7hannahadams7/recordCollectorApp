@@ -20,8 +20,14 @@ struct AddRecordView: View {
     @State private var editingMode: Bool = true
     @State private var newPhoto: Bool = false
     
+    @State private var showAlert: Bool = false
+    var isFormValid: Bool {
+        return !recordName.isEmpty && !artistName.isEmpty
+    }
+    
     @ObservedObject var genreManager = GenreManager()
     @State private var newGenre = ""
+    
     
     var ref: DatabaseReference! = Database.database().reference()
     
@@ -32,17 +38,21 @@ struct AddRecordView: View {
             VStack{
                 RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
                 
-                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear)
+                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
                 
                 Button(action:{
-                    viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
-
-                    presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
+                    if isFormValid{
+                        viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
+                        
+                        presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
+                    }else{
+                        showAlert = true
+                    }
                 }) {
                     
                     Text("Add Record").foregroundStyle(iconWhite)
 
-                }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                }                .padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
                 
                 Spacer()
                             

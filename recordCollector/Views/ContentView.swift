@@ -10,9 +10,8 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @State var selectedTab = 0
-//    @ObservedObject var statsViewModel: StatsViewModel
-//    @State private var s  let snapshot = try await ref.child("users/\(uid)/username").getData()
-//    let userName = snapshot.value as? String ?? "Unknown"electedTab = 0
+    
+    @State var genreManager = GenreManager()
     
     var body: some View {
         NavigationView{
@@ -22,7 +21,7 @@ struct ContentView: View {
                         Image(systemName:"house.fill")
                         Text("Home").bold()
                     }.tag(0)
-                    MyLibraryView(viewModel:viewModel).tabItem{
+                    MyLibraryView(viewModel:viewModel, genreManager:genreManager).tabItem{
                         Image(systemName:"filemenu.and.selection")
                         Text("My Library").bold()
                     }.tag(1)
@@ -40,9 +39,9 @@ struct ContentView: View {
                     HStack{
                         Spacer()
                         if selectedTab == 0 || selectedTab == 1{
-                            NavigationLink(destination: AddRecordView(viewModel:viewModel)) {
-                                Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
-                            }
+//                            NavigationLink(destination: AddRecordView(viewModel:viewModel)) {
+//                                Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
+//                            }
                         }
                     }.padding(.trailing,15)
                     Spacer()

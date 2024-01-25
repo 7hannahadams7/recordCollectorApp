@@ -222,35 +222,35 @@ import FirebaseStorage
 //    }
 //}
 
-struct GenreDisplayView: View{
-    @ObservedObject var genreManager: GenreManager
-    @Binding var displayOnly: Bool
-    
-    var body: some View{
-        GeometryReader{geometry in
-            ScrollView(.horizontal) {
-                HStack{
-                    ForEach(genreManager.genres.reversed(), id: \.self){genre in
-                        Button(action: {
-                            genreManager.removeGenre(genre)
-                        }, label: {
-                            ZStack{
-                                RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
-                                HStack{
-                                    Text(genre).font(.system(size:15))
-                                    if !displayOnly{
-                                        Image(systemName: "xmark")
-                                    }
-                                }.padding(.horizontal)
-                            }
-                        }).disabled(displayOnly)
-                    }
-                }
-            }.onAppear{
-                print(genreManager.genres)
-            }
-        }
-    }
-}
+//struct GenreDisplayView: View{
+//    @ObservedObject var genreManager: GenreManager
+//    @Binding var displayOnly: Bool
+//    
+//    var body: some View{
+//        GeometryReader{geometry in
+//            ScrollView(.horizontal) {
+//                HStack{
+//                    ForEach(genreManager.genres.reversed(), id: \.self){genre in
+//                        Button(action: {
+//                            genreManager.removeGenre(genre)
+//                        }, label: {
+//                            ZStack{
+//                                RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
+//                                HStack{
+//                                    Text(genre).font(.system(size:15))
+//                                    if !displayOnly{
+//                                        Image(systemName: "xmark")
+//                                    }
+//                                }.padding(.horizontal)
+//                            }
+//                        }).disabled(displayOnly)
+//                    }
+//                }
+//            }.onAppear{
+//                print(genreManager.genres)
+//            }
+//        }
+//    }
+//}
 
 

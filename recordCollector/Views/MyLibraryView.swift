@@ -12,7 +12,7 @@ struct MyLibraryView: View {
     @State private var sortingFactor: String = "Artist"
     @State private var sortingDirection: Bool = true
     
-    let genreManager = GenreManager()
+    var genreManager: GenreManager
     
     var body: some View {
         
@@ -96,7 +96,8 @@ struct PersonRowView: View {
 }
 
 struct MyLibraryView_Previews: PreviewProvider {
+
     static var previews: some View {
-        MyLibraryView(viewModel:LibraryViewModel())
+        MyLibraryView(viewModel:LibraryViewModel(), genreManager:GenreManager())
     }
 }

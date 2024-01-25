@@ -14,6 +14,8 @@ class LibraryViewModel: ObservableObject {
     @Published var recordLibrary = [RecordItem]()
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
+    @Published var fullGenres = Set<String>()
+    
     @Published var isImagePickerPresented: Bool = false
     @Published var capturedImage: UIImage? = nil
     
@@ -118,26 +120,20 @@ class LibraryViewModel: ObservableObject {
             }
         }
         
-        
     }
     
     func editRecordEntry(id: String,recordName: String? = nil, artistName: String? = nil, releaseYear: Int? = nil, newPhoto: Bool, genres: [String]? = nil){
-        print("Editing Entry: ", id, "NEW PHOTO? ", newPhoto)
+        print("Editing Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
-        
-        var recordItem = recordDictionaryByID[id]!
         
         // Re-value child elements
         if artistName != nil{
-//            recordItem.artist = artistName!
             ref.child("Records").child(id).child("artist").setValue(String(artistName!))
         }
         if artistName != nil{
-//            recordItem.name = recordName!
             ref.child("Records").child(id).child("name").setValue(String(recordName!))
         }
         if releaseYear != nil{
-//            recordItem.releaseYear = releaseYear!
             ref.child("Records").child(id).child("releaseYear").setValue(releaseYear!)
         }
         
@@ -168,14 +164,38 @@ class LibraryViewModel: ObservableObject {
         print("Updated Record, ID #: ", id)
     }
     
+    func deleteRecordEntry(id: String) async {
+        print("Deleting Entry: ", id)
+        let ref: DatabaseReference! = Database.database().reference()
+        let storageRef = Storage.storage().reference()
+        
+        // Create a reference to the file to delete
+        let imageRef = storageRef.child("recordImages").child(id + ".jpg")
+
+        do {
+          // Delete the file
+          try await imageRef.delete()
+        } catch {
+          print("No image file to delete from storage")
+        }
+        do{
+            try await ref.child("Records").child(id).removeValue()
+        } catch{
+            
+        }
+    }
+    
+    func deletePhotoFromStorage(id:String){
+        
+    }
+    
     
     // MARK: - Library Data Initializing (Fetching, Sorting, etc.)
     private func fetchData(completion: @escaping () -> Void){
         let allRecords = Database.database().reference().child("Records")
         let storageRef = Storage.storage().reference()
-//        print("View Model Completing Fetch...")
 
-        allRecords.observeSingleEvent(of: .value, with: { snapshot in
+        allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
             let dispatchGroup = DispatchGroup()
             for child in snapshot.children {
                 let snap = child as! DataSnapshot
@@ -193,6 +213,7 @@ class LibraryViewModel: ObservableObject {
                         // Check if the value is true
                         if value {
                             genres.append(genre)
+                            self.fullGenres.insert(genre)
                         }
                     }
                 }
@@ -264,60 +285,6 @@ class LibraryViewModel: ObservableObject {
         }
     }
     
-//    private func setupDatabaseListener() {
-//        let ref = Database.database().reference().child("Records")
-//
-//        // Set up an observer for the "Records" node
-//        ref.observe(.value) { [weak self] snapshot in
-//            guard let self = self else { return }
-//
-//            // Handle the change in data
-//            let elementDict = snapshot.value as! [String: Any]
-//
-//            let artist = elementDict["artist"] as! String
-//            let name = elementDict["name"] as! String
-//            let releaseYear = elementDict["releaseYear"] as! Int
-//
-//            var genres: [String] = []
-//
-//            // Check if "genres" key exists in the dictionary
-//            if let genresDict = elementDict["genres"] as? [String: Bool] {
-//                // Iterate through the keys of the genres dictionary
-//                for (genre, value) in genresDict {
-//                    // Check if the value is true
-//                    if value {
-//                        genres.append(genre)
-//                    }
-//                }
-//            }
-//
-////            if let im = elementDict["imageURL"] {
-////                let storageRef = Storage.storage().reference().child(im as! String)
-////                storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-////                    if error == nil, let data = data, let image = UIImage(data: data) {
-////                        DispatchQueue.main.async {
-////                            // Find the corresponding record in recordItems and update it
-////                            if let index = self.recordLibrary.firstIndex(where: { $0.id == snap.key }) {
-////                                self.recordLibrary[index] = RecordItem(id: snap.key, name: name, artist: artist, releaseYear: releaseYear, photo: image, genres: genres)
-////                            }
-////                        }
-////                    }
-////                }
-////            } else {
-////                DispatchQueue.main.async {
-////                    // Find the corresponding record in recordItems and update it
-////                    if let index = self.recordItems.firstIndex(where: { $0.id == snap.key }) {
-////                        self.recordItems[index] = RecordItem(id: snap.key, name: name, artist: artist, releaseYear: releaseYear, genres: genres)
-////                    }
-////                }
-////            }
-//        }
-//    }
-//
-//    // Call this method to set up the database listener (e.g., in your ViewModel's initializer)
-//    func startListening() {
-//        setupDatabaseListener()
-//    }
     
     
 }

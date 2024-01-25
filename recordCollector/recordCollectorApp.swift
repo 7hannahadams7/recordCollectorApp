@@ -29,12 +29,11 @@ struct test3App: App {
 //    
       @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    
+    var libraryViewModel = LibraryViewModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel:LibraryViewModel())
-//            DatabaseTesting()
+            ContentView(viewModel:libraryViewModel)
         }
     }
 }
