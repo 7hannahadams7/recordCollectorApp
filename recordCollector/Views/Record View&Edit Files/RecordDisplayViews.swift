@@ -25,7 +25,7 @@ struct RecordImageDisplayView: View{
                 viewModel.capturePhoto()
                 newPhoto = true
             }) {
-                // Show the photo capture screen
+                
                 ZStack{
                     RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
                     if let capturedImage = viewModel.capturedImage {
@@ -33,7 +33,7 @@ struct RecordImageDisplayView: View{
                         Image(uiImage: capturedImage)
                             .resizable()
                             .scaledToFill()
-                            .frame(width:200,height: 200).padding(.all,10).clipped()
+                            .frame(width:200,height: 200).clipped().padding(.all,10)
                     }else if record != nil{
                         Image(uiImage: record!.photo).resizable()
                                 .scaledToFill()

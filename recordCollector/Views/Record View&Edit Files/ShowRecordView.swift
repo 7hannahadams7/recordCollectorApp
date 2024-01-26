@@ -46,7 +46,7 @@ struct ShowRecordView: View {
                                 }){
                                     ZStack{
                                         Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
-                                        Image(systemName:"return").foregroundColor(decorBlack)
+                                        Image(systemName:"xmark").foregroundColor(decorBlack)
                                     }
                                 }
                                 Spacer()
@@ -103,8 +103,6 @@ struct ShowRecordView: View {
             }.onAppear {
                 //Initial set of genres list
                 genreManager.genres = record.genres
-            }.onDisappear{
-                viewModel.refreshData()
             }
         }.navigationBarBackButtonHidden(editingMode)
         

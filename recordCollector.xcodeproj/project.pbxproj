@@ -18,7 +18,6 @@
 		BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */; };
 		BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */; };
 		BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */; };
-		BB3BAD6E2B547A9F00A5397C /* DatabaseTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */; };
 		BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */; };
 		BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */; };
 		BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */; };
@@ -46,7 +45,6 @@
 		BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLibraryView.swift; sourceTree = "<group>"; };
 		BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
-		BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseTesting.swift; sourceTree = "<group>"; };
 		BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordDisplayViews.swift; sourceTree = "<group>"; };
 		BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStatsView.swift; sourceTree = "<group>"; };
@@ -149,11 +147,10 @@
 			isa = PBXGroup;
 			children = (
 				BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */,
-				BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */,
+				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
 				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
 				BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */,
-				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
 				BBF813362B52647C00654DAA /* Stats Page Files */,
 			);
 			path = Views;
@@ -310,7 +307,6 @@
 				BBDDD6872B6019E500584BA5 /* BubbleTestView.swift in Sources */,
 				BBF813382B53251E00654DAA /* DecadeViews.swift in Sources */,
 				BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */,
-				BB3BAD6E2B547A9F00A5397C /* DatabaseTesting.swift in Sources */,
 				BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */,
 				BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */,
 				BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */,

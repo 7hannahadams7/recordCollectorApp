@@ -60,7 +60,6 @@ struct AddRecordView: View {
             
         }.onDisappear(){
             viewModel.resetPhoto()
-            viewModel.refreshData()
         }
         .onAppear {
             UITableView.appearance().backgroundView = UIImageView(image: UIImage(named: "Page-Background"))
