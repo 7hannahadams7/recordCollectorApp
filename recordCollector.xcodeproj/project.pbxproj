@@ -26,6 +26,7 @@
 		BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */; };
 		BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */; };
 		BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */; };
+		BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D382B6831FD0075DA9F /* ViewManager.swift */; };
 		BBDDD6872B6019E500584BA5 /* BubbleTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDDD6862B6019E500584BA5 /* BubbleTestView.swift */; };
 		BBF813302B52266300654DAA /* GenericStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF8132F2B52266300654DAA /* GenericStatView.swift */; };
 		BBF813322B523F8C00654DAA /* GenreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF813312B523F8C00654DAA /* GenreViews.swift */; };
@@ -57,6 +58,7 @@
 		BBB8DE3F2B5036EE008D39E8 /* recordCollector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recordCollector.entitlements; sourceTree = "<group>"; };
 		BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddRecordView.swift; sourceTree = "<group>"; };
 		BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
+		BBD26D382B6831FD0075DA9F /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		BBDDD6862B6019E500584BA5 /* BubbleTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleTestView.swift; sourceTree = "<group>"; };
 		BBF8132F2B52266300654DAA /* GenericStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericStatView.swift; sourceTree = "<group>"; };
 		BBF813312B523F8C00654DAA /* GenreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreViews.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				BBB8DE402B503951008D39E8 /* Views */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
 				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
+				BBD26D382B6831FD0075DA9F /* ViewManager.swift */,
 				BBF813352B52645200654DAA /* ARCHIVE */,
 				BB2FEF8C2B4C56F200F0DFBB /* Assets.xcassets */,
 				BB2FEF912B4C56F200F0DFBB /* Info.plist */,
@@ -320,6 +323,7 @@
 			files = (
 				BBF813342B523FCC00654DAA /* ArtistViews.swift in Sources */,
 				BBDDD6872B6019E500584BA5 /* BubbleTestView.swift in Sources */,
+				BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */,
 				BBF813382B53251E00654DAA /* DecadeViews.swift in Sources */,
 				BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */,
 				BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */,

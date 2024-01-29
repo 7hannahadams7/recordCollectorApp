@@ -21,7 +21,6 @@ struct RecordImageDisplayView: View{
     
     @State private var selectedSourceType: ImagePicker.SourceType? = .camera
     @State private var isPhotoSourcePopupPresented: Bool = false
-    @State private var lpCoverSelector: String = "LP"
     
     @State private var lpOffset: CGFloat = 0.0
     @State private var dragging = false
@@ -31,20 +30,20 @@ struct RecordImageDisplayView: View{
             ZStack{
                 // Cover Photo Change Button
                 Button(action:{
-                    lpCoverSelector = "Cover"
+                    viewModel.whichPhoto = "Cover"
                     isPhotoSourcePopupPresented.toggle()
                     newPhoto = true
                 }) {
                     ZStack{
                         RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                        if let capturedImage = viewModel.capturedImage {
+                        if let capturedImage = viewModel.capturedCoverImage {
                             // If photo captured, show
                             Image(uiImage: capturedImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width:150,height: 150).clipped().padding(.all,10)
                         }else if record != nil{
-                            Image(uiImage: record!.photo).resizable()
+                            Image(uiImage: record!.coverPhoto).resizable()
                                 .scaledToFill()
                                 .frame(width:150,height: 150).clipped().padding(.all,10)
                         } else{
@@ -58,20 +57,20 @@ struct RecordImageDisplayView: View{
                 
                 // Disc Photo Change Button
                 Button(action:{
-                    lpCoverSelector = "LP"
+                    viewModel.whichPhoto = "LP"
                     isPhotoSourcePopupPresented.toggle()
                     newPhoto = true
                 }) {
                     ZStack{
                         Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
-                        if let capturedImage = viewModel.capturedImage {
+                        if let capturedImage = viewModel.capturedLPImage {
                             // If photo captured, show
                             Image(uiImage: capturedImage)
                                 .resizable()
                                 .scaledToFill()
                                 .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:100,height: 100).clipped().padding(.all,10)
                         }else if record != nil{
-                            Image(uiImage: record!.photo).resizable()
+                            Image(uiImage: record!.discPhoto).resizable()
                                 .scaledToFill()
                                 .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:100,height: 100).clipped().padding(.all,10)
                         } else{
@@ -86,7 +85,8 @@ struct RecordImageDisplayView: View{
                 
             }.frame(width:screenWidth,height:200)
                 .popover(isPresented: $isPhotoSourcePopupPresented, arrowEdge: .bottom) {
-                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented:$isPhotoSourcePopupPresented) {
+                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented: $isPhotoSourcePopupPresented,
+                          newPhoto: $newPhoto) {
                         selectedSourceType = .photoLibrary
                         isPhotoSourcePopupPresented.toggle()
                         viewModel.capturePhoto()
@@ -94,7 +94,7 @@ struct RecordImageDisplayView: View{
                         selectedSourceType = .camera
                         isPhotoSourcePopupPresented.toggle()
                         viewModel.capturePhoto()
-                    }.background(Color.clear)
+                    }
                 }
                 .sheet(isPresented: $viewModel.isImagePickerPresented) {
                     ImagePicker(isPresented: $viewModel.isImagePickerPresented, imageCallback: viewModel.imagePickerCallback, sourceType: selectedSourceType!)
@@ -105,14 +105,14 @@ struct RecordImageDisplayView: View{
                 // Disc Photo Change Button
                     ZStack{
                         Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
-                        if let capturedImage = viewModel.capturedImage {
+                        if let capturedImage = viewModel.capturedCoverImage {
                             // If photo captured, show
                             Image(uiImage: capturedImage)
                                 .resizable()
                                 .scaledToFill()
                                 .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:190,height: 190).clipped().padding(.all,10)
                         }else if record != nil{
-                            Image(uiImage: record!.photo).resizable()
+                            Image(uiImage: record!.discPhoto).resizable()
                                 .scaledToFill()
                                 .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:190,height: 190).clipped().padding(.all,10)
                         } else{
@@ -128,14 +128,14 @@ struct RecordImageDisplayView: View{
                 // Cover Photo Change Button
                     ZStack{
                         RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                        if let capturedImage = viewModel.capturedImage {
+                        if let capturedImage = viewModel.capturedLPImage {
                             // If photo captured, show
                             Image(uiImage: capturedImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width:200,height: 200).clipped().padding(.all,10)
                         }else if record != nil{
-                            Image(uiImage: record!.photo).resizable()
+                            Image(uiImage: record!.coverPhoto).resizable()
                                 .scaledToFill()
                                 .frame(width:200,height: 200).clipped().padding(.all,10)
                         } else{

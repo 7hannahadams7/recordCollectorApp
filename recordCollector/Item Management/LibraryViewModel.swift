@@ -19,7 +19,10 @@ class LibraryViewModel: ObservableObject {
     @Published var fullGenres = Set<String>()
     
     @Published var isImagePickerPresented: Bool = false
-    @Published var capturedImage: UIImage? = nil
+    @Published var capturedCoverImage: UIImage? = nil
+    @Published var capturedLPImage: UIImage? = nil
+    
+    @Published var whichPhoto: String = "Cover"
     
     @Published var sortingFactor: SortingFactor = .artist {
         didSet {
@@ -38,7 +41,8 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Photo Actions
     func resetPhoto(){
         print("Resetting Captured Photo")
-        capturedImage = nil
+        capturedLPImage = nil
+        capturedCoverImage = nil
     }
     
     func capturePhoto() {
@@ -47,7 +51,11 @@ class LibraryViewModel: ObservableObject {
     }
 
     func imagePickerCallback(image: UIImage?) {
-        capturedImage = image
+        if whichPhoto == "Cover"{
+            capturedCoverImage = image
+        }else{
+            capturedLPImage = image
+        }
         isImagePickerPresented = false
     }
     
@@ -74,23 +82,24 @@ class LibraryViewModel: ObservableObject {
         addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres)
 
         // Attempt photo upload, will handle adding to db if photo available
-        uploadPhoto(id: id, image: self.capturedImage)
+        uploadPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
+        uploadPhoto(id: id, image: self.capturedLPImage,type:"Disc")
         
         print("Added New Record, ID #: ", id)
         
     }
     
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, photo: UIImage? = UIImage(named:"TakePhoto"),genres:[String]) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String]) {
         // Add New Instance of Record Data to Local Library
         
-        let newItem = RecordItem(id: id, name: name, artist: artist, photo:photo!, releaseYear: releaseYear,genres:genres)
+        let newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres)
         
         // Add to array for library sorting, add to dictionary for fetching
         recordLibrary.append(newItem)
         recordDictionaryByID[id] = newItem
     }
     
-    func uploadPhoto(id: String, image: UIImage?) -> Void{
+    func uploadPhoto(id: String, image: UIImage?, type: String) -> Void{
         print("Attempting Image Upload")
         let ref: DatabaseReference! = Database.database().reference()
         
@@ -103,8 +112,13 @@ class LibraryViewModel: ObservableObject {
         // Replace image of current item in local library
         if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
             // Forced unwrap because checked image wasn't nil
-            self.recordLibrary[recordIndex].photo = image!
-            self.recordDictionaryByID[id]?.photo = image!
+            if type == "Cover"{
+                self.recordLibrary[recordIndex].coverPhoto = image!
+                self.recordDictionaryByID[id]?.coverPhoto = image!
+            }else{
+                self.recordLibrary[recordIndex].discPhoto = image!
+                self.recordDictionaryByID[id]?.discPhoto = image!
+            }
         }
         
         // Create storage reference
@@ -120,7 +134,12 @@ class LibraryViewModel: ObservableObject {
         }
         
         // Specify the file path and name
-        let path = "recordImages/" + id + ".jpg"
+        var path = ""
+        if type == "Cover"{
+            path = "recordImages/" + id + ".jpg"
+        }else{
+            path = "discImages/" + id + ".jpg"
+        }
         let fileRef = storageRef.child(path)
         
         // Upload data
@@ -130,7 +149,11 @@ class LibraryViewModel: ObservableObject {
             // Check no errors
             if error == nil && metadata != nil{
                 // Add URL to DB entry
-                ref.child("Records").child(id).child("imageURL").setValue(path)
+                if type == "Cover"{
+                    ref.child("Records").child(id).child("imageURL").setValue(path)
+                }else{
+                    ref.child("Records").child(id).child("discImageURL").setValue(path)
+                }
                 print("Image Upload Successful, ID #: ", id)
                 
             }else{
@@ -173,7 +196,8 @@ class LibraryViewModel: ObservableObject {
         
         // Attempt to upload photo if new photo available, uploadPhoto adds the photo to the database if possible
         if newPhoto{
-            self.uploadPhoto(id: id, image: self.capturedImage)
+            uploadPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
+            uploadPhoto(id: id, image: self.capturedLPImage,type:"Disc")
         }
         
         
@@ -214,7 +238,8 @@ class LibraryViewModel: ObservableObject {
         let storageRef = Storage.storage().reference()
         
         // Create a reference to the file to delete
-        let imageRef = storageRef.child("recordImages").child(id + ".jpg")
+        let coverImageRef = storageRef.child("recordImages").child(id + ".jpg")
+        let discImageRef = storageRef.child("discImages").child(id + ".jpg")
         
         // Remove from local library
         if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
@@ -223,8 +248,9 @@ class LibraryViewModel: ObservableObject {
         }
 
         do {
-          // Delete the file
-          try await imageRef.delete()
+          // Delete the files
+            try await coverImageRef.delete()
+            try await discImageRef.delete()
         } catch {
           print("No image file to delete from storage")
         }
@@ -237,69 +263,78 @@ class LibraryViewModel: ObservableObject {
     
     
     // MARK: - Library Data Initializing (Fetching, Sorting, etc.)
-    private func fetchData(completion: @escaping () -> Void){
+    private func fetchData(completion: @escaping () -> Void) {
         let allRecords = Database.database().reference().child("Records")
         let storageRef = Storage.storage().reference()
 
         allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
             let dispatchGroup = DispatchGroup()
+
             for child in snapshot.children {
                 let snap = child as! DataSnapshot
                 let elementDict = snap.value as! [String: Any]
-                
+
                 let artist = elementDict["artist"]
                 let name = elementDict["name"]
                 let releaseYear = elementDict["releaseYear"]
-                
+
+                var coverPhoto: UIImage?
+                var discPhoto: UIImage?
+
                 var genres: [String] = []
-                // Check if "genres" key exists in the dictionary
+
                 if let genresDict = elementDict["genres"] as? [String: Bool] {
-                    // Iterate through the keys of the genres dictionary
                     for (genre, value) in genresDict {
-                        // Check if the value is true
                         if value {
                             genres.append(genre)
                             self.fullGenres.insert(genre)
                         }
                     }
                 }
-                
-                
-                if let im = elementDict["imageURL"]{
+
+                if let im = elementDict["imageURL"] {
                     let fileRef = storageRef.child(im as! String)
+                    dispatchGroup.enter()
                     fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
-                        if error == nil && data != nil{
-                            let image = UIImage(data: data!)
-                            print("Storing with image")
-                            DispatchQueue.main.async{
-                                self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, photo: image!, genres:genres)
-                            }
-                        }else{
-                            print("Error on image fetch - storing without image")
-                            DispatchQueue.main.async{
-                                self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int,genres:genres)
-                                print("Fetch Complete - 2")
-                            }
+                        if error == nil, let data = data {
+                            coverPhoto = UIImage(data: data)
                         }
                         dispatchGroup.leave()
                     })
-                }else{
-                    print("Storing without image (No image available)")
-                    DispatchQueue.main.async{
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int,genres:genres)
-                        dispatchGroup.leave()
-                    }
-                    
                 }
-                dispatchGroup.enter()
+
+                if let im = elementDict["discImageURL"] {
+                    let fileRef = storageRef.child(im as! String)
+                    dispatchGroup.enter()
+                    fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
+                        if error == nil, let data = data {
+                            discPhoto = UIImage(data: data)
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+
+                dispatchGroup.notify(queue: .main) {
+                    print("IN QUEUE")
+                    if let discPhoto = discPhoto, let coverPhoto = coverPhoto {
+                        print("Adding both")
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres)
+                    } else if let discPhoto = discPhoto {
+                        print("Adding disc")
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, discPhoto: discPhoto, genres: genres)
+                    } else if let coverPhoto = coverPhoto {
+                        print("Adding cover")
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, genres: genres)
+                    } else {
+                        print("No Photo")
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, genres: genres)
+                    }
+                    completion()
+                }
             }
-            dispatchGroup.notify(queue: .main) {
-                 // Call the completion block once all data is processed
-                 completion()
-             }
         })
-        
     }
+
     
     private func sortRecords() {
         // Sorting of local library
@@ -353,7 +388,7 @@ class LibraryViewModel: ObservableObject {
     
     func fetchPhotoByID(id: String) -> UIImage? {
         if let recordItem = recordDictionaryByID[id] {
-            return recordItem.photo
+            return recordItem.coverPhoto
         }
         print("Couldn't find id in dictionary")
         return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
