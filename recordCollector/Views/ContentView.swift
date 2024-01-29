@@ -38,10 +38,10 @@ struct ContentView: View {
                 VStack{
                     HStack{
                         Spacer()
-                        if selectedTab == 0 || selectedTab == 1{
-//                            NavigationLink(destination: AddRecordView(viewModel:viewModel)) {
-//                                Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
-//                            }
+                        if selectedTab == 0{
+                            NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:genreManager)) {
+                                Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
+                            }
                         }
                     }.padding(.trailing,15)
                     Spacer()
@@ -49,6 +49,9 @@ struct ContentView: View {
             }
             
             
+        }
+        .onAppear(){
+            viewModel.refreshData()
         }
     }
 }

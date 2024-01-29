@@ -11,6 +11,8 @@ import FirebaseStorage
 
 struct ShowRecordView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject private var keyboard = KeyboardResponder()
+    
     @State private var recordName = ""
     @State private var artistName = ""
     var record: RecordItem
@@ -103,9 +105,9 @@ struct ShowRecordView: View {
             }.onAppear {
                 //Initial set of genres list
                 genreManager.genres = record.genres
-            }
+            }.padding(.bottom, keyboard.currentHeight/2)
         }.navigationBarBackButtonHidden(editingMode)
-        
+            
     }
     
     

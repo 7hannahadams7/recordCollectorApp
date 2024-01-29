@@ -20,7 +20,7 @@ struct HomePageView: View {
     @State private var isAddItemSheetPresented = false
 
     var body: some View {
-
+        
             //Background Decor
             ZStack{
                 

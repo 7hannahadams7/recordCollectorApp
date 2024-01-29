@@ -24,19 +24,26 @@ struct MyLibraryView: View {
             }
         }
         var sortingHeaders: [String]{
-            var returning: [String] = []
             if sortingFactor == "Artist"{
-                returning = viewModel.sortingElementHeaders.artist
+                if sortingDirection{
+                    return viewModel.sortingElementHeaders.artist
+                }else{
+                    return viewModel.sortingElementHeaders.artist.reversed()
+                }
             }else if sortingFactor == "Album"{
-                returning = viewModel.sortingElementHeaders.album
+                if sortingDirection{
+                    return viewModel.sortingElementHeaders.album
+                }else{
+                    return viewModel.sortingElementHeaders.album.reversed()
+                }
             }else if sortingFactor == "Release Year"{
-                returning = viewModel.sortingElementHeaders.releaseYear
+                if sortingDirection{
+                    return viewModel.sortingElementHeaders.releaseYear
+                }else{
+                    return viewModel.sortingElementHeaders.releaseYear.reversed()
+                }
             }
-            if sortingDirection{
-                return returning
-            }else{
-                return returning.reversed()
-            }
+            return []
         }
         
         NavigationView{
@@ -47,6 +54,7 @@ struct MyLibraryView: View {
                     Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
                 }.ignoresSafeArea()
                 
+                // Library Layout
                 VStack(spacing:5){
                     
                     //Sorting Buttons and Top Bar
@@ -64,7 +72,9 @@ struct MyLibraryView: View {
                         } label: {
                             Image("SortBy").resizable().aspectRatio(contentMode: .fit)
                         }.frame(height:30)
-                        Button(action:{sortingDirection.toggle()}){
+                        Button(action:{
+                            sortingDirection.toggle()
+                        }){
                             Text(sortingFactor).bold().foregroundStyle(recordBlack)
                             if sortingDirection{
                                 Image(systemName:"chevron.down").foregroundStyle(recordBlack)
@@ -106,26 +116,25 @@ struct MyLibraryView: View {
                     }.listStyle(.inset).cornerRadius(10).padding(5)
                     
                 }.padding().padding(.top,35)
+                
+                //Add New Button
+                VStack{
+                    HStack{
+                        Spacer()
+                        NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:genreManager)) {
+                            Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
+                        }
+                    }.padding(.trailing,15)
+                    Spacer()
+                }
             }
+            
         }
-        .onAppear{
-            viewModel.refreshData()
-        }
+//        .onAppear{
+//            viewModel.refreshData()
+//        }
     }
     
-    private func sectionHeader(for record: RecordItem) -> String {
-        // Provide logic to determine the section header based on the sorting factor
-        switch viewModel.sortingFactor {
-        case .artist:
-            return String(record.artist.prefix(1)).uppercased()
-        case .releaseYear:
-            // Example: Group by decade
-            return "\(record.releaseYear / 10)0s"
-        case .album:
-            // Example: Group by the first letter of the album name
-            return String(record.name.prefix(1)).uppercased()
-        }
-    }
 }
 
 struct PersonRowView: View {

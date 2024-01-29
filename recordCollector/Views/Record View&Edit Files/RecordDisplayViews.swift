@@ -19,10 +19,13 @@ struct RecordImageDisplayView: View{
     
     @Binding var editingMode: Bool
     
+    @State private var selectedSourceType: ImagePicker.SourceType? = .camera
+    @State private var isPhotoSourcePopupPresented: Bool = false
+    
     var body: some View{
         ZStack{
             Button(action:{
-                viewModel.capturePhoto()
+                isPhotoSourcePopupPresented.toggle()
                 newPhoto = true
             }) {
                 
@@ -48,8 +51,19 @@ struct RecordImageDisplayView: View{
                 
                 
             }.disabled(!editingMode)
+                .popover(isPresented: $isPhotoSourcePopupPresented, arrowEdge: .bottom) {
+                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented:$isPhotoSourcePopupPresented) {
+                                    selectedSourceType = .photoLibrary
+                                    isPhotoSourcePopupPresented.toggle()
+                                    viewModel.capturePhoto()
+                                } onCameraSelected: {
+                                    selectedSourceType = .camera
+                                    isPhotoSourcePopupPresented.toggle()
+                                    viewModel.capturePhoto()
+                                }.background(Color.clear)
+                }
                 .sheet(isPresented: $viewModel.isImagePickerPresented) {
-                    ImagePicker(isPresented: $viewModel.isImagePickerPresented, imageCallback: viewModel.imagePickerCallback)
+                    ImagePicker(isPresented: $viewModel.isImagePickerPresented, imageCallback: viewModel.imagePickerCallback, sourceType: selectedSourceType!)
                 }
                 .onTapGesture {
                     print("Tapped Button")
@@ -77,11 +91,20 @@ struct RecordFieldDisplayView: View{
     @Binding var showAlert: Bool
     
     var showList: Bool {
-        return !newGenre.isEmpty
+        // Show genre options to choose from if user is typing and there are genres available
+        return !newGenre.isEmpty && !filteredGenres.isEmpty
     }
     
     var filteredGenres: [String] {
-        return viewModel.fullGenres.filter { $0.lowercased().contains(newGenre.lowercased()) }
+        // Filter previous genres to include only those with words that start with text input and that aren't already included in genre list for current item
+        let lowercasedInput = newGenre.lowercased()
+
+        return viewModel.fullGenres
+            .filter { genre in
+                let words = genre.lowercased().components(separatedBy: " ")
+                return words.contains { $0.hasPrefix(lowercasedInput) }
+            }
+            .filter { !genreManager.genres.contains($0) }
     }
     
     var body: some View{
@@ -160,7 +183,6 @@ struct RecordFieldDisplayView: View{
                                 ZStack(alignment: .trailing){
                                     TextField("Genre", text: $newGenre).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                                     Button(action: {
-                                        print(filteredGenres)
                                         newGenre = ""
                                     }){
                                         Image(systemName: "xmark").foregroundStyle(decorWhite).padding()
@@ -196,17 +218,19 @@ struct RecordFieldDisplayView: View{
                                         }).disabled(!editingMode).frame(height:30)
                                     }
                                 }
-                            }.frame(height:40)
+                            }.frame(height:50)
                             if showList {
                                     List{
                                         ForEach(filteredGenres, id: \.self) { genre in
                                             Button(action: {
                                                 newGenre = genre // Auto-complete the text field with the selected genre
+                                                genreManager.addGenre(newGenre)
+                                                newGenre = ""
                                             }) {
                                                 Text(genre).font(.system(size:15)).clipped()
                                             }/*.listRowInsets(EdgeInsets(top:-20,leading:10,bottom:-20,trailing:10))*/
                                         }
-                                    }.listStyle(.inset).padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0)).background(iconWhite).frame(height: showList ? 40 : 0)
+                                    }.listStyle(.inset)/*.padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0))*/.background(iconWhite).frame(height: showList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
                                     
                             }
                         }
@@ -231,7 +255,9 @@ class GenreManager: ObservableObject {
     }
     
     func addGenre(_ genre: String) {
-        genres.append(genre)
+        if !(genres.contains(genre)){
+            genres.append(genre)
+        }
     }
 
     func removeGenre(_ genre: String) {

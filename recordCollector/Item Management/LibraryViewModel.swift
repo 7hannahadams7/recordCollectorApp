@@ -27,6 +27,7 @@ class LibraryViewModel: ObservableObject {
         }
     }
     
+    
     enum SortingFactor: String, CaseIterable {
 //        case dateAdded = "Date Added"
         case artist = "Artist"

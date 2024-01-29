@@ -18,7 +18,10 @@
 		BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */; };
 		BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */; };
 		BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */; };
+		BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */; };
 		BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */; };
+		BB9C009C2B659AC100CF02B4 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */; };
+		BB9C009F2B659D7200CF02B4 /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = BB9C009E2B659D7200CF02B4 /* SpotifyiOS */; };
 		BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */; };
 		BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */; };
 		BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */; };
@@ -45,7 +48,10 @@
 		BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLibraryView.swift; sourceTree = "<group>"; };
 		BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		BB8BACBE2B6568DF0015DBD9 /* recordCollector-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "recordCollector-Bridging-Header.h"; sourceTree = "<group>"; };
+		BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordDisplayViews.swift; sourceTree = "<group>"; };
+		BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStatsView.swift; sourceTree = "<group>"; };
 		BBB8DE3F2B5036EE008D39E8 /* recordCollector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recordCollector.entitlements; sourceTree = "<group>"; };
@@ -67,6 +73,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				94CCA83492A5AA9E66882AA2 /* Pods_recordCollector.framework in Frameworks */,
+				BB9C009F2B659D7200CF02B4 /* SpotifyiOS in Frameworks */,
+				BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				E0016FBBEB17030B8446C423 /* Pods_recordCollector.framework */,
+				BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -103,6 +112,7 @@
 		BB2FEF7C2B4C56EC00F0DFBB = {
 			isa = PBXGroup;
 			children = (
+				BB8BACBE2B6568DF0015DBD9 /* recordCollector-Bridging-Header.h */,
 				BB2FEF872B4C56EC00F0DFBB /* recordCollector */,
 				BB2FEF862B4C56EC00F0DFBB /* Products */,
 				053A922BE5D8E7E17E98E75B /* Pods */,
@@ -122,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */,
+				BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */,
 				BBB8DE402B503951008D39E8 /* Views */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
 				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
@@ -204,6 +215,9 @@
 			dependencies = (
 			);
 			name = recordCollector;
+			packageProductDependencies = (
+				BB9C009E2B659D7200CF02B4 /* SpotifyiOS */,
+			);
 			productName = test3;
 			productReference = BB2FEF852B4C56EC00F0DFBB /* recordCollector.app */;
 			productType = "com.apple.product-type.application";
@@ -233,6 +247,7 @@
 			mainGroup = BB2FEF7C2B4C56EC00F0DFBB;
 			packageReferences = (
 				BBF8133B2B5448D300654DAA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */,
 			);
 			productRefGroup = BB2FEF862B4C56EC00F0DFBB /* Products */;
 			projectDirPath = "";
@@ -317,6 +332,7 @@
 				BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */,
 				BBF813322B523F8C00654DAA /* GenreViews.swift in Sources */,
 				BB2FEF9C2B4C575100F0DFBB /* LibraryViewModel.swift in Sources */,
+				BB9C009C2B659AC100CF02B4 /* SpotifyController.swift in Sources */,
 				BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */,
 				BBF813302B52266300654DAA /* GenericStatView.swift in Sources */,
 				BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */,
@@ -450,18 +466,72 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = recordCollector/recordCollector.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"recordCollector/Preview Content\"";
 				DEVELOPMENT_TEAM = UB96HSGRNN;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = recordCollector/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"icucore\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"FirebaseAppCheckInterop\"",
+					"-framework",
+					"\"FirebaseAuth\"",
+					"-framework",
+					"\"FirebaseAuthInterop\"",
+					"-framework",
+					"\"FirebaseCore\"",
+					"-framework",
+					"\"FirebaseCoreExtension\"",
+					"-framework",
+					"\"FirebaseCoreInternal\"",
+					"-framework",
+					"\"FirebaseDatabase\"",
+					"-framework",
+					"\"FirebaseSharedSwift\"",
+					"-framework",
+					"\"FirebaseStorage\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"RecaptchaInterop\"",
+					"-framework",
+					"\"SafariServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"leveldb\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = hannah.recordCollector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "recordCollector-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -474,18 +544,72 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = recordCollector/recordCollector.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"recordCollector/Preview Content\"";
 				DEVELOPMENT_TEAM = UB96HSGRNN;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = recordCollector/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"icucore\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"FirebaseAppCheckInterop\"",
+					"-framework",
+					"\"FirebaseAuth\"",
+					"-framework",
+					"\"FirebaseAuthInterop\"",
+					"-framework",
+					"\"FirebaseCore\"",
+					"-framework",
+					"\"FirebaseCoreExtension\"",
+					"-framework",
+					"\"FirebaseCoreInternal\"",
+					"-framework",
+					"\"FirebaseDatabase\"",
+					"-framework",
+					"\"FirebaseSharedSwift\"",
+					"-framework",
+					"\"FirebaseStorage\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"RecaptchaInterop\"",
+					"-framework",
+					"\"SafariServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"leveldb\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = hannah.recordCollector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "recordCollector-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -515,6 +639,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spotify/ios-sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		BBF8133B2B5448D300654DAA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -524,6 +656,14 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB9C009E2B659D7200CF02B4 /* SpotifyiOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */;
+			productName = SpotifyiOS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BB2FEF7D2B4C56EC00F0DFBB /* Project object */;
 }

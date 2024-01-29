@@ -11,6 +11,8 @@ import FirebaseStorage
 
 struct AddRecordView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject private var keyboard = KeyboardResponder()
+    
     @State private var recordName = ""
     @State private var artistName = ""
     @State private var releaseYear: Int = 2024
@@ -25,7 +27,8 @@ struct AddRecordView: View {
         return !recordName.isEmpty && !artistName.isEmpty
     }
     
-    @ObservedObject var genreManager = GenreManager()
+    @ObservedObject var genreManager: GenreManager
+    
     @State private var newGenre = ""
     
     
@@ -33,37 +36,37 @@ struct AddRecordView: View {
     
     var body: some View {
         
-        ZStack(alignment:.center) {
-            Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
-            VStack{
-                RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
-                
-                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
-                
-                Button(action:{
-                    if isFormValid{
-                        viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
-                        
-                        presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
-                    }else{
-                        showAlert = true
-                    }
-                }) {
+            ZStack(alignment:.center) {
+                Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
+                VStack{
+                    RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode).padding(.top, 65)
                     
-                    Text("Add Record").foregroundStyle(iconWhite)
-
-                }                .padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                
-                Spacer()
+                    RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                    
+                    Button(action:{
+                        if isFormValid{
+                            viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
                             
+                            presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
+                        }else{
+                            showAlert = true
+                        }
+                    }) {
+                        
+                        Text("Add Record").foregroundStyle(iconWhite)
+                        
+                    }                .padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                    
+                    Spacer()
+                    
+                }
+                
+            }.onDisappear(){
+                viewModel.resetPhoto()
             }
-            
-        }.onDisappear(){
-            viewModel.resetPhoto()
-        }
-        .onAppear {
-            UITableView.appearance().backgroundView = UIImageView(image: UIImage(named: "Page-Background"))
-        }
+            .onAppear {
+                UITableView.appearance().backgroundView = UIImageView(image: UIImage(named: "Page-Background"))
+            }.padding(.bottom, keyboard.currentHeight/2)
         
     }
     
@@ -73,7 +76,7 @@ struct AddRecordView: View {
 
 struct AddRecordViewPageView_Previews: PreviewProvider {
     static var previews: some View {
-        AddRecordView(viewModel:LibraryViewModel())
+        AddRecordView(viewModel:LibraryViewModel(),genreManager:GenreManager())
     }
 }
 
