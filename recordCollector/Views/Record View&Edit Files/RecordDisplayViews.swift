@@ -21,55 +21,153 @@ struct RecordImageDisplayView: View{
     
     @State private var selectedSourceType: ImagePicker.SourceType? = .camera
     @State private var isPhotoSourcePopupPresented: Bool = false
+    @State private var lpCoverSelector: String = "LP"
+    
+    @State private var lpOffset: CGFloat = 0.0
+    @State private var dragging = false
     
     var body: some View{
-        ZStack{
-            Button(action:{
-                isPhotoSourcePopupPresented.toggle()
-                newPhoto = true
-            }) {
-                
-                ZStack{
-                    RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                    if let capturedImage = viewModel.capturedImage {
-                        // If photo captured, show
-                        Image(uiImage: capturedImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width:200,height: 200).clipped().padding(.all,10)
-                    }else if record != nil{
-                        Image(uiImage: record!.photo).resizable()
+        if editingMode{
+            ZStack{
+                // Cover Photo Change Button
+                Button(action:{
+                    lpCoverSelector = "Cover"
+                    isPhotoSourcePopupPresented.toggle()
+                    newPhoto = true
+                }) {
+                    ZStack{
+                        RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
+                        if let capturedImage = viewModel.capturedImage {
+                            // If photo captured, show
+                            Image(uiImage: capturedImage)
+                                .resizable()
                                 .scaledToFill()
-                                .frame(width:200,height: 200).clipped().padding(.all,10)
-                    } else{
-                        Image("TakePhoto")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width:200,height: 200).clipped().padding(.all,10)
+                                .frame(width:150,height: 150).clipped().padding(.all,10)
+                        }else if record != nil{
+                            Image(uiImage: record!.photo).resizable()
+                                .scaledToFill()
+                                .frame(width:150,height: 150).clipped().padding(.all,10)
+                        } else{
+                            Image("TakePhoto")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width:150,height: 150).clipped().padding(.all,10)
+                        }
                     }
-                }.frame(width:200,height: 200)
+                }.frame(width:150,height: 150).offset(x:-10,y:-10)
                 
+                // Disc Photo Change Button
+                Button(action:{
+                    lpCoverSelector = "LP"
+                    isPhotoSourcePopupPresented.toggle()
+                    newPhoto = true
+                }) {
+                    ZStack{
+                        Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
+                        if let capturedImage = viewModel.capturedImage {
+                            // If photo captured, show
+                            Image(uiImage: capturedImage)
+                                .resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:100,height: 100).clipped().padding(.all,10)
+                        }else if record != nil{
+                            Image(uiImage: record!.photo).resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:100,height: 100).clipped().padding(.all,10)
+                        } else{
+                            Image("TakePhoto")
+                                .resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:100,height: 100).padding(.all,10)
+                        }
+                        
+                    }
+                }.frame(width:100,height:100).offset(x:50,y: 50)
                 
-            }.disabled(!editingMode)
+            }.frame(width:screenWidth,height:200)
                 .popover(isPresented: $isPhotoSourcePopupPresented, arrowEdge: .bottom) {
                     PhotoSourceSelectionPopup(isPhotoSourcePopupPresented:$isPhotoSourcePopupPresented) {
-                                    selectedSourceType = .photoLibrary
-                                    isPhotoSourcePopupPresented.toggle()
-                                    viewModel.capturePhoto()
-                                } onCameraSelected: {
-                                    selectedSourceType = .camera
-                                    isPhotoSourcePopupPresented.toggle()
-                                    viewModel.capturePhoto()
-                                }.background(Color.clear)
+                        selectedSourceType = .photoLibrary
+                        isPhotoSourcePopupPresented.toggle()
+                        viewModel.capturePhoto()
+                    } onCameraSelected: {
+                        selectedSourceType = .camera
+                        isPhotoSourcePopupPresented.toggle()
+                        viewModel.capturePhoto()
+                    }.background(Color.clear)
                 }
                 .sheet(isPresented: $viewModel.isImagePickerPresented) {
                     ImagePicker(isPresented: $viewModel.isImagePickerPresented, imageCallback: viewModel.imagePickerCallback, sourceType: selectedSourceType!)
                 }
-                .onTapGesture {
-                    print("Tapped Button")
-                    print("Button Enabled? ", editingMode)
-                }
-            
+        }else{
+            // Display images with swipe view capability, no button function
+            ZStack{
+                // Disc Photo Change Button
+                    ZStack{
+                        Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
+                        if let capturedImage = viewModel.capturedImage {
+                            // If photo captured, show
+                            Image(uiImage: capturedImage)
+                                .resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:190,height: 190).clipped().padding(.all,10)
+                        }else if record != nil{
+                            Image(uiImage: record!.photo).resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:190,height: 190).clipped().padding(.all,10)
+                        } else{
+                            Image("TakePhoto")
+                                .resizable()
+                                .scaledToFill()
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:190,height: 190).padding(.all,10)
+                        }
+                        
+                    }.frame(width:190,height:190).offset(x:lpOffset+25.0)
+                    .disabled(!editingMode && !dragging)
+                
+                // Cover Photo Change Button
+                    ZStack{
+                        RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
+                        if let capturedImage = viewModel.capturedImage {
+                            // If photo captured, show
+                            Image(uiImage: capturedImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width:200,height: 200).clipped().padding(.all,10)
+                        }else if record != nil{
+                            Image(uiImage: record!.photo).resizable()
+                                .scaledToFill()
+                                .frame(width:200,height: 200).clipped().padding(.all,10)
+                        } else{
+                            Image("TakePhoto")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width:200,height: 200).clipped().padding(.all,10)
+                        }
+                }.frame(width:200,height: 200).offset(x: -lpOffset)
+                    .disabled(!editingMode && !dragging)
+                
+            }.frame(width:screenWidth,height:200)
+                .gesture(DragGesture()
+                    .onChanged { value in
+                        withAnimation {
+                            self.dragging = true
+                            self.lpOffset = max(value.translation.width,0.0)
+                        }
+                    }
+                    .onEnded { value in
+                        withAnimation {
+                            self.dragging = false
+                            if value.predictedEndTranslation.width > 0 {
+                                // User swiped right
+                                self.lpOffset = 50.0
+                            } else {
+                                // User swiped left
+                                self.lpOffset = 0.0
+                            }
+                        }
+                    }
+                )
         }
     }
 }

@@ -38,40 +38,44 @@ struct ShowRecordView: View {
             ZStack(alignment:.center) {
                 Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
                 VStack{
-                    HStack{
-                        VStack{
-                            if editingMode{
-                                Button(action:{
-                                    viewModel.resetPhoto()
-                                    editingMode.toggle()
-                                    genreManager.genres = record.genres
-                                }){
-                                    ZStack{
-                                        Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
-                                        Image(systemName:"xmark").foregroundColor(decorBlack)
+                    ZStack{
+                        HStack{
+                            VStack{
+                                if editingMode{
+                                    Button(action:{
+                                        viewModel.resetPhoto()
+                                        editingMode.toggle()
+                                        genreManager.genres = record.genres
+                                    }){
+                                        ZStack{
+                                            Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
+                                            Image(systemName:"xmark").foregroundColor(decorBlack)
+                                        }
                                     }
+                                    Spacer()
                                 }
-                                Spacer()
                             }
+                            Spacer()
+                            VStack{
+                                if editingMode{
+                                    Button(action:{
+                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
+                                        viewModel.resetPhoto()
+    //                                    editingMode.toggle()
+                                        presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
+                                    }){
+                                        ZStack{
+                                            Circle().fill(seaweedGreen).frame(width:60,height:60).padding(.horizontal)
+                                            Image(systemName:"checkmark").foregroundColor(decorWhite)
+                                        }
+                                    }
+                                    Spacer()
+                                }
+                            }
+                            
                         }.frame(height:150)
                         RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
-                        VStack{
-                            if editingMode{
-                                Button(action:{
-                                    viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
-                                    viewModel.resetPhoto()
-//                                    editingMode.toggle()
-                                    presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
-                                }){
-                                    ZStack{
-                                        Circle().fill(seaweedGreen).frame(width:60,height:60).padding(.horizontal)
-                                        Image(systemName:"checkmark").foregroundColor(decorWhite)
-                                    }
-                                }
-                                Spacer()
-                            }
-                        }.frame(height:150)
-                    }.padding(.top,editingMode ? 65 : 50)
+                    }.padding(.top,editingMode ? 65 : 75)
                     RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
                     
                     if editingMode{
