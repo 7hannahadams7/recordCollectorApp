@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @StateObject var spotifyController: SpotifyController
+    
     @State var selectedTab = 0
     
     @State var genreManager = GenreManager()
@@ -21,7 +23,7 @@ struct ContentView: View {
                         Image(systemName:"house.fill")
                         Text("Home").bold()
                     }.tag(0)
-                    MyLibraryView(viewModel:viewModel, genreManager:genreManager).tabItem{
+                    MyLibraryView(viewModel:viewModel,spotifyController: spotifyController, genreManager:genreManager).tabItem{
                         Image(systemName:"filemenu.and.selection")
                         Text("My Library").bold()
                     }.tag(1)
@@ -58,7 +60,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel:LibraryViewModel())
+        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
     }
 }
 

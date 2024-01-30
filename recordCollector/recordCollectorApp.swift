@@ -25,14 +25,23 @@ struct test3App: App {
 //    init() {
 //        FirebaseApp.configure()
 //    }
-//    
-      @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+//
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    @StateObject var spotifyController = SpotifyController()
     
     var libraryViewModel = LibraryViewModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel:libraryViewModel)
+//            ListenNow(viewModel:libraryViewModel,spotifyController:spotifyController)
+            ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)        
+            .onOpenURL { url in
+                spotifyController.setAccessToken(from: url)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification), perform: { _ in
+                spotifyController.connect()
+            })
         }
     }
 }

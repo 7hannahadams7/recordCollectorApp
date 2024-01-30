@@ -9,8 +9,12 @@ import SwiftUI
 
 struct MyLibraryView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    
     @State private var sortingFactor: String = "Artist"
     @State private var sortingDirection: Bool = true
+    
+    @Environment(\.presentationMode) var presentationMode
     
     var genreManager: GenreManager
     
@@ -94,19 +98,19 @@ struct MyLibraryView: View {
                                 Section(header: Text(String(char))) {
                                     if sortingFactor == "Artist"{
                                         ForEach(recordLibrary.filter({$0.artist.first == char.first })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel, record:record, genreManager: genreManager)) {
+                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
                                                 PersonRowView(record:record)
                                             }
                                         }
                                     }else if sortingFactor == "Album"{
                                         ForEach(recordLibrary.filter({$0.name.first == char.first })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel, record:record, genreManager: genreManager)) {
+                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
                                                 PersonRowView(record:record)
                                             }
                                         }
                                     }else if sortingFactor == "Release Year"{
                                         ForEach(recordLibrary.filter({String($0.releaseYear) == char })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel, record:record, genreManager: genreManager)) {
+                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
                                                 PersonRowView(record:record)
                                             }
                                         }
@@ -160,6 +164,6 @@ struct PersonRowView: View {
 struct MyLibraryView_Previews: PreviewProvider {
 
     static var previews: some View {
-        MyLibraryView(viewModel:LibraryViewModel(), genreManager:GenreManager())
+        MyLibraryView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(), genreManager:GenreManager())
     }
 }

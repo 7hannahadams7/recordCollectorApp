@@ -11,6 +11,7 @@ import FirebaseStorage
 
 struct ShowRecordView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var spotifyController: SpotifyController
     @ObservedObject private var keyboard = KeyboardResponder()
     
     @State private var recordName = ""
@@ -93,13 +94,21 @@ struct ShowRecordView: View {
                             
                         }.padding(20).frame(width:3*screenWidth/4).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
                     }else{
-                        Button(action:{
-                            editingMode.toggle()
-                        }) {
-                            
-                            Text("Edit Record").foregroundStyle(iconWhite)
-                            
-                        }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                        HStack{
+                            Button(action:{
+                                editingMode.toggle()
+                            }) {
+                                
+                                Text("Edit Record").foregroundStyle(iconWhite)
+                                
+                            }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                            NavigationLink(destination: ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record)) {
+                                    VStack{
+                                        Image("playButton").resizable().frame(width:50,height:50)
+                                        Text("Play Now")
+                                    }
+                                }
+                        }
                     }
                     
                     Spacer()

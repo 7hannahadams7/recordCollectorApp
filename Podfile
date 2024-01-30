@@ -10,5 +10,4 @@ target 'recordCollector' do
     	pod 'FirebaseDatabase'
 	pod 'FirebaseStorage'
 	pod 'FirebaseAuth'
-
 end
