@@ -21,6 +21,7 @@ struct ShowRecordView: View {
     
     @State private var editingMode: Bool = false
     @State private var newPhoto: Bool = false
+    @State private var listeningMode: Bool = false
     
     @State private var showAlert: Bool = false
     var isFormValid: Bool {
@@ -77,7 +78,11 @@ struct ShowRecordView: View {
                         }.frame(height:150)
                         RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
                     }.padding(.top,editingMode ? 65 : 75)
-                    RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                    if listeningMode{
+                        ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
+                    }else{
+                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                    }
                     
                     if editingMode{
                         Button(action:{
@@ -93,7 +98,13 @@ struct ShowRecordView: View {
                             }
                             
                         }.padding(20).frame(width:3*screenWidth/4).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                    }else{
+                    }else if listeningMode{
+                        Button(action:{
+                            listeningMode.toggle()
+                        }){
+                            Text("Back to Record")
+                        }
+                    }else {
                         HStack{
                             Button(action:{
                                 editingMode.toggle()
@@ -102,12 +113,14 @@ struct ShowRecordView: View {
                                 Text("Edit Record").foregroundStyle(iconWhite)
                                 
                             }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                            NavigationLink(destination: ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record)) {
-                                    VStack{
-                                        Image("playButton").resizable().frame(width:50,height:50)
-                                        Text("Play Now")
-                                    }
+                            Button(action:{
+                                listeningMode.toggle()
+                            }){
+                                VStack{
+                                    Image("playButton").resizable().frame(width:50,height:50)
+                                    Text("Play Now")
                                 }
+                            }
                         }
                     }
                     

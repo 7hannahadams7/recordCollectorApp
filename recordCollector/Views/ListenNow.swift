@@ -21,12 +21,8 @@ struct ListenNow: View {
     var body: some View {
 //        let record = viewModel.recordLibrary.last
         ZStack{
-            Color(woodAccent).edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-            VStack{
-                RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: .constant(true), editingMode: .constant(false))
-                if displayResults{
-                    SpotifyOptionDisplay(spotifyController:spotifyController,dataString:$dataString).frame(height:screenHeight/2)
-                }
+            if displayResults{
+                SpotifyOptionDisplay(spotifyController:spotifyController,dataString:$dataString)
             }
         }.onAppear(){
             searchSpotifyAlbum(albumName: record.name, artistName: record.artist) { result in

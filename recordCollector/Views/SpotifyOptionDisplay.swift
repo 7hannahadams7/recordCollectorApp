@@ -13,14 +13,28 @@ struct SpotifyOptionDisplay: View {
     @State private var searchResult: SearchResult?
     var body: some View {
         VStack{
-            if let albums = searchResult?.albums.items {
-                ScrollView {
-                    ForEach(albums, id: \.id) { album in
-                        AlbumRow(album: album, spotifyController: spotifyController)
-                            .padding(.vertical, 8)
+            List {
+                Section(header: Text("Album")){
+                    ScrollView {
+                        if let albums = searchResult?.albums.items {
+                            ForEach(albums, id: \.id) { album in
+                                AlbumRow(album: album, spotifyController: spotifyController)
+                                    .padding(.vertical, 8)
+                            }
+                        }
                     }
                 }
-            }
+                Section(header: Text("Playlists")){
+                    ScrollView {
+                        if let albums = searchResult?.albums.items {
+                            ForEach(albums, id: \.id) { album in
+                                AlbumRow(album: album, spotifyController: spotifyController)
+                                    .padding(.vertical, 8)
+                            }
+                        }
+                    }
+                }
+            }.listStyle(.inset).cornerRadius(10).padding(.all, 20)
         }.onChange(of: dataString, { oldData, newData in
             let jsonData = Data(newData.utf8)
             do {
@@ -44,6 +58,7 @@ struct SoundWaveView: View {
                 VStack{
                     Spacer()
                     HStack(alignment:.bottom,spacing: 2) {
+                        Spacer()
                         ForEach(0..<3, id: \.self) { index in
                             VStack{
                                 Spacer()
@@ -53,6 +68,7 @@ struct SoundWaveView: View {
                                     .animation(.spring,value:true)
                             }.offset(y:5)
                         }
+                        Spacer()
                     }.frame(height:geometry.size.height).clipped()
                 }
                 .onAppear {
@@ -108,22 +124,23 @@ struct AlbumRow: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 75, height: 75)
                     }
+                }.shadow(color:recordBlack, radius: 3.0)
+            }
+
+            GeometryReader{geometry in
+                VStack(alignment: .leading) {
+                    Text(album.name).minimumScaleFactor(0.85)
+                        .font(.headline)
+                    Text(album.artists.first?.name ?? "")
+                        .font(.subheadline).minimumScaleFactor(0.5).lineLimit(1)
+                    Text(album.release_date)
+                        .font(.subheadline).minimumScaleFactor(0.5).lineLimit(1)
+                    Link("Open in Spotify", destination: URL(string: album.externalURL)!).minimumScaleFactor(0.5).lineLimit(1)
                 }
+                .padding(.horizontal)
+                .frame(maxWidth:.infinity, alignment: .leading)
             }
-
-            VStack(alignment: .leading) {
-                Text(album.name)
-                    .font(.headline)
-                Text(album.artists.first?.name ?? "")
-                    .font(.subheadline)
-                Text(album.release_date)
-                    .font(.subheadline)
-                Link("Open in Spotify", destination: URL(string: album.externalURL)!)
-            }
-            .padding(.horizontal)
-            .frame(width: screenWidth / 2 - 10, alignment: .leading)
-
-            VStack{
+            VStack(alignment:.center){
                 if spotifyController.currentAlbum == album.uri{
                     Spacer()
                 }
@@ -139,7 +156,7 @@ struct AlbumRow: View {
                     SoundWaveView().frame(width: 50, height: 30).padding(.bottom)
                 }
             }.frame(width: 50, height: 100)
-        }.padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10.0))
+        }.padding()
     }
 }
 
