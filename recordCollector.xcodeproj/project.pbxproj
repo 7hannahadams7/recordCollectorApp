@@ -18,6 +18,8 @@
 		BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */; };
 		BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */; };
 		BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */; };
+		BB6D7BFA2B6C64B80037C391 /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = BB6D7BF92B6C64B80037C391 /* URLImage */; };
+		BB6D7BFC2B6C64B80037C391 /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = BB6D7BFB2B6C64B80037C391 /* URLImageStore */; };
 		BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */; };
 		BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */; };
 		BB9C009C2B659AC100CF02B4 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */; };
@@ -26,6 +28,7 @@
 		BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */; };
 		BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */; };
 		BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */; };
+		BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */; };
 		BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D382B6831FD0075DA9F /* ViewManager.swift */; };
 		BBD26D3B2B683E8E0075DA9F /* ListenNow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */; };
 		BBDBD57F2B694AEE00EB644B /* SpotifyOptionDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */; };
@@ -60,6 +63,7 @@
 		BBB8DE3F2B5036EE008D39E8 /* recordCollector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recordCollector.entitlements; sourceTree = "<group>"; };
 		BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddRecordView.swift; sourceTree = "<group>"; };
 		BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
+		BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyCodables.swift; sourceTree = "<group>"; };
 		BBD26D382B6831FD0075DA9F /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenNow.swift; sourceTree = "<group>"; };
 		BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyOptionDisplay.swift; sourceTree = "<group>"; };
@@ -78,8 +82,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB6D7BFC2B6C64B80037C391 /* URLImageStore in Frameworks */,
 				94CCA83492A5AA9E66882AA2 /* Pods_recordCollector.framework in Frameworks */,
 				BB9C009F2B659D7200CF02B4 /* SpotifyiOS in Frameworks */,
+				BB6D7BFA2B6C64B80037C391 /* URLImage in Frameworks */,
 				BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -169,6 +175,7 @@
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
 				BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */,
 				BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */,
+				BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */,
 				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
 				BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */,
 				BBF813362B52647C00654DAA /* Stats Page Files */,
@@ -226,6 +233,8 @@
 			name = recordCollector;
 			packageProductDependencies = (
 				BB9C009E2B659D7200CF02B4 /* SpotifyiOS */,
+				BB6D7BF92B6C64B80037C391 /* URLImage */,
+				BB6D7BFB2B6C64B80037C391 /* URLImageStore */,
 			);
 			productName = test3;
 			productReference = BB2FEF852B4C56EC00F0DFBB /* recordCollector.app */;
@@ -257,6 +266,7 @@
 			packageReferences = (
 				BBF8133B2B5448D300654DAA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */,
+				BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */,
 			);
 			productRefGroup = BB2FEF862B4C56EC00F0DFBB /* Products */;
 			projectDirPath = "";
@@ -349,6 +359,7 @@
 				BBF813302B52266300654DAA /* GenericStatView.swift in Sources */,
 				BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */,
 				BB2FEF892B4C56EC00F0DFBB /* recordCollectorApp.swift in Sources */,
+				BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -651,6 +662,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dmytro-anokhin/url-image";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
 		BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/spotify/ios-sdk.git";
@@ -670,6 +689,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BB6D7BF92B6C64B80037C391 /* URLImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */;
+			productName = URLImage;
+		};
+		BB6D7BFB2B6C64B80037C391 /* URLImageStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */;
+			productName = URLImageStore;
+		};
 		BB9C009E2B659D7200CF02B4 /* SpotifyiOS */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */;
