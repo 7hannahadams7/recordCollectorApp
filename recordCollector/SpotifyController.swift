@@ -15,7 +15,8 @@ class SpotifyController: NSObject, ObservableObject {
     
     var accessToken: String? = nil
     
-    @Published var currentAlbum: String = ""
+    @Published var currentPlaying: String = ""
+    @Published var playerPaused: Bool = false
     
     private var connectCancellable: AnyCancellable?
     
@@ -96,6 +97,7 @@ extension SpotifyController: SPTAppRemoteDelegate {
     
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("disconnected")
+
     }
 }
 
@@ -107,17 +109,18 @@ extension SpotifyController: SPTAppRemoteDelegate {
 //}
 
 extension SpotifyController {
-    func playSpotifyAlbum(uri: String) {
+    func playFromSpotify(uri: String) {
         if appRemote.isConnected {
             appRemote.playerAPI?.setShuffle(false, callback: { [self] (result, error) in
                 if let error = error {
                     debugPrint("Error setting shuffle: \(error.localizedDescription)")
                 } else {
                     // Play the album after setting shuffle to false
-                    appRemote.playerAPI?.play(uri, asRadio: false, callback: { (result, error) in
+                    appRemote.playerAPI?.play(uri, callback: { (result, error) in
                         if let error = error {
                             debugPrint("Error playing album: \(error.localizedDescription)")
                         } else {
+                            print("Playing Album")
                             debugPrint("Successfully played album!")
                         }
                     })
@@ -126,6 +129,35 @@ extension SpotifyController {
         } else {
             // Handle not connected error
             debugPrint("Error: Spotify App Remote is not connected.")
+            appRemote.connect()
+        }
+    }
+    func pauseSpotifyPlayback() {
+        if appRemote.isConnected {
+            appRemote.playerAPI?.pause { (result, error) in
+                if let error = error {
+                    debugPrint("Error pausing playback: \(error.localizedDescription)")
+                } else {
+                    print("Playback paused")
+                }
+            }
+        } else {
+            debugPrint("Error: Spotify App Remote is not connected.")
+            // Handle the case where the app remote is not connected.
+        }
+    }
+    func resumeSpotifyPlayback() {
+        if appRemote.isConnected {
+            appRemote.playerAPI?.resume { (result, error) in
+                if let error = error {
+                    debugPrint("Error resuming playback: \(error.localizedDescription)")
+                } else {
+                    print("Playback resumed")
+                }
+            }
+        } else {
+            debugPrint("Error: Spotify App Remote is not connected.")
+            // Handle the case where the app remote is not connected.
         }
     }
 }
@@ -134,20 +166,22 @@ extension SpotifyController {
 
 extension SpotifyController: SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-        print("player state changed")
-        print("isPaused", playerState.isPaused)
-        print("track.uri", playerState.track.uri)
-        print("track.name", playerState.track.name)
-        print("track.imageIdentifier", playerState.track.imageIdentifier)
-        print("track.artist.name", playerState.track.artist.name)
-        print("track.album.name", playerState.track.album.name)
-        self.currentAlbum = playerState.track.album.uri
-        print("HERE", self.currentAlbum)
-        print("track.isSaved", playerState.track.isSaved)
-        print("playbackSpeed", playerState.playbackSpeed)
-        print("playbackOptions.isShuffling", playerState.playbackOptions.isShuffling)
-        print("playbackOptions.repeatMode", playerState.playbackOptions.repeatMode.hashValue)
-        print("playbackPosition", playerState.playbackPosition)
+        self.currentPlaying = playerState.contextURI.absoluteString
+        self.playerPaused = playerState.isPaused
+        
+//        print("player state changed")
+//        print("isPaused", playerState.isPaused)
+//        print("track.uri", playerState.track.uri)
+//        print("track.name", playerState.track.name)
+//        print("track.imageIdentifier", playerState.track.imageIdentifier)
+//        print("track.artist.name", playerState.track.artist.name)
+//        print("track.album.name", playerState.track.album.name)
+//        print("HERE", self.currentPlaying)
+//        print("track.isSaved", playerState.track.isSaved)
+//        print("playbackSpeed", playerState.playbackSpeed)
+//        print("playbackOptions.isShuffling", playerState.playbackOptions.isShuffling)
+//        print("playbackOptions.repeatMode", playerState.playbackOptions.repeatMode.hashValue)
+//        print("playbackPosition", playerState.playbackPosition)
     }
     
 }

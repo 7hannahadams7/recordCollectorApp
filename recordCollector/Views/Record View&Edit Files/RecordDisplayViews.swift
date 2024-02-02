@@ -249,7 +249,7 @@ struct RecordFieldDisplayView: View{
             // Release Year Field
             HStack{
                 HStack{
-                    Text("Release Year: ")
+                    Text("Release Year: ").minimumScaleFactor(0.8)
                     Spacer()
                 }.frame(width:screenWidth/4)
                 if editingMode{

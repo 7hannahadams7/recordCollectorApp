@@ -117,7 +117,7 @@ struct MyLibraryView: View {
                                     }
                                 }
                             }
-                    }.listStyle(.inset).cornerRadius(10).padding(5)
+                    }.listStyle(.inset).cornerRadius(10).padding(5).preferredColorScheme(.light)
                     
                 }.padding().padding(.top,35)
                 

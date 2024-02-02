@@ -10,10 +10,9 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @StateObject var spotifyController: SpotifyController
+    @State var genreManager: GenreManager
     
     @State var selectedTab = 0
-    
-    @State var genreManager = GenreManager()
     
     var body: some View {
         NavigationView{
@@ -60,7 +59,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
+        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(), genreManager: GenreManager())
     }
 }
 
