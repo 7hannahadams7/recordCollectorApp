@@ -114,6 +114,7 @@
 		BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */ = {
 			isa = PBXGroup;
 			children = (
+				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
 				BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */,
 				BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */,
 				BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */,
@@ -145,10 +146,10 @@
 			children = (
 				BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */,
 				BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */,
+				BBD26D382B6831FD0075DA9F /* ViewManager.swift */,
+				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
 				BBB8DE402B503951008D39E8 /* Views */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
-				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
-				BBD26D382B6831FD0075DA9F /* ViewManager.swift */,
 				BBF813352B52645200654DAA /* ARCHIVE */,
 				BB2FEF8C2B4C56F200F0DFBB /* Assets.xcassets */,
 				BB2FEF912B4C56F200F0DFBB /* Info.plist */,
@@ -167,16 +168,23 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		BB6D7BFD2B6C71D80037C391 /* Spotify */ = {
+			isa = PBXGroup;
+			children = (
+				BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */,
+				BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */,
+				BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */,
+			);
+			path = Spotify;
+			sourceTree = "<group>";
+		};
 		BBB8DE402B503951008D39E8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */,
 				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
-				BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */,
-				BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */,
-				BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */,
-				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
+				BB6D7BFD2B6C71D80037C391 /* Spotify */,
 				BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */,
 				BBF813362B52647C00654DAA /* Stats Page Files */,
 			);

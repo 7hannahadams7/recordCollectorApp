@@ -21,7 +21,8 @@ struct SpotifyOptionDisplay: View {
         VStack{
             List {
                 Section(header: Text("Album")){
-                    ScrollView {
+                    ScrollView { // MUST KEEP SCROLLVIEW to maintain AppRemote connection in SpotifyPlayer
+                        // Pull Album items from Search Results
                         if let albums = albumSearchResult?.albums.items {
                             ForEach(albums, id: \.id) { album in
                                 SpotifyDisplayRow(album: album, spotifyController: spotifyController)
@@ -39,6 +40,7 @@ struct SpotifyOptionDisplay: View {
                 }
                 Section(header: Text("Playlists")){
                     ScrollView{
+                        // Pull Playlist items from Search Results
                         if let playlists = playlistSearchResult?.playlists.items {
                             ForEach(playlists, id: \.id) { playlist in
                                 SpotifyDisplayRow(playlist: playlist, spotifyController: spotifyController)
@@ -47,7 +49,8 @@ struct SpotifyOptionDisplay: View {
                     }
                 }
             }.listStyle(.inset).cornerRadius(10).padding(.all, 20).preferredColorScheme(.light)
-        }.onChange(of: albumDataString, { oldData, newData in
+        }// Perfrom data fetches for search results
+        .onChange(of: albumDataString, { oldData, newData in
             let jsonData = Data(newData.utf8)
             do {
                 let decoder = JSONDecoder()
@@ -133,6 +136,7 @@ struct SpotifyDisplayRow: View {
     @State private var imageURL: URL? = nil
 
     var body: some View {
+        // Pull generic items from initializers
         var name: String{
             return album?.name ?? playlist!.name
         }
@@ -152,6 +156,7 @@ struct SpotifyDisplayRow: View {
         
         HStack(alignment:.center) {
             
+            // Album Image
             if album != nil{
                 if let firstImageURL = album!.images.first?.url{
                     
@@ -171,28 +176,36 @@ struct SpotifyDisplayRow: View {
                             .aspectRatio(contentMode: .fit)
                             
                     }.frame(width: 75, height: 75).shadow(color:recordBlack, radius: 3.0)
-//
-//                    URLImage(firstImageURL, content: { image in
-//                        image
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fit)
-//                            .frame(width: 75, height: 75)
-//                        
-//                    })
                     
                 }
             }
+            
+            // OR Playlist Image
             if playlist != nil{
                 if let firstImageURL = playlist!.images.first?.url{
-                    URLImage(firstImageURL, content: { image in
+
+                    URLImage(firstImageURL) {
+                        // This view is displayed before download starts
+                        Image("TakePhoto").resizable().aspectRatio(contentMode: .fit)
+                    } inProgress: { progress in
+                        // Display progress
+                        Image("TakePhoto").resizable().aspectRatio(contentMode: .fit)
+                    } failure: { error, retry in
+                        // Display error and retry button
+                        Image("TakePhoto").resizable().aspectRatio(contentMode: .fit)
+                    } content: { image in
+                        // Downloaded image
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 75, height: 75)
-                    }).shadow(color:recordBlack, radius: 3.0)
+                            
+                    }.frame(width: 75, height: 75).shadow(color:recordBlack, radius: 3.0)
+                    
                 }
             }
 
+            
+            // Information Stack
             GeometryReader{geometry in
                 VStack(alignment: .leading) {
                     Text(name).minimumScaleFactor(0.85)
@@ -208,7 +221,10 @@ struct SpotifyDisplayRow: View {
                 .padding(.horizontal)
                 .frame(maxWidth:.infinity, alignment: .leading)
             }
+            
+            // Button Player Stack
             VStack(alignment:.center){
+                // Displaying pause and sound bars
                 if nowPlaying{
                     Spacer()
                     if spotifyController.playerPaused{

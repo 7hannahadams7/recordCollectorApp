@@ -57,6 +57,8 @@ struct SpotifyImage: Codable{
     let url: URL
 }
 
+
+// JSON Test Results from Spotify Search
 let test = """
   {
     "albums" : {
