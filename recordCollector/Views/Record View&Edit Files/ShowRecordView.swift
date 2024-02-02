@@ -37,102 +37,105 @@ struct ShowRecordView: View {
     var body: some View {
         let id = record.id
         NavigationView{
-            ZStack(alignment:.center) {
-                Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
-                VStack{
-                    ZStack{
-                        HStack{
-                            VStack{
-                                if editingMode{
+                ZStack(alignment:.center) {
+                    Color(woodBrown).edgesIgnoringSafeArea(.all)
+                    ScrollView{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    VStack{
+                                        if editingMode{
+                                            Button(action:{
+                                                viewModel.resetPhoto()
+                                                editingMode.toggle()
+                                                genreManager.genres = record.genres
+                                            }){
+                                                ZStack{
+                                                    Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
+                                                    Image(systemName:"xmark").foregroundColor(decorBlack)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Spacer()
+                                    VStack{
+                                        if editingMode{
+                                            Button(action:{
+                                                viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
+                                                viewModel.resetPhoto()
+                                                editingMode.toggle()
+                                            }){
+                                                ZStack{
+                                                    Circle().fill(seaweedGreen).frame(width:60,height:60).padding(.horizontal)
+                                                    Image(systemName:"checkmark").foregroundColor(decorWhite)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }.frame(height:150)
+                                RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
+                            }
+                            if listeningMode{
+                                ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
+                            }else{
+                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                            }
+                            
+                            // BOTTOM BUTTONS
+                            if editingMode{
+                                // DELETE RECORD BUTTON
+                                Button(action:{
+                                    Task{
+                                        await viewModel.deleteRecordEntry(id: id)
+                                    }
+                                    
+                                    presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
+                                }) {
+                                    HStack{
+                                        Text("DELETE RECORD").foregroundStyle(iconWhite)
+                                        Image(systemName:"xmark").foregroundColor(iconWhite)
+                                    }
+                                    
+                                }.padding(20).frame(width:3*screenWidth/4).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                            }else if listeningMode{
+                                // DISPLAYING SPOTIFY OPTIONS
+                                Button(action:{
+                                    listeningMode.toggle()
+                                }){
+                                    Text("Back to Record")
+                                }
+                            }else {
+                                // EDITING AND PLAYING OPTION
+                                HStack{
                                     Button(action:{
-                                        viewModel.resetPhoto()
                                         editingMode.toggle()
-                                        genreManager.genres = record.genres
-                                    }){
-                                        ZStack{
-                                            Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
-                                            Image(systemName:"xmark").foregroundColor(decorBlack)
-                                        }
-                                    }
-                                    Spacer()
-                                }
-                            }
-                            Spacer()
-                            VStack{
-                                if editingMode{
+                                    }) {
+                                        
+                                        Text("Edit Record").foregroundStyle(iconWhite)
+                                        
+                                    }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
                                     Button(action:{
-                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
-                                        viewModel.resetPhoto()
-    //                                    editingMode.toggle()
-                                        presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
+                                        listeningMode.toggle()
                                     }){
-                                        ZStack{
-                                            Circle().fill(seaweedGreen).frame(width:60,height:60).padding(.horizontal)
-                                            Image(systemName:"checkmark").foregroundColor(decorWhite)
+                                        VStack{
+                                            Image("playButton").resizable().frame(width:50,height:50)
+                                            Text("Play Now")
                                         }
                                     }
-                                    Spacer()
                                 }
                             }
                             
-                        }.frame(height:150)
-                        RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
-                    }.padding(.top,editingMode ? 65 : 75)
-                    if listeningMode{
-                        ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
-                    }else{
-                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
-                    }
-                    
-                    if editingMode{
-                        Button(action:{
-                            Task{
-                                await viewModel.deleteRecordEntry(id: id)
-                            }
+                            Spacer()
                             
-                            presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
-                        }) {
-                            HStack{
-                                Text("DELETE RECORD").foregroundStyle(iconWhite)
-                                Image(systemName:"xmark").foregroundColor(iconWhite)
-                            }
-                            
-                        }.padding(20).frame(width:3*screenWidth/4).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                    }else if listeningMode{
-                        Button(action:{
-                            listeningMode.toggle()
-                        }){
-                            Text("Back to Record")
-                        }
-                    }else {
-                        HStack{
-                            Button(action:{
-                                editingMode.toggle()
-                            }) {
-                                
-                                Text("Edit Record").foregroundStyle(iconWhite)
-                                
-                            }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                            Button(action:{
-                                listeningMode.toggle()
-                            }){
-                                VStack{
-                                    Image("playButton").resizable().frame(width:50,height:50)
-                                    Text("Play Now")
-                                }
-                            }
-                        }
+                        }.padding(.vertical)
                     }
-                    
-                    Spacer()
-                    
+                }.onAppear {
+                    //Initial set of genres list
+                    genreManager.genres = record.genres
                 }
-                
-            }.onAppear {
-                //Initial set of genres list
-                genreManager.genres = record.genres
-            }.padding(.bottom, keyboard.currentHeight/2)
-        }.navigationBarBackButtonHidden(editingMode)
+            /*.padding(.bottom, keyboard.currentHeight/2)*/ // Move frame up to type in genre box
+        }
             
     }
     

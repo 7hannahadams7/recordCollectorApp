@@ -122,26 +122,26 @@ class StatsViewModel: ObservableObject {
 
             }
             
-            decadeData.append((2000, 6,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-            decadeData.append((2010, 4,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-            decadeData.append((1990, 1,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-            decadeData.append((1950, 2,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-            
-            yearlyData.append((2001, 1,[]))
-            yearlyData.append((2004, 1,[]))
-            yearlyData.append((2007, 1,[]))
-            yearlyData.append((2003, 1,[]))
-            yearlyData.append((2005, 1,[]))
-            yearlyData.append((2004, 1,[]))
-            
-            yearlyData.append((2012, 2,[]))
-            yearlyData.append((2014, 1,[]))
-            yearlyData.append((2017, 1,[]))
-            
-            yearlyData.append((1992, 1,[]))
-            
-            yearlyData.append((1953, 1,[]))
-            yearlyData.append((1957, 1,[]))
+//            decadeData.append((2000, 6,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
+//            decadeData.append((2010, 4,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
+//            decadeData.append((1990, 1,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
+//            decadeData.append((1950, 2,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
+//            
+//            yearlyData.append((2001, 1,[]))
+//            yearlyData.append((2004, 1,[]))
+//            yearlyData.append((2007, 1,[]))
+//            yearlyData.append((2003, 1,[]))
+//            yearlyData.append((2005, 1,[]))
+//            yearlyData.append((2004, 1,[]))
+//            
+//            yearlyData.append((2012, 2,[]))
+//            yearlyData.append((2014, 1,[]))
+//            yearlyData.append((2017, 1,[]))
+//            
+//            yearlyData.append((1992, 1,[]))
+//            
+//            yearlyData.append((1953, 1,[]))
+//            yearlyData.append((1957, 1,[]))
 
 
             // Sort artists by count in descending order
@@ -153,21 +153,32 @@ class StatsViewModel: ObservableObject {
         
     }
     
-    func fetchYearsByDecade(decade: Int) -> (Int, Int){
-        let i = topYears.firstIndex(where: { ($0.0 / 10) * 10 == decade})
+    func fetchYearsByDecade(decade: Int) -> [(Int, Int, [String])]{
+        // Return all instances of records within the specified decade
+         
+        var yearsInDecade: [(Int, Int, [String])] = []
+        for year in topYears{
+            if (year.0 / 10) * 10 == decade{
+                yearsInDecade.append(year)
+            }
+        }
 
-        let j = topYears.lastIndex(where: { ($0.0 / 10) * 10 == decade})
-
-        return (i!, j!)
+        return yearsInDecade
 
     }
     
     
     init(viewModel: LibraryViewModel) {
-            self.viewModel = viewModel
-            fetchTopArtists()
-            fetchTopGenres()
-            fetchTopYears()
+        self.viewModel = viewModel
+        fetchTopArtists()
+        fetchTopGenres()
+        fetchTopYears()
+    }
+    
+    func refreshData(){
+        fetchTopArtists()
+        fetchTopGenres()
+        fetchTopYears()
     }
     
 }

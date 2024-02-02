@@ -9,57 +9,50 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: LibraryViewModel
-    @StateObject var spotifyController: SpotifyController
-    @State var genreManager: GenreManager
-    
-    @State var selectedTab = 0
+    @StateObject var spotifyController: SpotifyController    
     
     var body: some View {
-        NavigationView{
-            ZStack{
-                TabView(selection: $selectedTab){
-                    HomePageView().tabItem{
-                        Image(systemName:"house.fill")
-                        Text("Home").bold()
-                    }.tag(0)
-                    MyLibraryView(viewModel:viewModel,spotifyController: spotifyController, genreManager:genreManager).tabItem{
-                        Image(systemName:"filemenu.and.selection")
-                        Text("My Library").bold()
-                    }.tag(1)
-                    MyStatsView(viewModel:viewModel).tabItem{
-                        Image(systemName:"chart.pie.fill").foregroundColor(.blue)
-                        Text("My Stats").bold()
-                    }.tag(2)
-                    SettingsView().tabItem{
-                        Image(systemName:"gearshape")
-                        Text("Settings").bold()
-                    }.tag(3)
-                    
-                }.accentColor(redBrown)
-                VStack{
-                    HStack{
-                        Spacer()
-                        if selectedTab == 0{
-                            NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:genreManager)) {
-                                Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
-                            }
-                        }
-                    }.padding(.trailing,15)
-                    Spacer()
-                }
-            }
-            
-            
-        }
-        .onAppear(){
-            viewModel.refreshData()
-        }
+        @ObservedObject var statsViewModel = StatsViewModel(viewModel:viewModel)
+            TabView{
+                HomePageView(viewModel:viewModel).tabItem{
+                    Image(systemName:"house.fill")
+                    Text("Home").bold()
+                }.tag(0)
+                MyLibraryView(viewModel:viewModel,spotifyController: spotifyController).tabItem{
+                    Image(systemName:"filemenu.and.selection")
+                    Text("My Library").bold()
+                }.tag(1)
+                MyStatsView(statsViewModel:statsViewModel,spotifyController:spotifyController).tabItem{
+                    Image(systemName:"chart.pie.fill").foregroundColor(.blue)
+                    Text("My Stats").bold()
+                }.tag(2)
+                SettingsView().tabItem{
+                    Image(systemName:"gearshape")
+                    Text("Settings").bold()
+                }.tag(3)
+                
+            }.accentColor(darkRedBrown)
+            .tint(decorBlack)
+                    .onAppear(){
+                        let appearance = UITabBarAppearance()
+                        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+                        appearance.backgroundColor = UIColor(lightWoodBrown)
+                        appearance.shadowColor = UIColor(lightWoodBrown)
+                        
+                        // Use this appearance when scrolling behind the TabView:
+                        UITabBar.appearance().standardAppearance = appearance
+                        // Use this appearance when scrolled all the way up:
+                        UITabBar.appearance().scrollEdgeAppearance = appearance
+
+                        viewModel.refreshData()
+
+                    }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(), genreManager: GenreManager())
+        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
     }
 }
 

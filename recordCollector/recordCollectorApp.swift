@@ -33,14 +33,13 @@ struct test3App: App {
     let urlImageService = URLImageService(fileStore: URLImageFileStore(),
                                               inMemoryStore: URLImageInMemoryStore())
     
-    @StateObject var spotifyController = SpotifyController()
-    var libraryViewModel = LibraryViewModel()
-    @StateObject var genreManager = GenreManager()
+    @ObservedObject var spotifyController = SpotifyController()
+    @ObservedObject var libraryViewModel = LibraryViewModel()
 
     var body: some Scene {
         WindowGroup {
 //            ListenNow(viewModel:libraryViewModel,spotifyController:spotifyController)
-            ContentView(viewModel:libraryViewModel,spotifyController: spotifyController, genreManager: genreManager)        
+            ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)
             .onOpenURL { url in
                 spotifyController.setAccessToken(from: url)
             }

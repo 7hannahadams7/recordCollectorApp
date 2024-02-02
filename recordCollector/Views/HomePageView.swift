@@ -13,14 +13,17 @@ let screenHeight = UIScreen.main.bounds.size.height
 
 
 struct HomePageView: View {
-    
-    private var topStack: CGFloat = 100
-    private var bottomStack: CGFloat = 125
+    @ObservedObject var viewModel: LibraryViewModel
     
     @State private var isAddItemSheetPresented = false
+    
+    var topStack: CGFloat = 100
+    var bottomStack: CGFloat = 125
 
     var body: some View {
         
+        NavigationView{
+            
             //Background Decor
             ZStack{
                 
@@ -59,10 +62,22 @@ struct HomePageView: View {
                     }.frame(width: screenWidth, height:screenWidth+bottomStack+50,alignment:.bottom)
                     
                 }.ignoresSafeArea()
-
+                
+                //Add New Button
+                VStack{
+                    HStack{
+                        Spacer()
+                        NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:GenreManager())) {
+                            Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
+                        }
+                    }.padding(.trailing,15)
+                    Spacer()
+                }
+                
                 
             }
-        
+            
+        }
         }
     }
             
@@ -72,6 +87,6 @@ struct HomePageView: View {
 
 struct HomePageView_Previews: PreviewProvider {
     static var previews: some View {
-        HomePageView()
+        HomePageView(viewModel:LibraryViewModel())
     }
 }

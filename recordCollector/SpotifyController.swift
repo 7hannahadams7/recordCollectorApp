@@ -18,6 +18,8 @@ class SpotifyController: NSObject, ObservableObject {
     @Published var currentPlaying: String = ""
     @Published var playerPaused: Bool = false
     
+    @Published var connectionFailure: Bool = false
+    
     private var connectCancellable: AnyCancellable?
     
     private var disconnectCancellable: AnyCancellable?
@@ -68,13 +70,13 @@ class SpotifyController: NSObject, ObservableObject {
             self.appRemote.authorizeAndPlayURI("")
             return
         }
-        
         appRemote.connect()
     }
     
     func disconnect() {
         if appRemote.isConnected {
             appRemote.disconnect()
+            connectionFailure = true
         }
     }
 }
@@ -92,7 +94,11 @@ extension SpotifyController: SPTAppRemoteDelegate {
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
-        print("failed")
+        connectionFailure = true
+        print("failed", connectionFailure)
+//        self.accessToken = nil
+//        self.appRemote.connect()
+        
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {

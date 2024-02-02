@@ -264,6 +264,7 @@ class LibraryViewModel: ObservableObject {
     
     // MARK: - Library Data Initializing (Fetching, Sorting, etc.)
     private func fetchData(completion: @escaping () -> Void) {
+        print("PERFORMING FETCH")
         let allRecords = Database.database().reference().child("Records")
         let storageRef = Storage.storage().reference()
 

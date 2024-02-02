@@ -16,7 +16,7 @@ struct MyLibraryView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    var genreManager: GenreManager
+    var genreManager = GenreManager()
     
     var body: some View {
         
@@ -54,9 +54,10 @@ struct MyLibraryView: View {
             ZStack{
                 
                 //Background Image
-                ZStack{
-                    Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
-                }.ignoresSafeArea()
+                Color(woodBrown).edgesIgnoringSafeArea(.all)
+//                ZStack{
+//                    Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
+//                }.ignoresSafeArea()
                 
                 // Library Layout
                 VStack(spacing:5){

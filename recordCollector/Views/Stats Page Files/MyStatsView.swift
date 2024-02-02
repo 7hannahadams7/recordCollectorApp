@@ -9,20 +9,25 @@ import SwiftUI
 
 struct MyStatsView: View {
     @State private var displayTag = 0
-    @ObservedObject var viewModel: LibraryViewModel
+//    @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
+//    @ObservedObject var spotifyController: SpotifyController
+    
+    
     
     var body: some View {
-        let genresView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Genres")
-        let artistsView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
-        let decadesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Decades")
-        let storesView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
-        let historyView = GenericStatView(viewModel:StatsViewModel(viewModel:viewModel),viewType:"Artists")
+        let genresView = GenericStatView(viewModel:statsViewModel,viewType:"Genres")
+        let artistsView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
+        let decadesView = GenericStatView(viewModel:statsViewModel,viewType:"Decades")
+        let storesView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
+        let historyView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
         
-            //Background Decor
+        NavigationView{
             ZStack{
                 
                 //Background Image
-                Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
+                //                Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
+                Color(woodBrown).edgesIgnoringSafeArea(.all)
                 
                 VStack{
                     HStack{
@@ -36,7 +41,7 @@ struct MyStatsView: View {
                         Button(action:{displayTag = 2}){
                             Image("DecadesTab").resizable().aspectRatio(contentMode: .fit).shadow(color: displayTag==2 ? recordBlack.opacity(1.0) : .clear, radius: 5)
                         }
-
+                        
                     }.frame(height:40).padding(.horizontal,10).padding(.top,30)
                     HStack{
                         Button(action:{displayTag = 3}){
@@ -45,7 +50,7 @@ struct MyStatsView: View {
                         Button(action:{displayTag = 4}){
                             Image("HistoryTab").resizable().aspectRatio(contentMode: .fit).shadow(color: displayTag==4 ? recordBlack.opacity(1.0) : .clear, radius: 5)
                         }
-
+                        
                     }.frame(height:40).padding()
                     
                     ZStack(alignment:.topLeading){
@@ -65,10 +70,13 @@ struct MyStatsView: View {
                     Spacer()
                     
                 }.padding()
-            
-
+                
+                
             }
-
+        }
+        .onAppear{
+            statsViewModel.refreshData()
+        }
     }
             
     }
@@ -109,6 +117,6 @@ struct HistoryView: View {
     }
 }
 
-#Preview {
-    MyStatsView(viewModel:LibraryViewModel())
-}
+//#Preview {
+//    MyStatsView(statsViewModel:StatsViewModel(), spotifyController:SpotifyController())
+//}

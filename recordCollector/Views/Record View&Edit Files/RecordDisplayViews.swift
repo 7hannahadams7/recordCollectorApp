@@ -339,6 +339,44 @@ struct RecordFieldDisplayView: View{
                 newGenre = ""
             }
             
+            // Name Field
+            HStack{
+                HStack{
+                    Text("Name: ")
+                    Spacer()
+                }.frame(width:screenWidth/4)
+                if editingMode{
+                    TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                        .onAppear {
+                            if record != nil{
+                                recordName = record!.name
+                            }
+                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
+                }else{
+                    Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                Spacer()
+            }
+            
+            // Name Field
+            HStack{
+                HStack{
+                    Text("Name: ")
+                    Spacer()
+                }.frame(width:screenWidth/4)
+                if editingMode{
+                    TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                        .onAppear {
+                            if record != nil{
+                                recordName = record!.name
+                            }
+                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
+                }else{
+                    Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                Spacer()
+            }
+            
         }.padding(.all, 20).background(lightWoodBrown).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20).padding(.top,15).padding(.bottom,5)
         
     }
@@ -349,7 +387,7 @@ class GenreManager: ObservableObject {
     @Published var genres: [String] = []
     
     init(){
-        print("CREATED NEW GENREMANAGER")
+//        print("CREATED NEW GENREMANAGER")
     }
     
     func addGenre(_ genre: String) {

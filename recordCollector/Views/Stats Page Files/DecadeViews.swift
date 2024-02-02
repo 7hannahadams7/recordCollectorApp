@@ -158,18 +158,18 @@ struct BubbleInfo: View{
     let decade: Int
     
     var body: some View{
-        let (i,j) = viewModel.fetchYearsByDecade(decade: decade)
+        let yearsInDecade = viewModel.fetchYearsByDecade(decade: decade)
         let yearlyData = viewModel.topYears
         GeometryReader{geometry in
             ZStack{
                 ScrollView{
                     VStack{
-                        ForEach(i...j, id:\.self){index in
+                        ForEach(yearsInDecade.indices, id:\.self){index in
                             VStack(alignment:.leading){
-                                Text(String(yearlyData[index].year))
+                                Text(String(yearsInDecade[index].0))
                                 ScrollView(.horizontal){
                                     HStack{
-                                        ForEach(yearlyData[index].records, id:\.self){record in
+                                        ForEach(yearsInDecade[index].2, id:\.self){record in
                                             let photo = viewModel.viewModel.fetchPhotoByID(id: record)
                                             // BUTTON WITH NAVIGATION HERE
                                             Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()

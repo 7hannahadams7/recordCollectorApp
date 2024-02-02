@@ -35,39 +35,41 @@ struct AddRecordView: View {
     var ref: DatabaseReference! = Database.database().reference()
     
     var body: some View {
-        
+        NavigationView{
             ZStack(alignment:.center) {
-                Image("Page-Background-2").resizable().ignoresSafeArea().aspectRatio(contentMode: .fill)
-                VStack{
-                    RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode).padding(.top, 65)
-                    
-                    RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
-                    
-                    Button(action:{
-                        if isFormValid{
-                            viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
-                            
-                            presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
-                        }else{
-                            showAlert = true
-                        }
-                    }) {
-                        
-                        Text("Add Record").foregroundStyle(iconWhite)
-                        
-                    }                .padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                    
-                    Spacer()
-                    
-                }
+                Color(woodBrown).edgesIgnoringSafeArea(.all)
                 
+                ScrollView{
+                    VStack{
+                        RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
+                        
+                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                        
+                        Button(action:{
+                            if isFormValid{
+                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
+                                
+                                presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
+                            }else{
+                                showAlert = true
+                            }
+                        }) {
+                            
+                            Text("Add Record").foregroundStyle(iconWhite)
+                            
+                        }                .padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                        
+                        Spacer()
+                        
+                    }.padding(.vertical)
+                }
             }.onDisappear(){
                 viewModel.resetPhoto()
             }
             .onAppear {
-                UITableView.appearance().backgroundView = UIImageView(image: UIImage(named: "Page-Background"))
+                genreManager.genres = []
             }.padding(.bottom, keyboard.currentHeight/2)
-        
+        }
     }
     
     
