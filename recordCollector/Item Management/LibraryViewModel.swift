@@ -14,7 +14,7 @@ class LibraryViewModel: ObservableObject {
     @Published var recordLibrary = [RecordItem]()
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
-    @Published var sortingElementHeaders: (artist: [String], album: [String], releaseYear: [String]) = (artist:[],album:[],releaseYear:[])
+    @Published var sortingElementHeaders: (artist: [String], album: [String], releaseYear: [String], dateAdded: [String]) = (artist:[],album:[],releaseYear:[],dateAdded:[])
     
     @Published var fullGenres = Set<String>()
     
@@ -32,7 +32,7 @@ class LibraryViewModel: ObservableObject {
     
     
     enum SortingFactor: String, CaseIterable {
-//        case dateAdded = "Date Added"
+        case dateAdded = "Date Added"
         case artist = "Artist"
         case releaseYear = "Release Year"
         case album = "Album"
@@ -61,7 +61,7 @@ class LibraryViewModel: ObservableObject {
     
     // MARK: - Record Updating/Init
 
-    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String]){
+    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool){
         // Uploading New Instance of Record Data to Database
 
         // UUID of entry
@@ -70,16 +70,18 @@ class LibraryViewModel: ObservableObject {
         let ref: DatabaseReference! = Database.database().reference()
         
         // Add child elements
-        ref.child("Records").child(id).child("artist").setValue(String(artistName))
-        ref.child("Records").child(id).child("name").setValue(String(recordName))
+        ref.child("Records").child(id).child("artist").setValue(artistName)
+        ref.child("Records").child(id).child("name").setValue(recordName)
         ref.child("Records").child(id).child("releaseYear").setValue(releaseYear)
+        ref.child("Records").child(id).child("dateAdded").setValue(dateAdded)
+        ref.child("Records").child(id).child("isBand").setValue(isBand)
         for genre in genres{
             let path = "\(genre)"
             ref.child("Records").child(id).child("genres").child(path).setValue(true)
         }
         
         // Create new item in local library with data (leaves photo empty)
-        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres)
+        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand)
 
         // Attempt photo upload, will handle adding to db if photo available
         uploadPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
@@ -89,10 +91,10 @@ class LibraryViewModel: ObservableObject {
         
     }
     
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String]) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool) {
         // Add New Instance of Record Data to Local Library
         
-        let newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres)
+        let newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand)
         
         // Add to array for library sorting, add to dictionary for fetching
         recordLibrary.append(newItem)
@@ -164,7 +166,7 @@ class LibraryViewModel: ObservableObject {
         
     }
     
-    func editRecordEntry(id: String,recordName: String? = nil, artistName: String? = nil, releaseYear: Int? = nil, newPhoto: Bool, genres: [String]? = nil){
+    func editRecordEntry(id: String,recordName: String? = nil, artistName: String? = nil, releaseYear: Int? = nil, newPhoto: Bool, genres: [String]? = nil, dateAdded: String? = nil, isBand: Bool? = nil){
         // Edit values of current db Item
         
         print("Editing Entry: ", id)
@@ -184,6 +186,14 @@ class LibraryViewModel: ObservableObject {
             if releaseYear != nil{
                 self.recordLibrary[recordIndex].releaseYear = releaseYear!
                 self.recordDictionaryByID[id]?.releaseYear = releaseYear!
+            }
+            if dateAdded != nil{
+                self.recordLibrary[recordIndex].dateAdded = dateAdded!
+                self.recordDictionaryByID[id]?.dateAdded = dateAdded!
+            }
+            if isBand != nil{
+                self.recordLibrary[recordIndex].isBand = isBand!
+                self.recordDictionaryByID[id]?.isBand = isBand!
             }
             if genres != nil{
                 self.recordLibrary[recordIndex].genres = genres!
@@ -210,6 +220,12 @@ class LibraryViewModel: ObservableObject {
         }
         if releaseYear != nil{
             ref.child("Records").child(id).child("releaseYear").setValue(releaseYear!)
+        }
+        if dateAdded != nil{
+            ref.child("Records").child(id).child("dateAdded").setValue(dateAdded!)
+        }
+        if isBand != nil{
+            ref.child("Records").child(id).child("isBand").setValue(isBand!)
         }
         
         // Add new genres and deleted any removed from list by user
@@ -278,6 +294,8 @@ class LibraryViewModel: ObservableObject {
                 let artist = elementDict["artist"]
                 let name = elementDict["name"]
                 let releaseYear = elementDict["releaseYear"]
+                let dateAdded = elementDict["dateAdded"]
+                let isBand = elementDict["isBand"] as! Bool
 
                 var coverPhoto: UIImage?
                 var discPhoto: UIImage?
@@ -319,16 +337,16 @@ class LibraryViewModel: ObservableObject {
                     print("IN QUEUE")
                     if let discPhoto = discPhoto, let coverPhoto = coverPhoto {
                         print("Adding both")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres)
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     } else if let discPhoto = discPhoto {
                         print("Adding disc")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, discPhoto: discPhoto, genres: genres)
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     } else if let coverPhoto = coverPhoto {
                         print("Adding cover")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, genres: genres)
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, genres: genres,dateAdded:dateAdded as! String, isBand: isBand)
                     } else {
                         print("No Photo")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, genres: genres)
+                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     }
                     completion()
                 }
@@ -339,16 +357,42 @@ class LibraryViewModel: ObservableObject {
     
     private func sortRecords() {
         // Sorting of local library
+        let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM-dd-yyyy"
+        
         switch sortingFactor {
-//        case .dateAdded:
-//            vinylRecords.sort { $0.dateAdded > $1.dateAdded }
-        case .artist:
+        case .dateAdded:
             recordLibrary.sort {
-                if $0.artist != $1.artist {
-                    return $0.artist < $1.artist
-                } else {
-                    return $0.name < $1.name
+                guard let date1 = stringToDate(from: $0.dateAdded, format: "MM-dd-yyyy"),
+                      let date2 = stringToDate(from: $1.dateAdded, format: "MM-dd-yyyy") else {
+                    return false // Handle invalid date strings as needed
                 }
+                return date1 > date2
+            }
+        case .artist:
+            // Sort with consideration for band vs person and exclude leading The
+            recordLibrary.sort {
+                let isBand1 = $0.isBand
+                let isBand2 = $1.isBand
+
+                let name1: String
+                let name2: String
+
+                if isBand1 {
+                    let components1 = $0.artist.components(separatedBy: " ")
+                    name1 = components1.first == "The" ? components1.dropFirst().joined(separator: " ") : components1.first ?? ""
+                } else {
+                    name1 = $0.artist.components(separatedBy: " ").last ?? ""
+                }
+
+                if isBand2 {
+                    let components2 = $1.artist.components(separatedBy: " ")
+                    name2 = components2.first == "The" ? components2.dropFirst().joined(separator: " ") : components2.first ?? ""
+                } else {
+                    name2 = $1.artist.components(separatedBy: " ").last ?? ""
+                }
+
+                return name1 < name2
             }
         case .releaseYear:
             recordLibrary.sort {
@@ -368,23 +412,62 @@ class LibraryViewModel: ObservableObject {
             }
         }
         self.pullSortingHeaders()
+        for record in recordLibrary{
+            print(record.artist)
+        }
+    }
+    
+    func checkArtistHeaderMatch(record: RecordItem, header: String) -> Bool{
+        var char = ""
+        if record.isBand {
+            let components = record.artist.components(separatedBy: " ")
+            char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
+        } else {
+            char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
+        }
+        return char == header
     }
     
     private func pullSortingHeaders(){
         for record in self.recordLibrary{
-            if let character = record.artist.first, !sortingElementHeaders.artist.contains(String(character)) {
-                sortingElementHeaders.artist.append(String(character))
+//            if let character = record.artist.first, !sortingElementHeaders.artist.contains(String(character)) {
+//                sortingElementHeaders.artist.append(String(character))
+//            }
+            var char = ""
+            if record.isBand {
+                let components = record.artist.components(separatedBy: " ")
+                char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
+            } else {
+                char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
             }
+            if !sortingElementHeaders.artist.contains(char){
+                sortingElementHeaders.artist.append(char)
+            }
+            
             if let character = record.name.first, !sortingElementHeaders.album.contains(String(character)) {
                 sortingElementHeaders.album.append(String(character))
             }
             if !sortingElementHeaders.releaseYear.contains(String(record.releaseYear)){
                 sortingElementHeaders.releaseYear.append(String(record.releaseYear))
             }
+            if !sortingElementHeaders.dateAdded.contains(record.dateAdded){
+                sortingElementHeaders.dateAdded.append(record.dateAdded)
+            }
         }
         sortingElementHeaders.artist = sortingElementHeaders.artist.sorted(by: {$0 < $1})
+        print(sortingElementHeaders.artist)
         sortingElementHeaders.album = sortingElementHeaders.album.sorted(by: {$0 < $1})
         sortingElementHeaders.releaseYear = sortingElementHeaders.releaseYear.sorted(by: {$0 < $1})
+        
+        let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM-dd-yyyy"
+        sortingElementHeaders.dateAdded.sort {
+            guard let date1 = stringToDate(from: $0, format: "MM-dd-yyyy"),
+                  let date2 = stringToDate(from: $1, format: "MM-dd-yyyy") else {
+                return false // Handle invalid date strings as needed
+            }
+            return date1 > date2
+        }
     }
     
     func fetchPhotoByID(id: String) -> UIImage? {

@@ -16,6 +16,10 @@ struct AddRecordView: View {
     @State private var recordName = ""
     @State private var artistName = ""
     @State private var releaseYear: Int = 2024
+    @State private var dateAdded = Date()
+    @State private var isBand: Bool = false
+    
+    
     @State private var isImagePickerPresented: Bool = false
     @Environment(\.presentationMode) var presentationModeAddItem
     
@@ -43,11 +47,12 @@ struct AddRecordView: View {
                     VStack{
                         RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
                         
-                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,
+                                               isBand:$isBand,            showAlert: $showAlert)
                         
                         Button(action:{
                             if isFormValid{
-                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres)
+                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand)
                                 
                                 presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
                             }else{
@@ -70,6 +75,12 @@ struct AddRecordView: View {
                 genreManager.genres = []
             }.padding(.bottom, keyboard.currentHeight/2)
         }
+    }
+    
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd-yyyy"
+        return formatter.string(from: dateAdded)
     }
     
     

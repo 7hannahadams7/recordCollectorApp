@@ -183,10 +183,15 @@ struct RecordFieldDisplayView: View{
     @Binding var recordName: String
     @Binding var artistName: String
     @Binding var releaseYear: Int
+    @Binding var dateAdded: Date
+    @Binding var isBand: Bool
     
     @State private var newGenre = ""
     
     @Binding var showAlert: Bool
+    
+    @State private var isDatePickerVisible: Bool = false
+    
     
     var showList: Bool {
         // Show genre options to choose from if user is typing and there are genres available
@@ -234,14 +239,39 @@ struct RecordFieldDisplayView: View{
                     Spacer()
                 }.frame(width:screenWidth/4)
                 if editingMode{
-                    TextField("Artist", text: $artistName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2).aspectRatio(contentMode: .fill)
+                    TextField("Artist", text: $artistName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2-40).aspectRatio(contentMode: .fill)
                         .onAppear {
                             if record != nil{
                                 artistName = record!.artist
                             }
                         }.shadow(color:(showAlert && artistName.isEmpty) ? Color.red : Color.clear, radius: 5)
+                    VStack{
+                        Text("Band").font(.system(size:12))
+                        Button {
+                            isBand.toggle()
+                        } label: {
+                            if isBand{
+                                Image(systemName:"checkmark.square.fill").foregroundColor(grayBlue)
+                            }else{
+                                Image(systemName:"checkmark.square").foregroundColor(grayBlue)
+                            }
+                        }.onAppear{
+                            if record != nil{
+                                isBand = record!.isBand
+                            }
+                        }
+                    }
                 }else{
-                    Text(record?.artist ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Text(record?.artist ?? "").padding().frame(width:screenWidth/2-40, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    VStack{
+                        Text("Band").font(.system(size:12))
+                        if record?.isBand ?? false{
+                            Image(systemName:"checkmark.square.fill").foregroundColor(grayBlue)
+                        }else{
+                            Image(systemName:"checkmark.square").foregroundColor(grayBlue)
+                        }
+                        
+                    }
                 }
                 Spacer()
             }
@@ -339,40 +369,43 @@ struct RecordFieldDisplayView: View{
                 newGenre = ""
             }
             
-            // Name Field
+            // Date Added Field
             HStack{
                 HStack{
-                    Text("Name: ")
+                    Text("Date Added: ").minimumScaleFactor(0.8)
                     Spacer()
                 }.frame(width:screenWidth/4)
                 if editingMode{
-                    TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                    DatePicker("", selection: $dateAdded, in: ...Date(), displayedComponents: .date)
+                        .datePickerStyle(CompactDatePickerStyle())
+                        .labelsHidden()
+                        .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
                         .onAppear {
                             if record != nil{
-                                recordName = record!.name
+                                dateAdded = stringToDate(from: record!.dateAdded)!
                             }
-                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
+                        }
                 }else{
-                    Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Text(record?.dateAdded ?? dateToString(date:Date())).padding().frame(alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 Spacer()
             }
             
-            // Name Field
+            // Location Bought Field
             HStack{
                 HStack{
-                    Text("Name: ")
+                    Text("Location: ")
                     Spacer()
                 }.frame(width:screenWidth/4)
                 if editingMode{
-                    TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                    TextField("Location", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
                         .onAppear {
                             if record != nil{
                                 recordName = record!.name
                             }
                         }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                 }else{
-                    Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Text(dateToString(date: dateAdded)).padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 Spacer()
             }
@@ -381,7 +414,23 @@ struct RecordFieldDisplayView: View{
         
     }
     
+    
 }
+
+// Function to format a date into a string
+func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = format
+    return formatter.string(from: date)
+}
+
+// Function to convert a string into a date
+func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
+    let formatter = DateFormatter()
+    formatter.dateFormat = format
+    return formatter.date(from: string)
+}
+
 
 class GenreManager: ObservableObject {
     @Published var genres: [String] = []

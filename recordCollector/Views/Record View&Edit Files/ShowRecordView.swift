@@ -14,10 +14,13 @@ struct ShowRecordView: View {
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject private var keyboard = KeyboardResponder()
     
+    var record: RecordItem
+    
     @State private var recordName = ""
     @State private var artistName = ""
-    var record: RecordItem
     @State private var releaseYear: Int = 2024
+    @State private var dateAdded = Date()
+    @State private var isBand: Bool = false
     
     @State private var editingMode: Bool = false
     @State private var newPhoto: Bool = false
@@ -61,7 +64,7 @@ struct ShowRecordView: View {
                                     VStack{
                                         if editingMode{
                                             Button(action:{
-                                                viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres)
+                                                viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres, dateAdded: dateToString(date: dateAdded),isBand:isBand)
                                                 viewModel.resetPhoto()
                                                 editingMode.toggle()
                                             }){
@@ -79,7 +82,7 @@ struct ShowRecordView: View {
                             if listeningMode{
                                 ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
                             }else{
-                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, showAlert: $showAlert)
+                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded, isBand: $isBand, showAlert: $showAlert)
                             }
                             
                             // BOTTOM BUTTONS

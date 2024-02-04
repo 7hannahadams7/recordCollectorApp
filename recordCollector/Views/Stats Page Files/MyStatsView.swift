@@ -14,7 +14,6 @@ struct MyStatsView: View {
 //    @ObservedObject var spotifyController: SpotifyController
     
     
-    
     var body: some View {
         let genresView = GenericStatView(viewModel:statsViewModel,viewType:"Genres")
         let artistsView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
@@ -73,9 +72,6 @@ struct MyStatsView: View {
                 
                 
             }
-        }
-        .onAppear{
-            statsViewModel.refreshData()
         }
     }
             

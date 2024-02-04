@@ -18,12 +18,21 @@ struct MyLibraryView: View {
     
     var genreManager = GenreManager()
     
+    @State private var filteredGenres: [String] = ["Alternative","Classic Rock"]
+//    @State private var filterGenre: String = "Alternative"
+    
     var body: some View {
         
         var recordLibrary: [RecordItem] {
             if sortingDirection{
+                if filteredGenres != []{
+                    return viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}})
+                }
                 return viewModel.recordLibrary
             }else{
+                if filteredGenres != []{
+                    return viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
+                }
                 return viewModel.recordLibrary.reversed()
             }
         }
@@ -46,6 +55,12 @@ struct MyLibraryView: View {
                 }else{
                     return viewModel.sortingElementHeaders.releaseYear.reversed()
                 }
+            }else if sortingFactor == "Date Added"{
+                if sortingDirection{
+                    return viewModel.sortingElementHeaders.dateAdded
+                }else{
+                    return viewModel.sortingElementHeaders.dateAdded.reversed()
+                }
             }
             return []
         }
@@ -53,11 +68,8 @@ struct MyLibraryView: View {
         NavigationView{
             ZStack{
                 
-                //Background Image
+                //Background Color
                 Color(woodBrown).edgesIgnoringSafeArea(.all)
-//                ZStack{
-//                    Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
-//                }.ignoresSafeArea()
                 
                 // Library Layout
                 VStack(spacing:5){
@@ -77,9 +89,9 @@ struct MyLibraryView: View {
                         } label: {
                             Image("SortBy").resizable().aspectRatio(contentMode: .fit)
                         }.frame(height:30)
-                        Button(action:{
+                        Button{
                             sortingDirection.toggle()
-                        }){
+                        }label: {
                             Text(sortingFactor).bold().foregroundStyle(recordBlack)
                             if sortingDirection{
                                 Image(systemName:"chevron.down").foregroundStyle(recordBlack)
@@ -90,7 +102,51 @@ struct MyLibraryView: View {
                         Spacer()
                     }.frame(height:30).padding(.horizontal,10)
                     
-                    Image("topShelf").resizable().frame(height:20).aspectRatio(contentMode: .fit)
+                    ZStack{
+                        RoundedRectangle(cornerRadius: 5).fill(lightWoodBrown).shadow(color:recordBlack,radius:2)
+                        
+                            HStack{
+                                if !filteredGenres.isEmpty{
+                                    Text("Filters: ")
+                                    ScrollView(.horizontal){
+                                        HStack{
+                                            ForEach(filteredGenres, id:\.self){genre in
+                                                ZStack{
+                                                    HStack{
+                                                        Text(genre)
+                                                        Button{
+                                                            if let index = filteredGenres.firstIndex(of: genre) {
+                                                                filteredGenres.remove(at: index)
+                                                            }
+                                                        }label:{
+                                                            Image(systemName: "xmark").foregroundColor(recordBlack)
+                                                        }
+                                                    }.padding(8).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 5))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                Spacer()
+                                Menu {
+                                    Menu {
+                                        ForEach(viewModel.fullGenres.sorted(), id:\.self){genre in
+                                            Button{
+                                                if !filteredGenres.contains(genre){
+                                                    filteredGenres.append(genre)
+                                                }
+                                            }label:{
+                                                Text(genre)
+                                            }
+                                        }
+                                    }label:{
+                                        Text("Genres")
+                                    }
+                                } label: {
+                                    Image(systemName: "line.3.horizontal.decrease.circle").foregroundStyle(recordBlack)
+                                }
+                            }.padding(.horizontal)
+                    }.frame(height: (!filteredGenres.isEmpty) ? 50 : 25)
                     
                     //Library Listing
                     List {
@@ -98,7 +154,8 @@ struct MyLibraryView: View {
                                 char in
                                 Section(header: Text(String(char))) {
                                     if sortingFactor == "Artist"{
-                                        ForEach(recordLibrary.filter({$0.artist.first == char.first })){record in
+                                        ForEach(recordLibrary.filter({viewModel.checkArtistHeaderMatch(record:$0, header:char)})){
+                                            record in
                                             NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
                                                 PersonRowView(record:record)
                                             }
@@ -111,6 +168,12 @@ struct MyLibraryView: View {
                                         }
                                     }else if sortingFactor == "Release Year"{
                                         ForEach(recordLibrary.filter({String($0.releaseYear) == char })){record in
+                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
+                                                PersonRowView(record:record)
+                                            }
+                                        }
+                                    }else if sortingFactor == "Date Added"{
+                                        ForEach(recordLibrary.filter({$0.dateAdded == char })){record in
                                             NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
                                                 PersonRowView(record:record)
                                             }
@@ -135,9 +198,9 @@ struct MyLibraryView: View {
             }
             
         }
-//        .onAppear{
-//            viewModel.refreshData()
-//        }
+        .onAppear{
+            viewModel.refreshData()
+        }
     }
     
 }
