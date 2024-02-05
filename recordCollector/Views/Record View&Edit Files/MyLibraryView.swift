@@ -18,52 +18,12 @@ struct MyLibraryView: View {
     
     var genreManager = GenreManager()
     
-    @State private var filteredGenres: [String] = ["Alternative","Classic Rock"]
-//    @State private var filterGenre: String = "Alternative"
+    @State private var filteredGenres: [String] = []
     
     var body: some View {
         
-        var recordLibrary: [RecordItem] {
-            if sortingDirection{
-                if filteredGenres != []{
-                    return viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}})
-                }
-                return viewModel.recordLibrary
-            }else{
-                if filteredGenres != []{
-                    return viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
-                }
-                return viewModel.recordLibrary.reversed()
-            }
-        }
-        var sortingHeaders: [String]{
-            if sortingFactor == "Artist"{
-                if sortingDirection{
-                    return viewModel.sortingElementHeaders.artist
-                }else{
-                    return viewModel.sortingElementHeaders.artist.reversed()
-                }
-            }else if sortingFactor == "Album"{
-                if sortingDirection{
-                    return viewModel.sortingElementHeaders.album
-                }else{
-                    return viewModel.sortingElementHeaders.album.reversed()
-                }
-            }else if sortingFactor == "Release Year"{
-                if sortingDirection{
-                    return viewModel.sortingElementHeaders.releaseYear
-                }else{
-                    return viewModel.sortingElementHeaders.releaseYear.reversed()
-                }
-            }else if sortingFactor == "Date Added"{
-                if sortingDirection{
-                    return viewModel.sortingElementHeaders.dateAdded
-                }else{
-                    return viewModel.sortingElementHeaders.dateAdded.reversed()
-                }
-            }
-            return []
-        }
+        // Pull sorted and filtered library and headers for sections
+        let (recordLibrary, sortingHeaders) = viewModel.filteredLibrary(sortingFactor:sortingFactor, sortingDirection:sortingDirection,filteredGenres:!filteredGenres.isEmpty ? filteredGenres : viewModel.fullGenres.sorted())
         
         NavigationView{
             ZStack{
@@ -93,11 +53,7 @@ struct MyLibraryView: View {
                             sortingDirection.toggle()
                         }label: {
                             Text(sortingFactor).bold().foregroundStyle(recordBlack)
-                            if sortingDirection{
-                                Image(systemName:"chevron.down").foregroundStyle(recordBlack)
-                            }else{
-                                Image(systemName:"chevron.up").foregroundStyle(recordBlack)
-                            }
+                            Image(systemName:sortingDirection ? "chevron.down" : "chevron.up").foregroundStyle(recordBlack)
                         }
                         Spacer()
                     }.frame(height:30).padding(.horizontal,10)
@@ -146,41 +102,21 @@ struct MyLibraryView: View {
                                     Image(systemName: "line.3.horizontal.decrease.circle").foregroundStyle(recordBlack)
                                 }
                             }.padding(.horizontal)
-                    }.frame(height: (!filteredGenres.isEmpty) ? 50 : 25)
+                    }.frame(height: (!filteredGenres.isEmpty) ? 50 : 25).padding(5)
                     
                     //Library Listing
                     List {
-                            ForEach(sortingHeaders, id:\.self) {
-                                char in
-                                Section(header: Text(String(char))) {
-                                    if sortingFactor == "Artist"{
-                                        ForEach(recordLibrary.filter({viewModel.checkArtistHeaderMatch(record:$0, header:char)})){
-                                            record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
-                                                PersonRowView(record:record)
-                                            }
-                                        }
-                                    }else if sortingFactor == "Album"{
-                                        ForEach(recordLibrary.filter({$0.name.first == char.first })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
-                                                PersonRowView(record:record)
-                                            }
-                                        }
-                                    }else if sortingFactor == "Release Year"{
-                                        ForEach(recordLibrary.filter({String($0.releaseYear) == char })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
-                                                PersonRowView(record:record)
-                                            }
-                                        }
-                                    }else if sortingFactor == "Date Added"{
-                                        ForEach(recordLibrary.filter({$0.dateAdded == char })){record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
-                                                PersonRowView(record:record)
-                                            }
-                                        }
+                        ForEach(sortingHeaders, id:\.self) {
+                            char in
+                            Section(header: Text(String(char))) {
+                                ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
+                                        record in
+                                    NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
+                                        PersonRowView(record:record)
                                     }
                                 }
                             }
+                        }
                     }.listStyle(.inset).cornerRadius(10).padding(5).preferredColorScheme(.light)
                     
                 }.padding().padding(.top,35)
@@ -199,7 +135,7 @@ struct MyLibraryView: View {
             
         }
         .onAppear{
-            viewModel.refreshData()
+            viewModel.refreshData() // COMMENT OUT FOR STAGE RUN
         }
     }
     

@@ -14,8 +14,6 @@ class LibraryViewModel: ObservableObject {
     @Published var recordLibrary = [RecordItem]()
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
-    @Published var sortingElementHeaders: (artist: [String], album: [String], releaseYear: [String], dateAdded: [String]) = (artist:[],album:[],releaseYear:[],dateAdded:[])
-    
     @Published var fullGenres = Set<String>()
     
     @Published var isImagePickerPresented: Bool = false
@@ -37,6 +35,8 @@ class LibraryViewModel: ObservableObject {
         case releaseYear = "Release Year"
         case album = "Album"
     }
+    
+    
     
     // MARK: - Photo Actions
     func resetPhoto(){
@@ -354,9 +354,83 @@ class LibraryViewModel: ObservableObject {
         })
     }
 
+    func filteredLibrary(sortingFactor: String, sortingDirection: Bool, filteredGenres: [String]) -> (records: [RecordItem], headers: [String]){
+        // SortingFactor sort is handled by self.sortRecords() and is automatic from case change in MyLibraryView
+        
+        // Filter and Set Directions
+        let filteredRecords = sortingDirection ?  self.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}) :
+        self.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
+        
+        // Headers pulled from filtered library
+        let headers = sortingDirection ? sortingHeaderFunction(filteredRecords:filteredRecords, sortingFactor:sortingFactor) : sortingHeaderFunction(filteredRecords:filteredRecords, sortingFactor:sortingFactor).reversed()
+        
+        return (filteredRecords, headers)
+    }
+    
+    func headerToItemMatch(sortingFactor:String, header:String, record: RecordItem) -> Bool{
+        
+        if sortingFactor == "Artist"{
+            return checkArtistHeaderMatch(record: record, header: header)
+        }else if sortingFactor == "Album"{
+            return header.first == record.name.first
+        }else if sortingFactor == "Release Year"{
+            return header == String(record.releaseYear)
+        }else{
+            return header == record.dateAdded
+        }
+        
+    }
+    
+    private func sortingHeaderFunction(filteredRecords: [RecordItem], sortingFactor: String) -> [String]{
+        var headers: [String] = []
+        for record in filteredRecords{
+            if sortingFactor == "Artist"{
+                var char = ""
+                if record.isBand {
+                    let components = record.artist.components(separatedBy: " ")
+                    char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
+                } else {
+                    char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
+                }
+                if !headers.contains(char){
+                    headers.append(char)
+                }
+            }else if sortingFactor == "Album"{
+                if let character = record.name.first, !headers.contains(String(character)) {
+                    headers.append(String(character))
+                }
+            }else if sortingFactor == "Release Year"{
+                if !headers.contains(String(record.releaseYear)){
+                    headers.append(String(record.releaseYear))
+                }
+            }else{
+                if !headers.contains(record.dateAdded){
+                    headers.append(record.dateAdded)
+                }
+            }
+        }
+        
+        if sortingFactor == "Date Added"{
+            let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MM-dd-yyyy"
+            headers.sort {
+                guard let date1 = stringToDate(from: $0, format: "MM-dd-yyyy"),
+                      let date2 = stringToDate(from: $1, format: "MM-dd-yyyy") else {
+                    return false // Handle invalid date strings as needed
+                }
+                return date1 > date2
+            }
+            return headers
+        }else{
+            return headers.sorted(by: {$0 < $1})
+        }
+        
+    }
+    
+    
     
     private func sortRecords() {
-        // Sorting of local library
+        // Sorting of local library, runs on all refreshes, on change of sortingFactor case in MyLibraryView and on init
         let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM-dd-yyyy"
         
@@ -411,13 +485,10 @@ class LibraryViewModel: ObservableObject {
                 }
             }
         }
-        self.pullSortingHeaders()
-        for record in recordLibrary{
-            print(record.artist)
-        }
     }
     
     func checkArtistHeaderMatch(record: RecordItem, header: String) -> Bool{
+        // Returns whether record aligns with header for Artist Sorting Factor
         var char = ""
         if record.isBand {
             let components = record.artist.components(separatedBy: " ")
@@ -426,48 +497,6 @@ class LibraryViewModel: ObservableObject {
             char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
         }
         return char == header
-    }
-    
-    private func pullSortingHeaders(){
-        for record in self.recordLibrary{
-//            if let character = record.artist.first, !sortingElementHeaders.artist.contains(String(character)) {
-//                sortingElementHeaders.artist.append(String(character))
-//            }
-            var char = ""
-            if record.isBand {
-                let components = record.artist.components(separatedBy: " ")
-                char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
-            } else {
-                char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
-            }
-            if !sortingElementHeaders.artist.contains(char){
-                sortingElementHeaders.artist.append(char)
-            }
-            
-            if let character = record.name.first, !sortingElementHeaders.album.contains(String(character)) {
-                sortingElementHeaders.album.append(String(character))
-            }
-            if !sortingElementHeaders.releaseYear.contains(String(record.releaseYear)){
-                sortingElementHeaders.releaseYear.append(String(record.releaseYear))
-            }
-            if !sortingElementHeaders.dateAdded.contains(record.dateAdded){
-                sortingElementHeaders.dateAdded.append(record.dateAdded)
-            }
-        }
-        sortingElementHeaders.artist = sortingElementHeaders.artist.sorted(by: {$0 < $1})
-        print(sortingElementHeaders.artist)
-        sortingElementHeaders.album = sortingElementHeaders.album.sorted(by: {$0 < $1})
-        sortingElementHeaders.releaseYear = sortingElementHeaders.releaseYear.sorted(by: {$0 < $1})
-        
-        let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM-dd-yyyy"
-        sortingElementHeaders.dateAdded.sort {
-            guard let date1 = stringToDate(from: $0, format: "MM-dd-yyyy"),
-                  let date2 = stringToDate(from: $1, format: "MM-dd-yyyy") else {
-                return false // Handle invalid date strings as needed
-            }
-            return date1 > date2
-        }
     }
     
     func fetchPhotoByID(id: String) -> UIImage? {
