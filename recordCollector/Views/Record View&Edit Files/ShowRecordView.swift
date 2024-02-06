@@ -31,6 +31,8 @@ struct ShowRecordView: View {
         return !recordName.isEmpty && !artistName.isEmpty
     }
     
+    @State private var confirmDeletePopup:Bool = false
+    
     @ObservedObject var genreManager: GenreManager
     
     @State private var newGenre = ""
@@ -44,41 +46,8 @@ struct ShowRecordView: View {
                     Color(woodBrown).edgesIgnoringSafeArea(.all)
                     ScrollView{
                         VStack{
-                            ZStack{
-                                HStack{
-                                    VStack{
-                                        if editingMode{
-                                            Button(action:{
-                                                viewModel.resetPhoto()
-                                                editingMode.toggle()
-                                                genreManager.genres = record.genres
-                                            }){
-                                                ZStack{
-                                                    Circle().fill(decorWhite).frame(width:60,height:60).padding(.horizontal)
-                                                    Image(systemName:"xmark").foregroundColor(decorBlack)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    Spacer()
-                                    VStack{
-                                        if editingMode{
-                                            Button(action:{
-                                                viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres, dateAdded: dateToString(date: dateAdded),isBand:isBand)
-                                                viewModel.resetPhoto()
-                                                editingMode.toggle()
-                                            }){
-                                                ZStack{
-                                                    Circle().fill(seaweedGreen).frame(width:60,height:60).padding(.horizontal)
-                                                    Image(systemName:"checkmark").foregroundColor(decorWhite)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                }.frame(height:150)
-                                RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
-                            }
+                            RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
+                            
                             if listeningMode{
                                 ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
                             }else{
@@ -88,19 +57,89 @@ struct ShowRecordView: View {
                             // BOTTOM BUTTONS
                             if editingMode{
                                 // DELETE RECORD BUTTON
-                                Button(action:{
-                                    Task{
-                                        await viewModel.deleteRecordEntry(id: id)
+                                HStack{
+
+                                    // Exit Edit Mode Button
+                                    Button(action:{
+                                        viewModel.resetPhoto()
+                                        editingMode.toggle()
+                                        genreManager.genres = record.genres
+                                    }){
+                                        ZStack{
+                                            Circle().fill(decorWhite)
+                                            Image(systemName:"xmark").resizable().padding().foregroundColor(decorBlack).aspectRatio(contentMode:.fill)
+                                        }.frame(width:60,height:60).padding(.horizontal)
                                     }
                                     
-                                    presentationModeShowRecord.wrappedValue.dismiss() // Dismiss the View after update
-                                }) {
-                                    HStack{
-                                        Text("DELETE RECORD").foregroundStyle(iconWhite)
-                                        Image(systemName:"xmark").foregroundColor(iconWhite)
+                                    // Delete Record Button
+                                    Button(action: {
+                                        // Show the confirmation alert
+                                        confirmDeletePopup.toggle()
+                                    }) {
+                                        ZStack{
+                                            Circle().fill(pinkRed)
+                                            Image(systemName: "trash").resizable().padding().foregroundColor(decorWhite).aspectRatio(contentMode: .fill)
+                                        }.frame(width:60, height:60).padding(.horizontal)
                                     }
+                                    .popover(isPresented: $confirmDeletePopup, arrowEdge: .bottom) {
+                                        // Confirm Delete Popup
+                                        VStack {
+                                            VStack{
+                                                Text("Confirm Delete")
+                                                    .headlineText().padding()
+                                                
+                                                Text("Are you sure you want to delete this record? This action cannot be undone.").mainText()
+                                                    .multilineTextAlignment(.center).padding()
+                                                
+                                                HStack {
+                                                    // Cancel button
+                                                    Button{
+                                                        confirmDeletePopup.toggle()
+                                                    }label:{
+                                                        Text("Cancel").headlineText()
+                                                    }
+                                                    .padding()
+                                                    .foregroundColor(.blue)
+                                                    
+                                                    Spacer()
+                                                    // Delete button
+                                                    Button{
+                                                        // Delete the record and dismiss the view
+                                                        Task {
+                                                            await viewModel.deleteRecordEntry(id: id)
+                                                        }
+                                                        
+                                                        presentationModeShowRecord.wrappedValue.dismiss()
+                                                        
+                                                        // Close the confirmation alert
+                                                        confirmDeletePopup.toggle()
+                                                    } label:{
+                                                        Text("Delete").headlineText()
+                                                    }
+                                                    .padding()
+                                                    .foregroundColor(.red)
+                                                }
+                                            }.padding().frame(width:3*screenWidth/4).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 25.0))
+                                        }
+                                        .padding().clearModalBackground()
+                                    }
+
+
+                                    // Save Changes Button
+                                    Button(action:{
+                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand)
+                                        viewModel.resetPhoto()
+                                        editingMode.toggle()
+                                    }){
+                                        ZStack{
+                                            Circle().fill(seaweedGreen)
+                                            Image(systemName:"checkmark").resizable().padding().foregroundColor(decorWhite).aspectRatio(contentMode:.fill)
+                                        }.frame(width:60,height:60).padding(.horizontal)
+                                    }
+
                                     
-                                }.padding(20).frame(width:3*screenWidth/4).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
+                                }.padding(20)
+
                             }else if listeningMode{
                                 // DISPLAYING SPOTIFY OPTIONS
                                 Button(action:{
@@ -137,7 +176,6 @@ struct ShowRecordView: View {
                     //Initial set of genres list
                     genreManager.genres = record.genres
                 }
-            /*.padding(.bottom, keyboard.currentHeight/2)*/ // Move frame up to type in genre box
         }
             
     }

@@ -7,6 +7,24 @@
 
 import SwiftUI
 
+extension Text {
+    func headlineText() -> some View{
+        self.font(.system(size: 16)).bold()
+    }
+    
+    func mainText() -> some View{
+        self.font(.system(size: 16))
+    }
+    
+    func subtitleText() -> some View {
+        self.font(.system(size: 12))
+    }
+    
+    func italicSubtitleText() -> some View{
+        self.font(.system(size: 12)).italic()
+    }
+}
+
 struct MyLibraryView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
@@ -37,6 +55,7 @@ struct MyLibraryView: View {
                     //Sorting Buttons and Top Bar
                     
                     HStack{
+                        // Sorting Factor Selection
                         Menu {
                             ForEach(LibraryViewModel.SortingFactor.allCases, id: \.self) { factor in
                                 Button(action: {
@@ -49,36 +68,38 @@ struct MyLibraryView: View {
                         } label: {
                             Image("SortBy").resizable().aspectRatio(contentMode: .fit)
                         }.frame(height:30)
+                        
+                        // Sorting Direction Toggle
                         Button{
                             sortingDirection.toggle()
                         }label: {
-                            Text(sortingFactor).bold().foregroundStyle(recordBlack)
+                            Text(sortingFactor).headlineText().foregroundStyle(recordBlack)
                             Image(systemName:sortingDirection ? "chevron.down" : "chevron.up").foregroundStyle(recordBlack)
                         }
                         Spacer()
                     }.frame(height:30).padding(.horizontal,10)
                     
+                    // Filter Bar
                     ZStack{
                         RoundedRectangle(cornerRadius: 5).fill(lightWoodBrown).shadow(color:recordBlack,radius:2)
                         
                             HStack{
-                                if !filteredGenres.isEmpty{
-                                    Text("Filters: ")
-                                    ScrollView(.horizontal){
-                                        HStack{
-                                            ForEach(filteredGenres, id:\.self){genre in
-                                                ZStack{
-                                                    HStack{
-                                                        Text(genre)
-                                                        Button{
-                                                            if let index = filteredGenres.firstIndex(of: genre) {
-                                                                filteredGenres.remove(at: index)
-                                                            }
-                                                        }label:{
-                                                            Image(systemName: "xmark").foregroundColor(recordBlack)
+                                Text("Filters: ").mainText()
+                                // Display Current Filters
+                                ScrollView(.horizontal){
+                                    HStack{
+                                        ForEach(filteredGenres, id:\.self){genre in
+                                            ZStack{
+                                                HStack{
+                                                    Text(genre).subtitleText()
+                                                    Button{
+                                                        if let index = filteredGenres.firstIndex(of: genre) {
+                                                            filteredGenres.remove(at: index)
                                                         }
-                                                    }.padding(8).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 5))
-                                                }
+                                                    }label:{
+                                                        Image(systemName: "xmark").foregroundColor(recordBlack)
+                                                    }
+                                                }.padding(8).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 5))
                                             }
                                         }
                                     }
@@ -99,10 +120,11 @@ struct MyLibraryView: View {
                                         Text("Genres")
                                     }
                                 } label: {
-                                    Image(systemName: "line.3.horizontal.decrease.circle").foregroundStyle(recordBlack)
+                                    Image(systemName: "line.3.horizontal.decrease.circle").resizable().padding(3).frame(width:30,height:30).foregroundStyle(recordBlack)
+                                        .aspectRatio(contentMode: .fit)
                                 }
                             }.padding(.horizontal)
-                    }.frame(height: (!filteredGenres.isEmpty) ? 50 : 25).padding(5)
+                    }.frame(height: 50).padding(5)
                     
                     //Library Listing
                     List {
@@ -135,7 +157,7 @@ struct MyLibraryView: View {
             
         }
         .onAppear{
-            viewModel.refreshData() // COMMENT OUT FOR STAGE RUN
+            viewModel.refreshData()
         }
     }
     
@@ -146,15 +168,21 @@ struct PersonRowView: View {
 
     var body: some View {
         HStack{
-            Image(uiImage:record.coverPhoto).resizable().padding(/*@START_MENU_TOKEN@*/.all, 5.0/*@END_MENU_TOKEN@*/).frame(width:75,height:75).scaledToFill().clipped()
+            ZStack{
+                Image(uiImage:record.discPhoto)
+                    .resizable()
+                    .scaledToFill()
+                    .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:75,height: 75).clipped().offset(x:5)
+                Image(uiImage:record.coverPhoto)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width:75,height: 75).clipped().border(decorWhite, width: 3).offset(x:-5)
+            }
             VStack(alignment: .leading, spacing: 3) {
-                HStack{
-                    Text(record.name).bold()
-                    let release = String(record.releaseYear)
-                    Spacer()
-                    Text(release)
-                }
-                Text(record.artist)
+                Text(record.name).headlineText().minimumScaleFactor(0.9)
+                Text(record.artist).mainText()
+                Text(String(record.releaseYear)).subtitleText()
+                Text(record.dateAdded).subtitleText()
             }.padding(.all,10.0)
             Spacer()
         }.padding(.horizontal, 10.0).frame(height:75)

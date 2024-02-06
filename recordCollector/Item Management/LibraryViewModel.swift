@@ -28,7 +28,6 @@ class LibraryViewModel: ObservableObject {
         }
     }
     
-    
     enum SortingFactor: String, CaseIterable {
         case dateAdded = "Date Added"
         case artist = "Artist"
@@ -414,8 +413,9 @@ class LibraryViewModel: ObservableObject {
             let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "MM-dd-yyyy"
             headers.sort {
-                guard let date1 = stringToDate(from: $0, format: "MM-dd-yyyy"),
-                      let date2 = stringToDate(from: $1, format: "MM-dd-yyyy") else {
+                // Sort chronologically by actual date
+                guard let date1 = String.stringToDate(from: $0),
+                      let date2 = String.stringToDate(from: $1) else {
                     return false // Handle invalid date strings as needed
                 }
                 return date1 > date2
@@ -437,8 +437,9 @@ class LibraryViewModel: ObservableObject {
         switch sortingFactor {
         case .dateAdded:
             recordLibrary.sort {
-                guard let date1 = stringToDate(from: $0.dateAdded, format: "MM-dd-yyyy"),
-                      let date2 = stringToDate(from: $1.dateAdded, format: "MM-dd-yyyy") else {
+                // Sort chronologically by actual date
+                guard let date1 = String.stringToDate(from: $0.dateAdded),
+                      let date2 = String.stringToDate(from: $1.dateAdded) else {
                     return false // Handle invalid date strings as needed
                 }
                 return date1 > date2

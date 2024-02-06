@@ -20,21 +20,15 @@ struct SpotifyOptionDisplay: View {
     var body: some View {
         VStack{
             List {
-                Section(header: Text("Album")){
+                Section(header: Text("Albums")){
                     ScrollView { // MUST KEEP SCROLLVIEW to maintain AppRemote connection in SpotifyPlayer
-                        // Pull Album items from Search Results
-                        if let albums = albumSearchResult?.albums.items {
-                            ForEach(albums, id: \.id) { album in
-                                SpotifyDisplayRow(album: album, spotifyController: spotifyController)
-                                    .padding(.vertical, 8)
-                            }
-                        }
-                        if let remasters = remasterSearchResult?.albums.items {
-                            
-                            ForEach(remasters, id: \.id) { album in
-                                SpotifyDisplayRow(album: album, spotifyController: spotifyController)
-                                    .padding(.vertical, 8)
-                            }
+                        
+                        // Combine Album items from both search results
+                        let allAlbums = Set(albumSearchResult?.albums.items ?? []).union(remasterSearchResult?.albums.items ?? [])
+                        
+                        ForEach(Array(allAlbums), id: \.id) { album in
+                            SpotifyDisplayRow(album: album, spotifyController: spotifyController)
+                                .padding(.vertical, 8)
                         }
                     }
                 }

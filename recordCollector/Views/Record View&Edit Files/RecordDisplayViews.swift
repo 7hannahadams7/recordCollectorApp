@@ -102,7 +102,7 @@ struct RecordImageDisplayView: View{
         }else{
             // Display images with swipe view capability, no button function
             ZStack{
-                // Disc Photo Change Button
+                // Disc Photo
                     ZStack{
                         Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
                         if let capturedImage = viewModel.capturedCoverImage {
@@ -125,7 +125,7 @@ struct RecordImageDisplayView: View{
                     }.frame(width:190,height:190).offset(x:lpOffset+25.0)
                     .disabled(!editingMode && !dragging)
                 
-                // Cover Photo Change Button
+                // Cover Photo
                     ZStack{
                         RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
                         if let capturedImage = viewModel.capturedLPImage {
@@ -382,11 +382,11 @@ struct RecordFieldDisplayView: View{
                         .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
                         .onAppear {
                             if record != nil{
-                                dateAdded = stringToDate(from: record!.dateAdded)!
+                                dateAdded = String.stringToDate(from: record!.dateAdded)!
                             }
                         }
                 }else{
-                    Text(record?.dateAdded ?? dateToString(date:Date())).padding().frame(alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Text(record?.dateAdded ?? Date.dateToString(date: Date())).padding().frame(alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 Spacer()
             }
@@ -405,7 +405,7 @@ struct RecordFieldDisplayView: View{
                             }
                         }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                 }else{
-                    Text(dateToString(date: dateAdded)).padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Text(Date.dateToString(date: dateAdded)).padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 Spacer()
             }
@@ -417,19 +417,35 @@ struct RecordFieldDisplayView: View{
     
 }
 
-// Function to format a date into a string
-func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
-    let formatter = DateFormatter()
-    formatter.dateFormat = format
-    return formatter.string(from: date)
+extension Date {
+    static func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: date)
+    }
 }
 
-// Function to convert a string into a date
-func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
-    let formatter = DateFormatter()
-    formatter.dateFormat = format
-    return formatter.date(from: string)
+extension String {
+    static func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.date(from: string)
+    }
 }
+
+//// Function to format a date into a string
+//func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
+//    let formatter = DateFormatter()
+//    formatter.dateFormat = format
+//    return formatter.string(from: date)
+//}
+//
+//// Function to convert a string into a date
+//func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
+//    let formatter = DateFormatter()
+//    formatter.dateFormat = format
+//    return formatter.date(from: string)
+//}
 
 
 class GenreManager: ObservableObject {

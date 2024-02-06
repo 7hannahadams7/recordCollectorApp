@@ -22,7 +22,11 @@ struct PlaylistResponse: Codable {
     let items: [Playlist]
 }
 
-struct Album: Codable, Identifiable {
+struct Album: Codable, Identifiable, Hashable {
+    static func == (lhs: Album, rhs: Album) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
     let id: String
     let name: String
     let artists: [Artist]
@@ -31,6 +35,10 @@ struct Album: Codable, Identifiable {
     let images: [SpotifyImage]
     var externalURL: String {
         return "https://open.spotify.com/album/\(id)"
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 struct Playlist: Codable, Identifiable {
