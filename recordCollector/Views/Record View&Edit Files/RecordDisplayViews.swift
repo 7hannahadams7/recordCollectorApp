@@ -189,6 +189,7 @@ struct RecordFieldDisplayView: View{
     @State private var newGenre = ""
     
     @Binding var showAlert: Bool
+    @Binding var listeningMode: Bool
     
     @State private var isDatePickerVisible: Bool = false
     
@@ -213,38 +214,32 @@ struct RecordFieldDisplayView: View{
     var body: some View{
         
         VStack{
-            // Name Field
-            HStack{
+            if editingMode{
+                
+                // Name Field
                 HStack{
-                    Text("Name: ")
-                    Spacer()
-                }.frame(width:screenWidth/4)
-                if editingMode{
+                    // Label
+                    HStack{
+                        Text("Name: ")
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Text Field
                     TextField("Name", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
-                        .onAppear {
-                            if record != nil{
-                                recordName = record!.name
-                            }
-                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
-                }else{
-                    Text(record?.name ?? "").padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                Spacer()
-            }
-            
-            // Artist Field
-            HStack{
-                HStack{
-                    Text("Artist: ")
+                        .shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                     Spacer()
-                }.frame(width:screenWidth/4)
-                if editingMode{
+                }
+                
+                // Artist Field
+                HStack{
+                    // Label
+                    HStack{
+                        Text("Artist: ")
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Text Field
                     TextField("Artist", text: $artistName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2-40).aspectRatio(contentMode: .fill)
-                        .onAppear {
-                            if record != nil{
-                                artistName = record!.artist
-                            }
-                        }.shadow(color:(showAlert && artistName.isEmpty) ? Color.red : Color.clear, radius: 5)
+                        .shadow(color:(showAlert && artistName.isEmpty) ? Color.red : Color.clear, radius: 5)
+                    // Band Selector
                     VStack{
                         Text("Band").font(.system(size:12))
                         Button {
@@ -255,78 +250,58 @@ struct RecordFieldDisplayView: View{
                             }else{
                                 Image(systemName:"checkmark.square").foregroundColor(grayBlue)
                             }
-                        }.onAppear{
-                            if record != nil{
-                                isBand = record!.isBand
-                            }
                         }
                     }
-                }else{
-                    Text(record?.artist ?? "").padding().frame(width:screenWidth/2-40, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
-                    VStack{
-                        Text("Band").font(.system(size:12))
-                        if record?.isBand ?? false{
-                            Image(systemName:"checkmark.square.fill").foregroundColor(grayBlue)
-                        }else{
-                            Image(systemName:"checkmark.square").foregroundColor(grayBlue)
-                        }
-                        
-                    }
-                }
-                Spacer()
-            }
-            
-            // Release Year Field
-            HStack{
-                HStack{
-                    Text("Release Year: ").minimumScaleFactor(0.8)
                     Spacer()
-                }.frame(width:screenWidth/4)
-                if editingMode{
+                }
+                
+                // Release Year Field
+                HStack{
+                    // Label
+                    HStack{
+                        Text("Release Year: ").minimumScaleFactor(0.8)
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Year Picker
                     Picker("Year", selection: $releaseYear) {
                         ForEach((1500..<Int(Date.now.formatted(.dateTime.year()))!+1).reversed(), id:\.self) { year in
                             Text(String(year)).tag(year)
                         }
-                    }.onAppear {
-                        if record != nil{
-                            releaseYear = record!.releaseYear
-                        }
                     }
                     .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
-                }else{
-                    Text(String(record?.releaseYear ?? 2024)).padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                Spacer()
-            }
-            
-            //Genre Field
-            HStack{
-                HStack{
-                    Text("Genres: ")
                     Spacer()
-                }.frame(width:screenWidth/4)
+                }
+                
+                //Genre Field
+                HStack{
+                    // Label
+                    HStack{
+                        Text("Genres: ")
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Genre Field
                     VStack(alignment:.leading){
-                        if editingMode{
-                            HStack{
-                                ZStack(alignment: .trailing){
-                                    TextField("Genre", text: $newGenre).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10))
-                                    Button(action: {
-                                        newGenre = ""
-                                    }){
-                                        Image(systemName: "xmark").foregroundStyle(decorWhite).padding()
-                                    }
-                                }
-                                
+                        HStack{
+                            // Entry Field
+                            ZStack(alignment: .trailing){
+                                TextField("Genre", text: $newGenre).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10))
                                 Button(action: {
-                                    if newGenre != ""{
-                                        genreManager.addGenre(newGenre)
-                                        newGenre = ""
-                                    }
-                                }) {
-                                    Image(systemName: "plus").foregroundColor(recordBlack).padding()
-                                }.frame(width:15)
+                                    newGenre = ""
+                                }){
+                                    Image(systemName: "xmark").foregroundStyle(decorWhite).padding()
+                                }
                             }
+                            // Add Button
+                            Button(action: {
+                                if newGenre != ""{
+                                    genreManager.addGenre(newGenre)
+                                    newGenre = ""
+                                }
+                            }) {
+                                Image(systemName: "plus").foregroundColor(recordBlack).padding()
+                            }.frame(width:15)
                         }
+                        // Genre List View
                         ZStack(alignment:.leading){
                             ScrollView(.horizontal) {
                                 HStack{
@@ -347,70 +322,115 @@ struct RecordFieldDisplayView: View{
                                     }
                                 }
                             }.frame(height:50)
+                            // Dropdown list of selectable genres
                             if showList {
-                                    List{
-                                        ForEach(filteredGenres, id: \.self) { genre in
-                                            Button(action: {
-                                                newGenre = genre // Auto-complete the text field with the selected genre
-                                                genreManager.addGenre(newGenre)
-                                                newGenre = ""
-                                            }) {
-                                                Text(genre).font(.system(size:15)).clipped()
-                                            }/*.listRowInsets(EdgeInsets(top:-20,leading:10,bottom:-20,trailing:10))*/
-                                        }
-                                    }.listStyle(.inset)/*.padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0))*/.background(iconWhite).frame(height: showList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
-                                    
+                                List{
+                                    ForEach(filteredGenres, id: \.self) { genre in
+                                        Button(action: {
+                                            newGenre = genre // Auto-complete the text field with the selected genre
+                                            genreManager.addGenre(newGenre)
+                                            newGenre = ""
+                                        }) {
+                                            Text(genre).font(.system(size:15)).clipped()
+                                        }/*.listRowInsets(EdgeInsets(top:-20,leading:10,bottom:-20,trailing:10))*/
+                                    }
+                                }.listStyle(.inset)/*.padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0))*/.background(iconWhite).frame(height: showList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
+                                
                             }
                         }
                     }.padding(10).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
-                Spacer()
-            }
-            .onChange(of: editingMode) {
-                newGenre = ""
-            }
-            
-            // Date Added Field
-            HStack{
-                HStack{
-                    Text("Date Added: ").minimumScaleFactor(0.8)
                     Spacer()
-                }.frame(width:screenWidth/4)
-                if editingMode{
+                }
+                .onChange(of: editingMode) {
+                    newGenre = "" // Reset text field
+                }
+                
+                // Date Added Field
+                HStack{
+                    // Label
+                    HStack{
+                        Text("Date Added: ").minimumScaleFactor(0.8)
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Date Picker
                     DatePicker("", selection: $dateAdded, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(CompactDatePickerStyle())
                         .labelsHidden()
                         .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
-                        .onAppear {
-                            if record != nil{
-                                dateAdded = String.stringToDate(from: record!.dateAdded)!
+                    Spacer()
+                }
+                
+                // Location Bought Field
+                HStack{
+                    // Label
+                    HStack{
+                        Text("Location: ")
+                        Spacer()
+                    }.frame(width:screenWidth/4)
+                    // Text Field
+                    TextField("Location", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                        .shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
+                    Spacer()
+                }
+                
+            }else{
+                
+                VStack(alignment:.leading){
+                    HStack{
+                        VStack(alignment:.leading){
+                            Text(recordName).headlineText()
+                            Text(artistName + (isBand ? "" : "ª")).mainText()
+                            Text("Released: " +  String(releaseYear)).subtitleText()
+                        }.padding(.bottom,5)
+                        Spacer()
+                        if !listeningMode{
+                            Button(action:{
+                                listeningMode.toggle()
+                            }){
+                                Image("playButton").resizable().frame(width:50,height:50)
                             }
                         }
-                }else{
-                    Text(record?.dateAdded ?? Date.dateToString(date: Date())).padding().frame(alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                Spacer()
-            }
-            
-            // Location Bought Field
-            HStack{
-                HStack{
-                    Text("Location: ")
-                    Spacer()
-                }.frame(width:screenWidth/4)
-                if editingMode{
-                    TextField("Location", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
-                        .onAppear {
-                            if record != nil{
-                                recordName = record!.name
+                    }
+                    VStack(alignment:.leading){
+                        Text("Genres: ").italicSubtitleText()
+                        ScrollView(.horizontal) {
+                            HStack{
+                                ForEach(genreManager.genres.reversed(), id: \.self){genre in
+                                    ZStack{
+                                        RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
+                                        HStack{
+                                            Text(genre).italicSubtitleText().onAppear{
+                                                print(genre)
+                                            }
+                                        }.padding(.horizontal)
+                                    }.frame(height:30)
+                                }
                             }
-                        }.shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
-                }else{
-                    Text(Date.dateToString(date: dateAdded)).padding().frame(width:screenWidth/2, alignment:.leading).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                    }.padding(.vertical,5)
+                    .onAppear{
+                        genreManager.genres = record?.genres ?? []
+                    }
+                    VStack(alignment:.leading){
+                        Text("Date Added: " + (Date.dateToString(date: dateAdded))).subtitleText()
+                        Text("Location Bought: " + (record?.name ?? "")).subtitleText()
+                    }.padding(.vertical,5)
                 }
-                Spacer()
             }
             
         }.padding(.all, 20).background(lightWoodBrown).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20).padding(.top,15).padding(.bottom,5)
+            .onAppear{
+                recordName = record?.name ?? ""
+                artistName = record?.artist ?? ""
+                releaseYear = record?.releaseYear ?? 2024
+                dateAdded = String.stringToDate(from: record?.dateAdded ?? "01-01-0001")!
+                isBand = record?.isBand ?? false
+                genreManager.genres = record?.genres ?? []
+            }
+            .onChange(of: editingMode) { _, _ in
+                genreManager.genres = record?.genres ?? []
+                print("IN DISPLAY: ", genreManager.genres)
+            }
         
     }
     
@@ -432,20 +452,6 @@ extension String {
         return formatter.date(from: string)
     }
 }
-
-//// Function to format a date into a string
-//func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
-//    let formatter = DateFormatter()
-//    formatter.dateFormat = format
-//    return formatter.string(from: date)
-//}
-//
-//// Function to convert a string into a date
-//func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
-//    let formatter = DateFormatter()
-//    formatter.dateFormat = format
-//    return formatter.date(from: string)
-//}
 
 
 class GenreManager: ObservableObject {

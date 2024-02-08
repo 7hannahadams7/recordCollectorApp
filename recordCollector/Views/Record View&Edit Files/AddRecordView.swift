@@ -19,6 +19,7 @@ struct AddRecordView: View {
     @State private var dateAdded = Date()
     @State private var isBand: Bool = false
     
+    @State private var listeningMode: Bool = true
     
     @State private var isImagePickerPresented: Bool = false
     @Environment(\.presentationMode) var presentationModeAddItem
@@ -48,7 +49,7 @@ struct AddRecordView: View {
                         RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
                         
                         RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,
-                                               isBand:$isBand,            showAlert: $showAlert)
+                                               isBand:$isBand,            showAlert: $showAlert, listeningMode: $listeningMode)
                         
                         Button(action:{
                             if isFormValid{

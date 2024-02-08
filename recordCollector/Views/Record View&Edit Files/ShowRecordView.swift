@@ -51,7 +51,7 @@ struct ShowRecordView: View {
                             if listeningMode{
                                 ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
                             }else{
-                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded, isBand: $isBand, showAlert: $showAlert)
+                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded, isBand: $isBand, showAlert: $showAlert, listeningMode: $listeningMode)
                             }
                             
                             // BOTTOM BUTTONS
@@ -64,6 +64,7 @@ struct ShowRecordView: View {
                                         viewModel.resetPhoto()
                                         editingMode.toggle()
                                         genreManager.genres = record.genres
+                                        print(genreManager.genres)
                                     }){
                                         ZStack{
                                             Circle().fill(decorWhite)
@@ -154,18 +155,13 @@ struct ShowRecordView: View {
                                         editingMode.toggle()
                                     }) {
                                         
-                                        Text("Edit Record").foregroundStyle(iconWhite)
-                                        
-                                    }.padding(20).background(pinkRed).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.horizontal,20)
-                                    Button(action:{
-                                        listeningMode.toggle()
-                                    }){
-                                        VStack{
-                                            Image("playButton").resizable().frame(width:50,height:50)
-                                            Text("Play Now")
+                                        HStack{
+                                            Text("Edit Record").foregroundStyle(decorBlack)
+                                            Image(systemName: "square.and.pencil").resizable().aspectRatio(contentMode: .fit).frame(width:20, height:20).foregroundStyle(decorBlack)
                                         }
-                                    }
-                                }
+                                        
+                                    }.padding(20).background(decorWhite).clipShape(RoundedRectangle(cornerRadius: 10))
+                                }.frame(height:50).padding()
                             }
                             
                             Spacer()

@@ -15,6 +15,7 @@ class LibraryViewModel: ObservableObject {
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
     @Published var fullGenres = Set<String>()
+    @Published var fullArtists = Set<String>()
     
     @Published var isImagePickerPresented: Bool = false
     @Published var capturedCoverImage: UIImage? = nil
@@ -39,13 +40,13 @@ class LibraryViewModel: ObservableObject {
     
     // MARK: - Photo Actions
     func resetPhoto(){
-        print("Resetting Captured Photo")
+//        print("Resetting Captured Photo")
         capturedLPImage = nil
         capturedCoverImage = nil
     }
     
     func capturePhoto() {
-        print("capturePhoto selected")
+//        print("capturePhoto selected")
         isImagePickerPresented = true
     }
 
@@ -104,12 +105,12 @@ class LibraryViewModel: ObservableObject {
     
     // Upload photo to storage, link to db, add to local library entry
     func uploadPhoto(id: String, image: UIImage?, type: String) -> Void{
-        print("Attempting Image Upload")
+//        print("Attempting Image Upload")
         let ref: DatabaseReference! = Database.database().reference()
         
         // Check selected image property not nil
         guard image != nil else{
-            print("No Image Uploaded, ID #: ", id)
+//            print("No Image Uploaded, ID #: ", id)
             return
         }
         
@@ -133,7 +134,7 @@ class LibraryViewModel: ObservableObject {
         
         // Check that we were able to convert it to data
         guard imageData != nil else{
-            print("ERROR Cannot Convert Image, ID #: ", id)
+//            print("ERROR Cannot Convert Image, ID #: ", id)
             return
         }
         
@@ -158,10 +159,10 @@ class LibraryViewModel: ObservableObject {
                 }else{
                     ref.child("Records").child(id).child("discImageURL").setValue(path)
                 }
-                print("Image Upload Successful, ID #: ", id)
+//                print("Image Upload Successful, ID #: ", id)
                 
             }else{
-                print("ERROR Image Upload, ID #: ", id)
+//                print("ERROR Image Upload, ID #: ", id)
                 return
             }
         }
@@ -298,6 +299,7 @@ class LibraryViewModel: ObservableObject {
                 let elementDict = snap.value as! [String: Any]
 
                 let artist = elementDict["artist"]
+                
                 let name = elementDict["name"]
                 let releaseYear = elementDict["releaseYear"]
                 let dateAdded = elementDict["dateAdded"]
@@ -312,7 +314,6 @@ class LibraryViewModel: ObservableObject {
                     for (genre, value) in genresDict {
                         if value {
                             genres.append(genre)
-                            self.fullGenres.insert(genre)
                         }
                     }
                 }
@@ -340,18 +341,18 @@ class LibraryViewModel: ObservableObject {
                 }
 
                 dispatchGroup.notify(queue: .main) {
-                    print("IN QUEUE")
+//                    print("IN QUEUE")
                     if let discPhoto = discPhoto, let coverPhoto = coverPhoto {
-                        print("Adding both")
+//                        print("Adding both")
                         self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     } else if let discPhoto = discPhoto {
-                        print("Adding disc")
+//                        print("Adding disc")
                         self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     } else if let coverPhoto = coverPhoto {
-                        print("Adding cover")
+//                        print("Adding cover")
                         self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, genres: genres,dateAdded:dateAdded as! String, isBand: isBand)
                     } else {
-                        print("No Photo")
+//                        print("No Photo")
                         self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
                     }
                     completion()
@@ -386,6 +387,15 @@ class LibraryViewModel: ObservableObject {
             return header == record.dateAdded
         }
         
+    }
+    
+    func gatherAllFilterOptions(){
+        for record in self.recordLibrary{
+            self.fullArtists.insert(record.artist)
+            for genre in record.genres{
+                self.fullGenres.insert(genre)
+            }
+        }
     }
     
     private func sortingHeaderFunction(filteredRecords: [RecordItem], sortingFactor: String) -> [String]{
@@ -510,7 +520,7 @@ class LibraryViewModel: ObservableObject {
         if let recordItem = recordDictionaryByID[id] {
             return recordItem.coverPhoto
         }
-        print("Couldn't find id in dictionary")
+//        print("Couldn't find id in dictionary")
         return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
     }
     
@@ -520,6 +530,7 @@ class LibraryViewModel: ObservableObject {
         recordDictionaryByID = [:]
         fetchData{
             self.sortRecords()
+            self.gatherAllFilterOptions()
         }
     }
     

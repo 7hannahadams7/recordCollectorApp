@@ -25,16 +25,19 @@ class SpotifyController: NSObject, ObservableObject {
     private var disconnectCancellable: AnyCancellable?
     
     override init() {
+        print("INIT")
         super.init()
         connectCancellable = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
             .receive(on: DispatchQueue.main)
             .sink { _ in
+                print("FIRST")
                 self.connect()
             }
         
         disconnectCancellable = NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
             .receive(on: DispatchQueue.main)
             .sink { _ in
+                print("SECOND")
                 self.disconnect()
             }
 
@@ -53,6 +56,7 @@ class SpotifyController: NSObject, ObservableObject {
     }()
     
     func setAccessToken(from url: URL) {
+        print("SETTING TOKEN")
         let parameters = appRemote.authorizationParameters(from: url)
         
         if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {

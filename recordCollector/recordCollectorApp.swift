@@ -23,12 +23,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct test3App: App {
-    // register app delegate for Firebase setup
-    
-//    init() {
-//        FirebaseApp.configure()
-//    }
-//
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     let urlImageService = URLImageService(fileStore: URLImageFileStore(),
                                               inMemoryStore: URLImageInMemoryStore())
@@ -38,12 +33,13 @@ struct test3App: App {
 
     var body: some Scene {
         WindowGroup {
-//            ListenNow(viewModel:libraryViewModel,spotifyController:spotifyController)
             ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)
             .onOpenURL { url in
+                print("CALLING OPENURL")
                 spotifyController.setAccessToken(from: url)
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification), perform: { _ in
+                print("TRIGGERING CONNECT")
                 spotifyController.connect()
             })
             .environment(\.urlImageService, urlImageService)

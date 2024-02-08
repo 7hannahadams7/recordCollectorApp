@@ -37,12 +37,13 @@ struct MyLibraryView: View {
     var genreManager = GenreManager()
     
     @State private var filteredGenres: [String] = []
+    @State private var filteredArtists: [String] = ["David Bowie", "Pink Floyd"]
     
     var body: some View {
         
         // Pull sorted and filtered library and headers for sections
-        var recordLibrary = filteredLibrary()
-        var sortingHeaders = filteredHeaders(filteredLibrary: recordLibrary)
+        let recordLibrary = filteredLibrary()
+        let sortingHeaders = filteredHeaders(filteredLibrary: recordLibrary)
         
         NavigationView{
             ZStack{
@@ -89,13 +90,16 @@ struct MyLibraryView: View {
                                 // Display Current Filters
                                 ScrollView(.horizontal){
                                     HStack{
-                                        ForEach(filteredGenres, id:\.self){genre in
+                                        ForEach((filteredArtists + filteredGenres), id:\.self){item in
                                             ZStack{
                                                 HStack{
-                                                    Text(genre).subtitleText()
+                                                    Text(item).subtitleText()
                                                     Button{
-                                                        if let index = filteredGenres.firstIndex(of: genre) {
+                                                        if let index = filteredGenres.firstIndex(of: item) {
                                                             filteredGenres.remove(at: index)
+                                                        }
+                                                        if let index = filteredArtists.firstIndex(of: item) {
+                                                            filteredArtists.remove(at: index)
                                                         }
                                                     }label:{
                                                         Image(systemName: "xmark").foregroundColor(recordBlack)
@@ -119,6 +123,20 @@ struct MyLibraryView: View {
                                         }
                                     }label:{
                                         Text("Genres")
+                                    }
+                                    
+                                    Menu {
+                                        ForEach(viewModel.fullArtists.sorted(), id:\.self){artist in
+                                            Button{
+                                                if !filteredArtists.contains(artist){
+                                                    filteredArtists.append(artist)
+                                                }
+                                            }label:{
+                                                Text(artist)
+                                            }
+                                        }
+                                    }label:{
+                                        Text("Artists")
                                     }
                                 } label: {
                                     Image(systemName: "line.3.horizontal.decrease.circle").resizable().padding(3).frame(width:30,height:30).foregroundStyle(recordBlack)
@@ -160,20 +178,39 @@ struct MyLibraryView: View {
             
         }.onAppear{
             // Reset and redefine library view when navigated to
+            print("APPEAR")
+//            viewModel.gatherAllFilterOptions()
             filteredGenres = []
+//            viewModel.refreshData()
         }
     }
     
-    private func filteredLibrary() -> [RecordItem]{
-        if filteredGenres.isEmpty{
-            return sortingDirection ? viewModel.recordLibrary : viewModel.recordLibrary.reversed()
-        }else{
-            return sortingDirection ?  viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}) :
-            viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
+    private func filteredLibrary() -> [RecordItem] {
+        print("Performing Filter")
+        
+        var filteredRecords: [RecordItem]
+        
+        if filteredGenres.isEmpty && filteredArtists.isEmpty {
+            filteredRecords = viewModel.recordLibrary
+        } else {
+            filteredRecords = viewModel.recordLibrary.filter { record in
+                let genresMatch = filteredGenres.isEmpty || record.genres.contains { Set(filteredGenres).contains($0) }
+                let artistsMatch = filteredArtists.isEmpty || filteredArtists.contains(record.artist)
+                
+                return genresMatch && artistsMatch
+            }
+            
+            if !sortingDirection {
+                filteredRecords = filteredRecords.reversed()
+            }
         }
+        
+        return filteredRecords
     }
+
     
     private func filteredHeaders(filteredLibrary: [RecordItem]) -> [String]{
+        print("Extracting Headers")
         var headers: [String] = []
         for record in filteredLibrary{
             if sortingFactor == "Artist"{
@@ -248,8 +285,11 @@ struct PersonRowView: View {
 }
 
 struct MyLibraryView_Previews: PreviewProvider {
-
+    
     static var previews: some View {
-        MyLibraryView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(), genreManager:GenreManager())
+        MyLibraryView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()}
     }
 }
+
+let testViewModel = LibraryViewModel()
+
