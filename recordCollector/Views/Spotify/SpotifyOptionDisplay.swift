@@ -9,6 +9,22 @@ import SwiftUI
 import URLImage
 import URLImageStore
 
+extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var result = [Element]()
+        var seen = Set<Element>()
+
+        for element in self {
+            if seen.insert(element).inserted {
+                result.append(element)
+            }
+        }
+
+        return result
+    }
+}
+
+
 struct SpotifyOptionDisplay: View {
     @ObservedObject var spotifyController: SpotifyController
     @Binding var albumDataString: String
@@ -20,13 +36,12 @@ struct SpotifyOptionDisplay: View {
     var body: some View {
         VStack{
             List {
-                Section(header: Text("Albums")){
-                    ScrollView { // MUST KEEP SCROLLVIEW to maintain AppRemote connection in SpotifyPlayer
-                        
-                        // Combine Album items from both search results
-                        let allAlbums = Set(albumSearchResult?.albums.items ?? []).union(remasterSearchResult?.albums.items ?? [])
-                        
-                        ForEach(Array(allAlbums), id: \.id) { album in
+                Section(header: Text("Albums")) {
+                    ScrollView {
+                        // Combine Album items from both search results without duplicates
+                        let allAlbums = ((albumSearchResult?.albums.items ?? []) + (remasterSearchResult?.albums.items ?? [])).removingDuplicates()
+
+                        ForEach(allAlbums) { album in
                             SpotifyDisplayRow(album: album, spotifyController: spotifyController)
                                 .padding(.vertical, 8)
                         }

@@ -41,7 +41,8 @@ struct MyLibraryView: View {
     var body: some View {
         
         // Pull sorted and filtered library and headers for sections
-        let (recordLibrary, sortingHeaders) = viewModel.filteredLibrary(sortingFactor:sortingFactor, sortingDirection:sortingDirection,filteredGenres:!filteredGenres.isEmpty ? filteredGenres : viewModel.fullGenres.sorted())
+        var recordLibrary = filteredLibrary()
+        var sortingHeaders = filteredHeaders(filteredLibrary: recordLibrary)
         
         NavigationView{
             ZStack{
@@ -133,7 +134,9 @@ struct MyLibraryView: View {
                             Section(header: Text(String(char))) {
                                 ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
                                         record in
-                                    NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager)) {
+                                    NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager).onDisappear(){
+                                        filteredGenres = []
+                                    }) {
                                         PersonRowView(record:record)
                                     }
                                 }
@@ -155,9 +158,64 @@ struct MyLibraryView: View {
                 }
             }
             
+        }.onAppear{
+            // Reset and redefine library view when navigated to
+            filteredGenres = []
         }
-        .onAppear{
-            viewModel.refreshData()
+    }
+    
+    private func filteredLibrary() -> [RecordItem]{
+        if filteredGenres.isEmpty{
+            return sortingDirection ? viewModel.recordLibrary : viewModel.recordLibrary.reversed()
+        }else{
+            return sortingDirection ?  viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}) :
+            viewModel.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
+        }
+    }
+    
+    private func filteredHeaders(filteredLibrary: [RecordItem]) -> [String]{
+        var headers: [String] = []
+        for record in filteredLibrary{
+            if sortingFactor == "Artist"{
+                var char = ""
+                if record.isBand {
+                    let components = record.artist.components(separatedBy: " ")
+                    char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
+                } else {
+                    char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
+                }
+                if !headers.contains(char){
+                    headers.append(char)
+                }
+            }else if sortingFactor == "Album"{
+                if let character = record.name.first, !headers.contains(String(character)) {
+                    headers.append(String(character))
+                }
+            }else if sortingFactor == "Release Year"{
+                if !headers.contains(String(record.releaseYear)){
+                    headers.append(String(record.releaseYear))
+                }
+            }else{
+                if !headers.contains(record.dateAdded){
+                    headers.append(record.dateAdded)
+                }
+            }
+        }
+        
+        if sortingFactor == "Date Added"{
+            let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MM-dd-yyyy"
+            headers.sort {
+                // Sort chronologically by actual date
+                guard let date1 = String.stringToDate(from: $0),
+                      let date2 = String.stringToDate(from: $1) else {
+                    return false // Handle invalid date strings as needed
+                }
+                return date1 > date2
+            }
+            return headers
+        }else{
+            return headers.sorted(by: {$0 < $1})
         }
     }
     

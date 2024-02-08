@@ -60,6 +60,7 @@ class LibraryViewModel: ObservableObject {
     
     // MARK: - Record Updating/Init
 
+    // Upload new entry to database and local library
     func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool){
         // Uploading New Instance of Record Data to Database
 
@@ -90,6 +91,7 @@ class LibraryViewModel: ObservableObject {
         
     }
     
+    // Adds new entry to local library
     func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool) {
         // Add New Instance of Record Data to Local Library
         
@@ -100,6 +102,7 @@ class LibraryViewModel: ObservableObject {
         recordDictionaryByID[id] = newItem
     }
     
+    // Upload photo to storage, link to db, add to local library entry
     func uploadPhoto(id: String, image: UIImage?, type: String) -> Void{
         print("Attempting Image Upload")
         let ref: DatabaseReference! = Database.database().reference()
@@ -165,6 +168,7 @@ class LibraryViewModel: ObservableObject {
         
     }
     
+    // Edit existing entry in db and local library
     func editRecordEntry(id: String,recordName: String? = nil, artistName: String? = nil, releaseYear: Int? = nil, newPhoto: Bool, genres: [String]? = nil, dateAdded: String? = nil, isBand: Bool? = nil){
         // Edit values of current db Item
         
@@ -247,6 +251,7 @@ class LibraryViewModel: ObservableObject {
         print("Updated Record, ID #: ", id)
     }
     
+    // Delete entry locally and from db, and images from storage
     func deleteRecordEntry(id: String) async {
         print("Deleting Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
@@ -278,6 +283,8 @@ class LibraryViewModel: ObservableObject {
     
     
     // MARK: - Library Data Initializing (Fetching, Sorting, etc.)
+    
+    // Fetch data from db and store in local library
     private func fetchData(completion: @escaping () -> Void) {
         print("PERFORMING FETCH")
         let allRecords = Database.database().reference().child("Records")
@@ -366,6 +373,7 @@ class LibraryViewModel: ObservableObject {
         return (filteredRecords, headers)
     }
     
+    // Given a sorting factor, header, and recordItem, determine if the record falls under the header or not
     func headerToItemMatch(sortingFactor:String, header:String, record: RecordItem) -> Bool{
         
         if sortingFactor == "Artist"{
@@ -426,8 +434,6 @@ class LibraryViewModel: ObservableObject {
         }
         
     }
-    
-    
     
     private func sortRecords() {
         // Sorting of local library, runs on all refreshes, on change of sortingFactor case in MyLibraryView and on init
