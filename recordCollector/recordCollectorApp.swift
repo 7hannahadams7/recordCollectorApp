@@ -8,6 +8,9 @@
 import SwiftUI
 import FirebaseCore
 
+import URLImage
+import URLImageStore
+
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
@@ -18,23 +21,28 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 
-
 @main
 struct test3App: App {
-    // register app delegate for Firebase setup
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    let urlImageService = URLImageService(fileStore: URLImageFileStore(),
+                                              inMemoryStore: URLImageInMemoryStore())
     
-//    init() {
-//        FirebaseApp.configure()
-//    }
-//    
-      @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
-    
+    @ObservedObject var spotifyController = SpotifyController()
+    @ObservedObject var libraryViewModel = LibraryViewModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel:LibraryViewModel())
-//            DatabaseTesting()
+            ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)
+            .onOpenURL { url in
+                print("CALLING OPENURL")
+                spotifyController.setAccessToken(from: url)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification), perform: { _ in
+                print("TRIGGERING CONNECT")
+                spotifyController.connect()
+            })
+            .environment(\.urlImageService, urlImageService)
         }
     }
 }

@@ -4,7 +4,7 @@
 //
 //  Created by Hannah Adams on 1/12/24.
 //
-
+import Foundation
 import SwiftUI
 import Charts
 
@@ -12,6 +12,7 @@ struct ArtistRecordShelf: View {
     @ObservedObject var viewModel: StatsViewModel //
     var isTabExpanded: Bool
     @State private var offset = 0.0
+    var images: [Image] = []
     
     var body: some View {
         
@@ -19,13 +20,39 @@ struct ArtistRecordShelf: View {
             let recordStack: CGFloat = geometry.size.height/2*0.85
             let recordSpacing: CGFloat = min(recordStack/3,(geometry.size.width-3*recordStack)/3)
             
+            let artistBarData = viewModel.topArtists.prefix(6)
+            
+            var images: [Image] {
+                var imageArray: [Image] = []
+
+                for index in 0..<6 {
+                    let image: Image
+
+                    if index < artistBarData.count {
+                        let recordID = artistBarData[index].records.first
+                        let photo = viewModel.viewModel.fetchPhotoByID(id: recordID!)
+                        if photo != UIImage(named:"TakePhoto"){
+                            image = Image(uiImage: photo!)
+                        }else{
+                            image = Image("DavidBowie")
+                        }
+                    } else {
+                        image = Image("DavidBowie")
+                    }
+
+                    imageArray.append(image)
+                }
+
+                return imageArray
+            }
+            
             VStack{
                 //Top Shelf
                 ZStack(alignment:.bottom){
                     HStack(spacing:recordSpacing){
-                        Image("DavidBowie").resizable().aspectRatio(contentMode:.fit)
-                        Image("PinkFloyd").resizable().aspectRatio(contentMode: .fit)
-                        Image("TheSmiths").resizable().aspectRatio(contentMode: .fit)
+                        images[0].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        images[1].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        images[2].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
                     }.frame(height: recordStack)
                     Rectangle().frame(width:4*recordStack,height:0.15*recordStack).foregroundColor(lightWoodBrown).offset(y:3)
                     
@@ -33,9 +60,9 @@ struct ArtistRecordShelf: View {
                 //Bottom Shelf
                 ZStack(alignment:.bottom){
                     HStack(spacing:recordSpacing){
-                        Image("LedZeppelin").resizable().aspectRatio(contentMode:.fit)
-                        Image("Radiohead").resizable().aspectRatio(contentMode: .fit)
-                        Image("S&G").resizable().aspectRatio(contentMode: .fit)
+                        images[3].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        images[4].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        images[5].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
                     }.frame(height: recordStack)
                     Rectangle().frame(width:4*recordStack,height:0.15*recordStack).foregroundColor(lightWoodBrown).offset(y:3)
                     
@@ -64,7 +91,6 @@ struct ArtistRecordShelf: View {
     }
 }
 
-
 struct ArtistInfoChart: View {
     @ObservedObject var viewModel: StatsViewModel //
     var isTabExpanded: Bool
@@ -80,73 +106,45 @@ struct ArtistInfoChart: View {
             // Table Graphic
             VStack{
                 if !isTabExpanded{
+                    let minAmount = artistBarData.map { $0.amount }.min() ?? 1
+                    let maxAmount = artistBarData.map { $0.amount }.max() ?? 1
+                    let total = artistBarData.count
                     ZStack{
                         VStack{
-                            ForEach(artistBarData.indices, id:\.self){index in
-//                                Text(artistBarData[index].artist)
+                            ForEach(0..<min(6, artistBarData.count), id: \.self) { index in
+                                            // Use the index to access elements in the subarray
                                 let item = artistBarData[index]
-                                let center_val = artistBarData.last!.count - artistBarData[0].count
-                                ArtistBarItem(artist: item.artist, count: item.count, color: smallDisplayColors[index%6], center: CGFloat(center_val), total: artistBarData.count)
-//                                ArtistRowView(artistItem:artistBarData[index],viewModel:viewModel,color:smallDisplayColors[index%6],positionProportion:fractionalValue(for: index, totalCount: totalArtists)
-//                                ).id(3).animation(.easeInOut(duration:0.3))
+                                ArtistBarItem(artist: item.artist, amount: item.amount, color: smallDisplayColors[index%6], total: total, minAmount: minAmount, maxAmount: maxAmount)
+                                
                             }
-                        }
-//                    Chart{
-//                        ForEach(artistBarData.indices, id:\.self){
-//                            index in
-//                            let amount = artistBarData[index].count
-//                            let name = artistBarData[index].artist
-//                            BarMark(
-//                                x: .value("Amount", amount),
-//                                y: .value("Position", name)
-//                            )
-//                            .cornerRadius(5)
-//                            .foregroundStyle(smallDisplayColors[index])
-//                            .annotation(position: .trailing, alignment: .leading) {
-//                                Text(String(amount)).foregroundStyle(recordBlack).padding(5)
-//                            }
-//                            .annotation(position: .overlay, alignment: .trailing) {
-//                                Text(name).foregroundStyle(iconWhite).padding(5)
-//                                
-//                            }
-//                        }
-//                    }.chartXAxis(.hidden)
-//                        .chartYAxis(.hidden)
-//                        .chartScrollableAxes(isTabExpanded ? .vertical : [])
-//                        .chartXScale(domain: [artistBarData.last!.count-1, artistBarData[0].count])
-//                        .aspectRatio(contentMode: .fit)
-//                        .padding(5)
+
+                        }.padding(.vertical)
                     }.frame(width:geometry.size.width,height:geometry.size.height)
                         .background(isTabExpanded ? Color.clear: decorWhite)
                         .id(1)
-                        .animation(.easeInOut(duration:0.5).delay(0.05))
+                        .animation(.easeInOut(duration:0.5).delay(0.05),value:isTabExpanded)
                         .transition( .move(edge: .leading))
                 }else{
                     ScrollView{
                         ForEach(artistTotalData.indices, id:\.self){index in
-                            ArtistRowView(artistItem:artistTotalData[index],viewModel:viewModel,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists)
-                            ).id(3).animation(.easeInOut(duration:0.3))
+                            ArtistRowView(artistItem:artistTotalData[index],viewModel:viewModel,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
                             
                         }
                     }.padding(.vertical,30)
                         .id(2)
                         .animation(.easeInOut(duration:0.5).delay(0.15))
-//                            Animation.default.delay(0.2))
                         .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .leading)))
-
-//                        .onChange(of: isTabExpanded, initial: false) { value, value2 in
-//                            if value{
-//                                withAnimation(.easeOut(duration: 0.5).delay(0.5)){
-//                                    self.transition(.move(edge:.leading))
-//                                }
-//                            }
-//                        }
-                        
-//                        .transition( .move(edge: .leading)).animation(.easeInOut(duration:1.0).delay(3.0),value:isTabExpanded)/*.frame(width:geometry.size.width,height:geometry.size.height).clipped()*/
                     
                 }
                 
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
+                .offset(x:offset)
+                .onAppear(perform: {
+                    offset = -screenWidth
+                    withAnimation(.easeOut(duration: 0.5).delay(0.4)){
+                        offset = 0.0
+                    }
+                })
             
         }
 
@@ -162,22 +160,25 @@ struct ArtistInfoChart: View {
 
 struct ArtistBarItem: View{
     var artist: String
-    var count: Int
+    var amount: Int
     var color: Color
-    var center: CGFloat
     var total: Int
+    var minAmount: Int
+    var maxAmount: Int
     
     var body: some View{
-        let shift = CGFloat(count)-center*100
         GeometryReader{geometry in
+
+            let proportionalSize = CGFloat(amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.width - 100) + 100
+            
             HStack{
                 HStack{
                     RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .trailing) {
                         Text(artist).bold().foregroundStyle(iconWhite).padding()
                     }
-                    Text(String(count))
+                    Text(String(amount))
                     Spacer()
-                }.padding(5).frame(width:screenWidth*0.75+100*shift,height:geometry.size.height/(CGFloat(total))).offset(x:-30)
+                }.frame(width:proportionalSize,height:geometry.size.height).offset(x:-30)
                 Spacer()
             }.background(decorWhite)
         }
@@ -185,7 +186,7 @@ struct ArtistBarItem: View{
 }
 
 struct ArtistRowView: View {
-    var artistItem: (artist: String, count: Int, records: [String]);
+    var artistItem: (artist: String, amount: Int, records: [String]);
     var viewModel: StatsViewModel
     var color: Color
     var positionProportion: CGFloat
@@ -199,8 +200,7 @@ struct ArtistRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(artistItem.records, id:\.self){recordID in
-                            let recordItem: RecordItem = viewModel.viewModel.recordDictionaryByID[recordID]!
-                            let photo = recordItem.photo
+                            let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
                             Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
                         }
                     }
@@ -216,7 +216,7 @@ struct ArtistRowView: View {
                     Button(action:{
                         expanded.toggle()
                     }){
-                        Text(String(artistItem.count))
+                        Text(String(artistItem.amount))
                     }.padding()
                     Spacer()
                 }.padding(5).frame(width:screenWidth*0.75+100*positionProportion,height:75).offset(x:-30)

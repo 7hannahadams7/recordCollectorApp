@@ -12,8 +12,12 @@ struct RecordItem: Identifiable {
     var id: String
     var name: String
     var artist: String
-    var photo: UIImage? = nil
+    var coverPhoto: UIImage
+    var discPhoto: UIImage
     var releaseYear: Int
+    var genres: [String] = []
+    var dateAdded: String
+    var isBand: Bool
     // Add other properties as needed
 }
 //
