@@ -42,6 +42,7 @@ struct test3App: App {
                 print("TRIGGERING CONNECT")
                 spotifyController.connect()
             })
+            .environment(\.colorScheme, .light)
             .environment(\.urlImageService, urlImageService)
         }
     }

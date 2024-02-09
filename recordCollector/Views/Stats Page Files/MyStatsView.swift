@@ -10,15 +10,16 @@ import SwiftUI
 struct MyStatsView: View {
     @State private var displayTag = 0
     @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
     
     
     var body: some View {
         // Consolidated views of all stat types
-        let genresView = GenericStatView(viewModel:statsViewModel,viewType:"Genres")
-        let artistsView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
-        let decadesView = GenericStatView(viewModel:statsViewModel,viewType:"Decades")
-        let storesView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
-        let historyView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
+        let genresView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Genres")
+        let artistsView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Artists")
+        let decadesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Decades")
+        let storesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Artists")
+        let historyView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Artists")
         
         NavigationView{
             ZStack{

@@ -63,6 +63,7 @@ struct GenrePieChart: View {
 
 struct GenreInfoChart: View {
     @ObservedObject var viewModel: StatsViewModel //
+    @ObservedObject var spotifyController: SpotifyController
     @Binding var isTabExpanded: Bool
     
     @State private var offset = 0.0
@@ -107,7 +108,7 @@ struct GenreInfoChart: View {
                     //Expanded Genre Info
                     ScrollView{
                         ForEach(genreTotalData.indices, id: \.self) {index in
-                            GenreRowView(genreItem:genreTotalData[index],viewModel:viewModel,color:fullDisplayColors[index%totalDisplayColors])
+                            GenreRowView(genreItem:genreTotalData[index],viewModel:viewModel,spotifyController:spotifyController, color:fullDisplayColors[index%totalDisplayColors])
                         }
                     }.padding(.vertical,30)
                         .id(2)
@@ -127,9 +128,33 @@ struct GenreInfoChart: View {
     }
 }
 
+struct PhotoToPopup: View{
+    @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    
+    var record: RecordItem
+    
+    @State var showRecordPopupPresented: Bool = false
+    var body: some View{
+        VStack{
+            Button{
+                showRecordPopupPresented = true
+            }label:{
+                let photo = viewModel.fetchPhotoByID(id: record.id)
+                // BUTTON WITH NAVIGATION HERE
+                Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
+            }
+        }.popover(isPresented: $showRecordPopupPresented, content: {
+            ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: GenreManager())
+        })
+    }
+}
+
 struct GenreRowView: View {
     var genreItem: (genre: String, amount: Int, records: [String])
-    var viewModel: StatsViewModel
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    
     var color: Color
     
     @State private var expanded: Bool = false
@@ -141,9 +166,11 @@ struct GenreRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(genreItem.records, id:\.self){recordID in
-                            let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
-                            // BUTTON WITH NAVIGATION HERE
-                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
+                            if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
+                                PhotoToPopup(viewModel: viewModel.viewModel, spotifyController: spotifyController, record: record)
+                            }
+//                            let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
+//                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
                         }
                     }
                 }.frame(height:60).padding(.all,5).padding(.horizontal,20).background(Rectangle().fill(color).opacity(0.3))

@@ -11,6 +11,7 @@ import Charts
 
 struct GenericStatView: View {
     @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
     var viewType: String
     
     @State private var isTabExpanded = false
@@ -83,7 +84,7 @@ struct GenericStatView: View {
             if topFrame{
                 GenrePieChart(viewModel:viewModel,isTabExpanded:isTabExpanded)
             }else{
-                GenreInfoChart(viewModel:viewModel,isTabExpanded:$isTabExpanded)
+                GenreInfoChart(viewModel:viewModel,spotifyController:spotifyController, isTabExpanded:$isTabExpanded)
             }
         }else if viewType == "Artists"{
             if topFrame{
@@ -100,7 +101,7 @@ struct GenericStatView: View {
             }
 
         }else{
-            GenreInfoChart(viewModel:viewModel,isTabExpanded:$isTabExpanded)
+            EmptyView()
         }
 
     }
@@ -110,5 +111,5 @@ struct GenericStatView: View {
 }
 
 #Preview {
-    GenericStatView(viewModel:StatsViewModel(viewModel:LibraryViewModel()),viewType:"Artists")
+    GenericStatView(viewModel:StatsViewModel(viewModel:LibraryViewModel()),spotifyController:SpotifyController(),viewType:"Artists")
 }

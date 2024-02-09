@@ -11,6 +11,7 @@ import FirebaseDatabase
 
 class StatsViewModel: ObservableObject {
     @ObservedObject var viewModel: LibraryViewModel
+    
     @Published var topArtists: [(artist: String, amount: Int, records: [String])] = []
     @Published var topGenres: [(genre: String, amount: Int, records: [String])] = []
     @Published var topDecades: [(decade: Int, amount: Int, records: [String])] = []
