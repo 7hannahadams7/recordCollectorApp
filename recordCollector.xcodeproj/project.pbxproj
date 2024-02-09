@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		94CCA83492A5AA9E66882AA2 /* Pods_recordCollector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0016FBBEB17030B8446C423 /* Pods_recordCollector.framework */; };
+		BB16B1B62B62BD1B0039BDE2 /* ShowRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */; };
 		BB2FEF892B4C56EC00F0DFBB /* recordCollectorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */; };
 		BB2FEF8B2B4C56EC00F0DFBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */; };
 		BB2FEF8D2B4C56F200F0DFBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB2FEF8C2B4C56F200F0DFBB /* Assets.xcassets */; };
@@ -17,13 +18,22 @@
 		BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */; };
 		BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */; };
 		BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */; };
-		BB3BAD6E2B547A9F00A5397C /* DatabaseTesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */; };
-		BBA0BCAC2B597A4E0035C05A /* ShowRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */; };
-		BBA0BCAE2B597FF60035C05A /* EditRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */; };
+		BB6D7BFA2B6C64B80037C391 /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = BB6D7BF92B6C64B80037C391 /* URLImage */; };
+		BB6D7BFC2B6C64B80037C391 /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = BB6D7BFB2B6C64B80037C391 /* URLImageStore */; };
+		BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */; };
+		BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */; };
+		BB9C009C2B659AC100CF02B4 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */; };
+		BB9C009F2B659D7200CF02B4 /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = BB9C009E2B659D7200CF02B4 /* SpotifyiOS */; };
 		BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */; };
 		BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */; };
 		BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */; };
 		BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */; };
+		BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */; };
+		BBBDD9812B75BB1000C2E59D /* ClassExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */; };
+		BBBDD9832B75BCE100C2E59D /* GenreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBDD9822B75BCE100C2E59D /* GenreManager.swift */; };
+		BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D382B6831FD0075DA9F /* ViewManager.swift */; };
+		BBD26D3B2B683E8E0075DA9F /* ListenNow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */; };
+		BBDBD57F2B694AEE00EB644B /* SpotifyOptionDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */; };
 		BBF813302B52266300654DAA /* GenericStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF8132F2B52266300654DAA /* GenericStatView.swift */; };
 		BBF813322B523F8C00654DAA /* GenreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF813312B523F8C00654DAA /* GenreViews.swift */; };
 		BBF813342B523FCC00654DAA /* ArtistViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF813332B523FCC00654DAA /* ArtistViews.swift */; };
@@ -33,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		06CE01F5E8A14FCC63D4A76C /* Pods-recordCollector.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-recordCollector.debug.xcconfig"; path = "Target Support Files/Pods-recordCollector/Pods-recordCollector.debug.xcconfig"; sourceTree = "<group>"; };
+		BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRecordView.swift; sourceTree = "<group>"; };
 		BB2FEF852B4C56EC00F0DFBB /* recordCollector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recordCollector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recordCollectorApp.swift; sourceTree = "<group>"; };
 		BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,14 +55,21 @@
 		BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLibraryView.swift; sourceTree = "<group>"; };
 		BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
-		BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseTesting.swift; sourceTree = "<group>"; };
-		BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRecordView.swift; sourceTree = "<group>"; };
-		BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditRecordView.swift; sourceTree = "<group>"; };
+		BB8BACBE2B6568DF0015DBD9 /* recordCollector-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "recordCollector-Bridging-Header.h"; sourceTree = "<group>"; };
+		BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
+		BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordDisplayViews.swift; sourceTree = "<group>"; };
+		BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BBB8DE3D2B4F0E24008D39E8 /* MyStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStatsView.swift; sourceTree = "<group>"; };
 		BBB8DE3F2B5036EE008D39E8 /* recordCollector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recordCollector.entitlements; sourceTree = "<group>"; };
 		BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddRecordView.swift; sourceTree = "<group>"; };
 		BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
+		BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyCodables.swift; sourceTree = "<group>"; };
+		BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassExtensions.swift; sourceTree = "<group>"; };
+		BBBDD9822B75BCE100C2E59D /* GenreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GenreManager.swift; path = /Users/Hannah/recordCollector/recordCollector/GenreManager.swift; sourceTree = "<absolute>"; };
+		BBD26D382B6831FD0075DA9F /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
+		BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenNow.swift; sourceTree = "<group>"; };
+		BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyOptionDisplay.swift; sourceTree = "<group>"; };
 		BBF8132F2B52266300654DAA /* GenericStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericStatView.swift; sourceTree = "<group>"; };
 		BBF813312B523F8C00654DAA /* GenreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreViews.swift; sourceTree = "<group>"; };
 		BBF813332B523FCC00654DAA /* ArtistViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViews.swift; sourceTree = "<group>"; };
@@ -66,7 +84,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB6D7BFC2B6C64B80037C391 /* URLImageStore in Frameworks */,
 				94CCA83492A5AA9E66882AA2 /* Pods_recordCollector.framework in Frameworks */,
+				BB9C009F2B659D7200CF02B4 /* SpotifyiOS in Frameworks */,
+				BB6D7BFA2B6C64B80037C391 /* URLImage in Frameworks */,
+				BB8BACC22B65709F0015DBD9 /* SpotifyiOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,13 +108,26 @@
 			isa = PBXGroup;
 			children = (
 				E0016FBBEB17030B8446C423 /* Pods_recordCollector.framework */,
+				BB8BACC12B65709F0015DBD9 /* SpotifyiOS.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */ = {
+			isa = PBXGroup;
+			children = (
+				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
+				BB93D6382B5ED4F400D700BC /* RecordDisplayViews.swift */,
+				BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */,
+				BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */,
+			);
+			path = "Record View&Edit Files";
 			sourceTree = "<group>";
 		};
 		BB2FEF7C2B4C56EC00F0DFBB = {
 			isa = PBXGroup;
 			children = (
+				BB8BACBE2B6568DF0015DBD9 /* recordCollector-Bridging-Header.h */,
 				BB2FEF872B4C56EC00F0DFBB /* recordCollector */,
 				BB2FEF862B4C56EC00F0DFBB /* Products */,
 				053A922BE5D8E7E17E98E75B /* Pods */,
@@ -113,8 +148,8 @@
 			children = (
 				BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */,
 				BBB8DE402B503951008D39E8 /* Views */,
+				BBBDD9842B75BFD100C2E59D /* Other Classes */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
-				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
 				BBF813352B52645200654DAA /* ARCHIVE */,
 				BB2FEF8C2B4C56F200F0DFBB /* Assets.xcassets */,
 				BB2FEF912B4C56F200F0DFBB /* Info.plist */,
@@ -133,16 +168,24 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		BB6D7BFD2B6C71D80037C391 /* Spotify */ = {
+			isa = PBXGroup;
+			children = (
+				BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */,
+				BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */,
+				BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */,
+			);
+			path = Spotify;
+			sourceTree = "<group>";
+		};
 		BBB8DE402B503951008D39E8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */,
-				BB3BAD6D2B547A9F00A5397C /* DatabaseTesting.swift */,
-				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
-				BB2FEF9E2B4C578600F0DFBB /* MyLibraryView.swift */,
-				BBB8DE422B5040E3008D39E8 /* AddRecordView.swift */,
-				BBA0BCAB2B597A4E0035C05A /* ShowRecordView.swift */,
 				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
+				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
+				BB6D7BFD2B6C71D80037C391 /* Spotify */,
+				BB16B1B72B62BD4C0039BDE2 /* Record View&Edit Files */,
 				BBF813362B52647C00654DAA /* Stats Page Files */,
 			);
 			path = Views;
@@ -158,10 +201,21 @@
 			path = "Item Management";
 			sourceTree = "<group>";
 		};
+		BBBDD9842B75BFD100C2E59D /* Other Classes */ = {
+			isa = PBXGroup;
+			children = (
+				BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */,
+				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
+				BBBDD9822B75BCE100C2E59D /* GenreManager.swift */,
+				BBD26D382B6831FD0075DA9F /* ViewManager.swift */,
+				BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */,
+			);
+			path = "Other Classes";
+			sourceTree = "<group>";
+		};
 		BBF813352B52645200654DAA /* ARCHIVE */ = {
 			isa = PBXGroup;
 			children = (
-				BBA0BCAD2B597FF60035C05A /* EditRecordView.swift */,
 			);
 			path = ARCHIVE;
 			sourceTree = "<group>";
@@ -196,6 +250,11 @@
 			dependencies = (
 			);
 			name = recordCollector;
+			packageProductDependencies = (
+				BB9C009E2B659D7200CF02B4 /* SpotifyiOS */,
+				BB6D7BF92B6C64B80037C391 /* URLImage */,
+				BB6D7BFB2B6C64B80037C391 /* URLImageStore */,
+			);
 			productName = test3;
 			productReference = BB2FEF852B4C56EC00F0DFBB /* recordCollector.app */;
 			productType = "com.apple.product-type.application";
@@ -225,6 +284,8 @@
 			mainGroup = BB2FEF7C2B4C56EC00F0DFBB;
 			packageReferences = (
 				BBF8133B2B5448D300654DAA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */,
+				BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */,
 			);
 			productRefGroup = BB2FEF862B4C56EC00F0DFBB /* Products */;
 			projectDirPath = "";
@@ -296,23 +357,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBF813342B523FCC00654DAA /* ArtistViews.swift in Sources */,
+				BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */,
 				BBF813382B53251E00654DAA /* DecadeViews.swift in Sources */,
 				BB2FEF9F2B4C578600F0DFBB /* MyLibraryView.swift in Sources */,
-				BB3BAD6E2B547A9F00A5397C /* DatabaseTesting.swift in Sources */,
 				BBB8DE3E2B4F0E24008D39E8 /* MyStatsView.swift in Sources */,
-				BBA0BCAE2B597FF60035C05A /* EditRecordView.swift in Sources */,
 				BBB8DE432B5040E3008D39E8 /* AddRecordView.swift in Sources */,
-				BBA0BCAC2B597A4E0035C05A /* ShowRecordView.swift in Sources */,
+				BB93D6392B5ED4F400D700BC /* RecordDisplayViews.swift in Sources */,
 				BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */,
 				BB2FEF992B4C570A00F0DFBB /* RecordItem.swift in Sources */,
 				BB2FEF8B2B4C56EC00F0DFBB /* ContentView.swift in Sources */,
+				BB16B1B62B62BD1B0039BDE2 /* ShowRecordView.swift in Sources */,
 				BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */,
 				BBF813322B523F8C00654DAA /* GenreViews.swift in Sources */,
 				BB2FEF9C2B4C575100F0DFBB /* LibraryViewModel.swift in Sources */,
+				BB9C009C2B659AC100CF02B4 /* SpotifyController.swift in Sources */,
+				BBDBD57F2B694AEE00EB644B /* SpotifyOptionDisplay.swift in Sources */,
+				BBD26D3B2B683E8E0075DA9F /* ListenNow.swift in Sources */,
 				BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */,
+				BBBDD9832B75BCE100C2E59D /* GenreManager.swift in Sources */,
 				BBF813302B52266300654DAA /* GenericStatView.swift in Sources */,
 				BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */,
 				BB2FEF892B4C56EC00F0DFBB /* recordCollectorApp.swift in Sources */,
+				BBBDD9812B75BB1000C2E59D /* ClassExtensions.swift in Sources */,
+				BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,18 +509,72 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = recordCollector/recordCollector.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"recordCollector/Preview Content\"";
 				DEVELOPMENT_TEAM = UB96HSGRNN;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = recordCollector/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"icucore\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"FirebaseAppCheckInterop\"",
+					"-framework",
+					"\"FirebaseAuth\"",
+					"-framework",
+					"\"FirebaseAuthInterop\"",
+					"-framework",
+					"\"FirebaseCore\"",
+					"-framework",
+					"\"FirebaseCoreExtension\"",
+					"-framework",
+					"\"FirebaseCoreInternal\"",
+					"-framework",
+					"\"FirebaseDatabase\"",
+					"-framework",
+					"\"FirebaseSharedSwift\"",
+					"-framework",
+					"\"FirebaseStorage\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"RecaptchaInterop\"",
+					"-framework",
+					"\"SafariServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"leveldb\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = hannah.recordCollector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "recordCollector-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -466,18 +587,72 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = recordCollector/recordCollector.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"recordCollector/Preview Content\"";
 				DEVELOPMENT_TEAM = UB96HSGRNN;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = recordCollector/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"icucore\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"FirebaseAppCheckInterop\"",
+					"-framework",
+					"\"FirebaseAuth\"",
+					"-framework",
+					"\"FirebaseAuthInterop\"",
+					"-framework",
+					"\"FirebaseCore\"",
+					"-framework",
+					"\"FirebaseCoreExtension\"",
+					"-framework",
+					"\"FirebaseCoreInternal\"",
+					"-framework",
+					"\"FirebaseDatabase\"",
+					"-framework",
+					"\"FirebaseSharedSwift\"",
+					"-framework",
+					"\"FirebaseStorage\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"RecaptchaInterop\"",
+					"-framework",
+					"\"SafariServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"leveldb\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = hannah.recordCollector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "recordCollector-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -507,6 +682,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dmytro-anokhin/url-image";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
+		BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spotify/ios-sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		BBF8133B2B5448D300654DAA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -516,6 +707,24 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB6D7BF92B6C64B80037C391 /* URLImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */;
+			productName = URLImage;
+		};
+		BB6D7BFB2B6C64B80037C391 /* URLImageStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6D7BF82B6C64B80037C391 /* XCRemoteSwiftPackageReference "url-image" */;
+			productName = URLImageStore;
+		};
+		BB9C009E2B659D7200CF02B4 /* SpotifyiOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB9C009D2B659D7200CF02B4 /* XCRemoteSwiftPackageReference "ios-sdk" */;
+			productName = SpotifyiOS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BB2FEF7D2B4C56EC00F0DFBB /* Project object */;
 }
