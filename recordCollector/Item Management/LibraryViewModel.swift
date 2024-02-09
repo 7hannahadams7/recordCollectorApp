@@ -23,20 +23,20 @@ class LibraryViewModel: ObservableObject {
     
     @Published var whichPhoto: String = "Cover"
     
+    // Re-sorting local library on change of sorting factor
     @Published var sortingFactor: SortingFactor = .artist {
         didSet {
             sortRecords()
         }
     }
     
+    // MyLibrary sorting factors
     enum SortingFactor: String, CaseIterable {
         case dateAdded = "Date Added"
         case artist = "Artist"
         case releaseYear = "Release Year"
         case album = "Album"
     }
-    
-    
     
     // MARK: - Photo Actions
     func resetPhoto(){
@@ -61,10 +61,8 @@ class LibraryViewModel: ObservableObject {
     
     // MARK: - Record Updating/Init
 
-    // Upload new entry to database and local library
+    // Upload new entry to database and local library, called via AddRecordView
     func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool){
-        // Uploading New Instance of Record Data to Database
-
         // UUID of entry
         let id = UUID().uuidString
         
@@ -85,14 +83,14 @@ class LibraryViewModel: ObservableObject {
         addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand)
 
         // Attempt photo upload, will handle adding to db if photo available
-        uploadPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
-        uploadPhoto(id: id, image: self.capturedLPImage,type:"Disc")
+        uploadAddPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
+        uploadAddPhoto(id: id, image: self.capturedLPImage,type:"Disc")
         
         print("Added New Record, ID #: ", id)
         
     }
     
-    // Adds new entry to local library
+    // Adds new entry to local library, called via AddRecordView and in self.fetch()
     func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool) {
         // Add New Instance of Record Data to Local Library
         
@@ -101,16 +99,23 @@ class LibraryViewModel: ObservableObject {
         // Add to array for library sorting, add to dictionary for fetching
         recordLibrary.append(newItem)
         recordDictionaryByID[id] = newItem
+        
+        // Update current filter options when adding new item to array
+        fullArtists.insert(artist)
+        for genre in genres{
+            fullGenres.insert(genre)
+        }
     }
     
-    // Upload photo to storage, link to db, add to local library entry
-    func uploadPhoto(id: String, image: UIImage?, type: String) -> Void{
-//        print("Attempting Image Upload")
+    // Upload photo to storage, link to db, add to local library entry, called in uploads and edits
+    func uploadAddPhoto(id: String, image: UIImage?, type: String) -> Void{
+
         let ref: DatabaseReference! = Database.database().reference()
+        let storageRef = Storage.storage().reference()
         
         // Check selected image property not nil
         guard image != nil else{
-//            print("No Image Uploaded, ID #: ", id)
+            print("No Image Uploaded, ID #: ", id)
             return
         }
         
@@ -126,19 +131,15 @@ class LibraryViewModel: ObservableObject {
             }
         }
         
-        // Create storage reference
-        let storageRef = Storage.storage().reference()
-        
         // Turn image into jpeg data
         let imageData = image!.jpegData(compressionQuality: 0.5)
         
         // Check that we were able to convert it to data
         guard imageData != nil else{
-//            print("ERROR Cannot Convert Image, ID #: ", id)
             return
         }
         
-        // Specify the file path and name
+        // Specify the storage file path and name
         var path = ""
         if type == "Cover"{
             path = "recordImages/" + id + ".jpg"
@@ -159,106 +160,91 @@ class LibraryViewModel: ObservableObject {
                 }else{
                     ref.child("Records").child(id).child("discImageURL").setValue(path)
                 }
-//                print("Image Upload Successful, ID #: ", id)
                 
             }else{
-//                print("ERROR Image Upload, ID #: ", id)
                 return
             }
         }
         
     }
     
-    // Edit existing entry in db and local library
-    func editRecordEntry(id: String,recordName: String? = nil, artistName: String? = nil, releaseYear: Int? = nil, newPhoto: Bool, genres: [String]? = nil, dateAdded: String? = nil, isBand: Bool? = nil){
-        // Edit values of current db Item
-        
+    // Edit existing entry in db and local library, called via ShowRecordView
+    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool){
+
         print("Editing Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
         
         // Pulling item from local library by id, making changes in local library
         if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
-            // Re-value child elements
-            if artistName != nil{
-                self.recordLibrary[recordIndex].artist = artistName!
-                self.recordDictionaryByID[id]?.artist = artistName!
-            }
-            if artistName != nil{
-                self.recordLibrary[recordIndex].name = recordName!
-                self.recordDictionaryByID[id]?.name = recordName!
-            }
-            if releaseYear != nil{
-                self.recordLibrary[recordIndex].releaseYear = releaseYear!
-                self.recordDictionaryByID[id]?.releaseYear = releaseYear!
-            }
-            if dateAdded != nil{
-                self.recordLibrary[recordIndex].dateAdded = dateAdded!
-                self.recordDictionaryByID[id]?.dateAdded = dateAdded!
-            }
-            if isBand != nil{
-                self.recordLibrary[recordIndex].isBand = isBand!
-                self.recordDictionaryByID[id]?.isBand = isBand!
-            }
-            if genres != nil{
-                self.recordLibrary[recordIndex].genres = genres!
-                self.recordDictionaryByID[id]?.genres = genres!
-            }
+
+            self.recordLibrary[recordIndex].artist = artistName
+            self.recordDictionaryByID[id]?.artist = artistName
+
+            self.recordLibrary[recordIndex].name = recordName
+            self.recordDictionaryByID[id]?.name = recordName
+
+            self.recordLibrary[recordIndex].releaseYear = releaseYear
+            self.recordDictionaryByID[id]?.releaseYear = releaseYear
+
+            self.recordLibrary[recordIndex].dateAdded = dateAdded
+            self.recordDictionaryByID[id]?.dateAdded = dateAdded
+
+            self.recordLibrary[recordIndex].isBand = isBand
+            self.recordDictionaryByID[id]?.isBand = isBand
+
+            self.recordLibrary[recordIndex].genres = genres
+            self.recordDictionaryByID[id]?.genres = genres
             
+            // Re-sort with new edited elements
             sortRecords()
             
         }
         
         // Attempt to upload photo if new photo available, uploadPhoto adds the photo to the database if possible
-        if newPhoto{
-            uploadPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
-            uploadPhoto(id: id, image: self.capturedLPImage,type:"Disc")
+        if newCoverPhoto{
+            uploadAddPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
+        }
+        if newDiskPhoto{
+            uploadAddPhoto(id: id, image: self.capturedLPImage,type:"Disc")
         }
         
         
         // Change db values
-        if artistName != nil{
-            ref.child("Records").child(id).child("artist").setValue(String(artistName!))
-        }
-        if artistName != nil{
-            ref.child("Records").child(id).child("name").setValue(String(recordName!))
-        }
-        if releaseYear != nil{
-            ref.child("Records").child(id).child("releaseYear").setValue(releaseYear!)
-        }
-        if dateAdded != nil{
-            ref.child("Records").child(id).child("dateAdded").setValue(dateAdded!)
-        }
-        if isBand != nil{
-            ref.child("Records").child(id).child("isBand").setValue(isBand!)
-        }
+        ref.child("Records").child(id).child("artist").setValue(String(artistName))
+        ref.child("Records").child(id).child("name").setValue(String(recordName))
+        ref.child("Records").child(id).child("releaseYear").setValue(releaseYear)
+        ref.child("Records").child(id).child("dateAdded").setValue(dateAdded)
+        ref.child("Records").child(id).child("isBand").setValue(isBand)
+
         
         // Add new genres and deleted any removed from list by user
-        if genres != nil{
-            if let previousGenres = self.recordDictionaryByID[id]?.genres{
-                // Add new
-                for genre in genres!{
-                    // Add new genre child (repeats handled)
-                    ref.child("Records").child(id).child("genres").child(genre).setValue(true)
-                }
-                // Remove old
-                for genre in previousGenres{
-                    if !genres!.contains(genre){
-                        ref.child("Records").child(id).child("genres").child(genre).removeValue()
-                    }
+        if let previousGenres = self.recordDictionaryByID[id]?.genres{
+            // Add new
+            for genre in genres{
+                // Add new genre child (repeats handled)
+                ref.child("Records").child(id).child("genres").child(genre).setValue(true)
+            }
+            // Remove old
+            for genre in previousGenres{
+                if !genres.contains(genre){
+                    ref.child("Records").child(id).child("genres").child(genre).removeValue()
                 }
             }
         }
+        
+        // Reset and re-gather all filter options when one is edited
+        self.gatherAllFilterOptions()
 
         print("Updated Record, ID #: ", id)
     }
     
-    // Delete entry locally and from db, and images from storage
+    // Delete entry locally and from db, and images from storage, called via ShowRecordView
     func deleteRecordEntry(id: String) async {
         print("Deleting Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
         let storageRef = Storage.storage().reference()
         
-        // Create a reference to the file to delete
+        // Create a reference to the files to delete
         let coverImageRef = storageRef.child("recordImages").child(id + ".jpg")
         let discImageRef = storageRef.child("discImages").child(id + ".jpg")
         
@@ -268,12 +254,18 @@ class LibraryViewModel: ObservableObject {
             self.recordDictionaryByID[id] = nil
         }
 
+        // Attempt cover image delete from storage
+        do {
+            try await coverImageRef.delete()
+        } catch {
+          print("No cover image file to delete from storage")
+        }
+        // Attempt disk image delete from storage
         do {
           // Delete the files
-            try await coverImageRef.delete()
             try await discImageRef.delete()
         } catch {
-          print("No image file to delete from storage")
+          print("No disk image file to delete from storage")
         }
         do{
             try await ref.child("Records").child(id).removeValue()
@@ -283,7 +275,7 @@ class LibraryViewModel: ObservableObject {
     }
     
     
-    // MARK: - Library Data Initializing (Fetching, Sorting, etc.)
+    // MARK: - Library Data Initializing (Fetching, Local Libraries, etc.)
     
     // Fetch data from db and store in local library
     private func fetchData(completion: @escaping () -> Void) {
@@ -298,18 +290,20 @@ class LibraryViewModel: ObservableObject {
                 let snap = child as! DataSnapshot
                 let elementDict = snap.value as! [String: Any]
 
-                let artist = elementDict["artist"]
+                let artist = elementDict["artist"] as! String
                 
-                let name = elementDict["name"]
-                let releaseYear = elementDict["releaseYear"]
-                let dateAdded = elementDict["dateAdded"]
+                let name = elementDict["name"] as! String
+                let releaseYear = elementDict["releaseYear"] as! Int
+                let dateAdded = elementDict["dateAdded"] as! String
                 let isBand = elementDict["isBand"] as! Bool
 
-                var coverPhoto: UIImage?
-                var discPhoto: UIImage?
+                // Set to default images
+                var coverPhoto = UIImage(named:"TakePhoto")
+                var discPhoto = UIImage(named:"TakePhoto")
 
                 var genres: [String] = []
 
+                // Pull genres to array
                 if let genresDict = elementDict["genres"] as? [String: Bool] {
                     for (genre, value) in genresDict {
                         if value {
@@ -318,6 +312,7 @@ class LibraryViewModel: ObservableObject {
                     }
                 }
 
+                // Pull cover image from storage
                 if let im = elementDict["imageURL"] {
                     let fileRef = storageRef.child(im as! String)
                     dispatchGroup.enter()
@@ -329,6 +324,7 @@ class LibraryViewModel: ObservableObject {
                     })
                 }
 
+                // Pull disk image from storage
                 if let im = elementDict["discImageURL"] {
                     let fileRef = storageRef.child(im as! String)
                     dispatchGroup.enter()
@@ -340,55 +336,27 @@ class LibraryViewModel: ObservableObject {
                     })
                 }
 
+                // Add record to local library
                 dispatchGroup.notify(queue: .main) {
 //                    print("IN QUEUE")
-                    if let discPhoto = discPhoto, let coverPhoto = coverPhoto {
-//                        print("Adding both")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
-                    } else if let discPhoto = discPhoto {
-//                        print("Adding disc")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
-                    } else if let coverPhoto = coverPhoto {
-//                        print("Adding cover")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, coverPhoto: coverPhoto, genres: genres,dateAdded:dateAdded as! String, isBand: isBand)
-                    } else {
-//                        print("No Photo")
-                        self.addNewRecord(id: snap.key, name: name as! String, artist: artist as! String, releaseYear: releaseYear as! Int, genres: genres,dateAdded:dateAdded as! String,isBand: isBand)
-                    }
+                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand)
                     completion()
                 }
             }
         })
     }
-
-    func filteredLibrary(sortingFactor: String, sortingDirection: Bool, filteredGenres: [String]) -> (records: [RecordItem], headers: [String]){
-        // SortingFactor sort is handled by self.sortRecords() and is automatic from case change in MyLibraryView
-        
-        // Filter and Set Directions
-        let filteredRecords = sortingDirection ?  self.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}) :
-        self.recordLibrary.filter({$0.genres.contains{Set(filteredGenres).contains($0)}}).reversed()
-        
-        // Headers pulled from filtered library
-        let headers = sortingDirection ? sortingHeaderFunction(filteredRecords:filteredRecords, sortingFactor:sortingFactor) : sortingHeaderFunction(filteredRecords:filteredRecords, sortingFactor:sortingFactor).reversed()
-        
-        return (filteredRecords, headers)
-    }
     
-    // Given a sorting factor, header, and recordItem, determine if the record falls under the header or not
-    func headerToItemMatch(sortingFactor:String, header:String, record: RecordItem) -> Bool{
-        
-        if sortingFactor == "Artist"{
-            return checkArtistHeaderMatch(record: record, header: header)
-        }else if sortingFactor == "Album"{
-            return header.first == record.name.first
-        }else if sortingFactor == "Release Year"{
-            return header == String(record.releaseYear)
-        }else{
-            return header == record.dateAdded
+    // Reset local libraries and re-fetch and sort data
+    func refreshData(){
+        print("REFRESHING DATA")
+        recordLibrary = []
+        recordDictionaryByID = [:]
+        fetchData{
+            self.sortRecords()
         }
-        
     }
     
+    // Iterate through library, gather all Genres and Artists in library for Filters
     func gatherAllFilterOptions(){
         for record in self.recordLibrary{
             self.fullArtists.insert(record.artist)
@@ -398,55 +366,18 @@ class LibraryViewModel: ObservableObject {
         }
     }
     
-    private func sortingHeaderFunction(filteredRecords: [RecordItem], sortingFactor: String) -> [String]{
-        var headers: [String] = []
-        for record in filteredRecords{
-            if sortingFactor == "Artist"{
-                var char = ""
-                if record.isBand {
-                    let components = record.artist.components(separatedBy: " ")
-                    char = String((components.first == "The" ? components.dropFirst().joined(separator: " ") : components.first ?? "z").first!)
-                } else {
-                    char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
-                }
-                if !headers.contains(char){
-                    headers.append(char)
-                }
-            }else if sortingFactor == "Album"{
-                if let character = record.name.first, !headers.contains(String(character)) {
-                    headers.append(String(character))
-                }
-            }else if sortingFactor == "Release Year"{
-                if !headers.contains(String(record.releaseYear)){
-                    headers.append(String(record.releaseYear))
-                }
-            }else{
-                if !headers.contains(record.dateAdded){
-                    headers.append(record.dateAdded)
-                }
-            }
+    // Used to display images in different views via call
+    func fetchPhotoByID(id: String) -> UIImage? {
+        if let recordItem = recordDictionaryByID[id] {
+            return recordItem.coverPhoto
         }
-        
-        if sortingFactor == "Date Added"{
-            let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MM-dd-yyyy"
-            headers.sort {
-                // Sort chronologically by actual date
-                guard let date1 = String.stringToDate(from: $0),
-                      let date2 = String.stringToDate(from: $1) else {
-                    return false // Handle invalid date strings as needed
-                }
-                return date1 > date2
-            }
-            return headers
-        }else{
-            return headers.sorted(by: {$0 < $1})
-        }
-        
+        return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
     }
     
+    // MARK: - Local Library Sorting and Comparator Functions
+    
+    // Sorting of local library, runs on all refreshes, on change of sortingFactor case in MyLibraryView and on init
     private func sortRecords() {
-        // Sorting of local library, runs on all refreshes, on change of sortingFactor case in MyLibraryView and on init
         let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM-dd-yyyy"
         
@@ -504,7 +435,23 @@ class LibraryViewModel: ObservableObject {
         }
     }
     
-    func checkArtistHeaderMatch(record: RecordItem, header: String) -> Bool{
+    // Given a sorting factor, header, and recordItem, determine if the record falls under the header or not, called in MyLibrary to compare section header
+    func headerToItemMatch(sortingFactor:String, header:String, record: RecordItem) -> Bool{
+        
+        if sortingFactor == "Artist"{
+            return checkArtistHeaderMatch(record: record, header: header)
+        }else if sortingFactor == "Album"{
+            return header.first == record.name.first
+        }else if sortingFactor == "Release Year"{
+            return header == String(record.releaseYear)
+        }else{
+            return header == record.dateAdded
+        }
+        
+    }
+    
+    // Compare function for header to artist name (considers if isBand and excludes 'The')
+    private func checkArtistHeaderMatch(record: RecordItem, header: String) -> Bool{
         // Returns whether record aligns with header for Artist Sorting Factor
         var char = ""
         if record.isBand {
@@ -515,25 +462,6 @@ class LibraryViewModel: ObservableObject {
         }
         return char == header
     }
-    
-    func fetchPhotoByID(id: String) -> UIImage? {
-        if let recordItem = recordDictionaryByID[id] {
-            return recordItem.coverPhoto
-        }
-//        print("Couldn't find id in dictionary")
-        return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
-    }
-    
-    func refreshData(){
-        print("REFRESHING DATA")
-        recordLibrary = []
-        recordDictionaryByID = [:]
-        fetchData{
-            self.sortRecords()
-            self.gatherAllFilterOptions()
-        }
-    }
-    
-    
+
     
 }

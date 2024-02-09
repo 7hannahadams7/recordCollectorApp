@@ -121,14 +121,14 @@ struct DecadeBottomChart: View{
                                         let minAmount = decadeSortedData.map { $0.amount }.min() ?? 1
                                         let maxAmount = decadeSortedData.map { $0.amount }.max() ?? 1
                                         ForEach(decadeSortedData.indices, id: \.self) { index in
-                                            BubbleView(decadeItem:decadeSortedData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadeSortedData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width, tapped: $tapped, infoExpanded: $infoExpanded)
+                                            BubbleItem(decadeItem:decadeSortedData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadeSortedData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width, tapped: $tapped, infoExpanded: $infoExpanded)
                                         }
                                     }.padding()
                                 }
                                 
                                 if infoExpanded{
                                     ZStack(alignment:.topLeading){
-                                        BubbleInfo(viewModel:viewModel,decade:tapped)
+                                        BubbleItemInfo(viewModel:viewModel,decade:tapped)
                                         Button(action:{infoExpanded.toggle()}){
                                             Image(systemName: "xmark").padding()
                                         }
@@ -153,39 +153,7 @@ struct DecadeBottomChart: View{
         
 }
 
-struct BubbleInfo: View{
-    var viewModel: StatsViewModel
-    let decade: Int
-    
-    var body: some View{
-        let yearsInDecade = viewModel.fetchYearsByDecade(decade: decade)
-        let yearlyData = viewModel.topYears
-        GeometryReader{geometry in
-            ZStack{
-                ScrollView{
-                    VStack{
-                        ForEach(yearsInDecade.indices, id:\.self){index in
-                            VStack(alignment:.leading){
-                                Text(String(yearsInDecade[index].0))
-                                ScrollView(.horizontal){
-                                    HStack{
-                                        ForEach(yearsInDecade[index].2, id:\.self){record in
-                                            let photo = viewModel.viewModel.fetchPhotoByID(id: record)
-                                            // BUTTON WITH NAVIGATION HERE
-                                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
-                                        }
-                                    }.padding()
-                                }.background(fullDisplayColors[index%totalDisplayColors].opacity(0.3))
-                            }
-                        }
-                    }
-                }.padding().padding(.top,30)
-            }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)
-        }
-    }
-}
-
-struct BubbleView: View {
+struct BubbleItem: View {
     let decadeItem: (decade: Int, amount: Int, records: [String])
     var color: Color
     var index: Int
@@ -228,166 +196,36 @@ struct BubbleView: View {
     
 }
 
-//struct BubbleTestView: View {
-//    @State private var switching = false
-//    let decadesData: [(decade: Int, amount: Int, records:[String])] = [(2000, 6,["ID1","ID2","ID3"]),(2010, 4,["ID1","ID2","ID3"]),(1990, 1,["ID1","ID2","ID3"]),(1950, 2,["ID1","ID2","ID3"])].sorted(by: { $0.decade > $1.decade })
-//    
-//    var body: some View {
-//        GeometryReader{geometry in
-//            ScrollView {
-//                LazyVStack(spacing:0) {
-//                    let minAmount = decadesData.map { $0.amount }.min() ?? 1
-//                    let maxAmount = decadesData.map { $0.amount }.max() ?? 1
-//                    ForEach(decadesData.indices, id: \.self) { index in
-//                        BubbleView(decadeItem:decadesData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadesData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width)
-//                    }
-//                }
-//                .padding()
-//            }
-//        }
-//    }
-//
-//}
-
-//struct DecadeBottomChart2: View {
-//    @ObservedObject var viewModel: StatsViewModel //
-//    var isTabExpanded: Bool
-//    @State private var selectedTab = 1
-//    @State private var selectedBar: Int?
-//    
-//    @State private var offset = 0.0
-//    
-//    var body: some View {
-//        let decadeBarData = viewModel.topDecades.prefix(4)
-//
-//        GeometryReader{geometry in
-//            VStack{
-//                if !isTabExpanded{
-//                    ZStack{
-//                        HStack{
-//                            let total = decadeBarData.count
-//                            let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
-//                            let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
-//                            ForEach(decadeBarData.indices, id:\.self){index in
-//                                let item = decadeBarData[index]
-//                                DecadeBarItem(decade: item.decade, amount: item.amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
-//                            }
-//                        }
-//                    }.padding().frame(width:geometry.size.width,height:geometry.size.height)
-//                        .background(isTabExpanded ? Color.clear: decorWhite)
-//                        .id(1)
-//                        .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .leading)))
-//                        .animation(.easeInOut(duration:0.5),value:isTabExpanded)
-//                }else{
-//                    VStack(alignment:.center){
-//                        Picker("", selection: $selectedTab) {
-//                            Text("Decades").tag(1)
-//                            Text("Years").tag(2)
-//                        }
-//                        .pickerStyle(SegmentedPickerStyle())
-//                        .padding().frame(width:geometry.size.width/2)
-//                        ZStack{
-//                            if selectedTab == 1{
-//                                DecadeScrollView(viewModel: viewModel)
-//                            }else{
-//                                YearScrollView(viewModel: viewModel)
-//                            }
-//                        }.padding()
-//                    }.padding()
-//                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .top)))
-//                        .animation(.easeInOut(duration:0.5),value:isTabExpanded)
-//                }
-//            }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
-//                .offset(x:offset)
-//                .onAppear(perform: {
-//                    offset = -screenWidth
-//                    withAnimation(.easeOut(duration: 0.5).delay(0.4)){
-//                        offset = 0.0
-//                    }
-//                })
-//        }
-//    }
-//}
-//
-//struct YearScrollView: View{
-//    var viewModel: StatsViewModel
-//    
-//    var body: some View{
-//            let decadeBarData = viewModel.topYears.sorted { $0.0
-//                < $1.0 }
-//            VStack{
-//                GeometryReader{geometry in
-//                    
-//                ScrollView(.horizontal){
-//                    
-//                        HStack{
-//                            let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
-//                            let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
-//                            ForEach(decadeBarData.indices, id:\.self){index in
-//                                let item = decadeBarData[index]
-//                                let proportionalSize = CGFloat(item.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.height - 100)+50
-//                                ZStack(alignment:.bottom){
-//                                    VStack{
-//                                        Spacer()
-//                                        
-//                                        VStack{
-//                                            Text(String(item.amount))
-//                                                RoundedRectangle(cornerRadius: 25.0).fill(fullDisplayColors[index%totalDisplayColors])
-//                                        }.frame(width:80,height:proportionalSize).padding(5)
-//                                        
-//                                    }
-//                                    VStack{
-//                                        Text(String(item.year)).bold().padding()
-//                                    }.frame(width:80,height:30).background(iconWhite)
-//                                }
-//                                
-//                            }
-//                        }
-//                    }
-//                }.clipped()
-//            }.padding(.horizontal).background(iconWhite)
-//    }
-//}
-//
-//struct DecadeScrollView: View{
-//    var viewModel: StatsViewModel
-//    
-//    var body: some View{
-//        let decadeBarData = viewModel.topDecades.sorted { $0.0
-//                < $1.0 }
-//        let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
-//        let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
-//        VStack{
-//            GeometryReader{geometry in
-//                    
-//                ScrollView(.horizontal){
-//                        
-//                    HStack{
-//                        ForEach(decadeBarData.indices, id:\.self){index in
-//                            let item = decadeBarData[index]
-//                            let proportionalSize = CGFloat(item.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.height - 100)+50
-//                            ZStack(alignment:.bottom){
-//                                VStack{
-//                                    Spacer()
-//                                    
-//                                    VStack{
-//                                        Text(String(item.amount))
-//                                        RoundedRectangle(cornerRadius: 25.0).fill(fullDisplayColors[index%totalDisplayColors])
-//                                    }.frame(width:80,height:proportionalSize).padding(5)
-//                                    
-//                                }
-//                                VStack{
-//                                    Text(String(item.decade)).bold().padding()
-//                                }.frame(width:80,height:30).background(iconWhite)
-//                            }
-//                            
-//                        }
-//                    }
-//                }
-//            }.clipped()
-//        }.padding(.horizontal).background(iconWhite)
-//    }
-//}
+struct BubbleItemInfo: View{
+    var viewModel: StatsViewModel
+    let decade: Int
+    
+    var body: some View{
+        let yearsInDecade = viewModel.fetchYearsByDecade(decade: decade)
+        GeometryReader{geometry in
+            ZStack{
+                ScrollView{
+                    VStack{
+                        ForEach(yearsInDecade.indices, id:\.self){index in
+                            VStack(alignment:.leading){
+                                Text(String(yearsInDecade[index].0))
+                                ScrollView(.horizontal){
+                                    HStack{
+                                        ForEach(yearsInDecade[index].2, id:\.self){record in
+                                            let photo = viewModel.viewModel.fetchPhotoByID(id: record)
+                                            // BUTTON WITH NAVIGATION HERE
+                                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
+                                        }
+                                    }.padding()
+                                }.background(fullDisplayColors[index%totalDisplayColors].opacity(0.3))
+                            }
+                        }
+                    }
+                }.padding().padding(.top,30)
+            }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)
+        }
+    }
+}
 
 struct DecadeBarItem: View{
     var decade: Int

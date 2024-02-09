@@ -12,7 +12,6 @@ import FirebaseStorage
 struct ShowRecordView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
-    @ObservedObject private var keyboard = KeyboardResponder()
     
     var record: RecordItem
     
@@ -23,7 +22,10 @@ struct ShowRecordView: View {
     @State private var isBand: Bool = false
     
     @State private var editingMode: Bool = false
-    @State private var newPhoto: Bool = false
+    
+    @State private var newCoverPhoto: Bool = false
+    @State private var newDiskPhoto: Bool = false
+    
     @State private var listeningMode: Bool = false
     
     @State private var showAlert: Bool = false
@@ -46,7 +48,7 @@ struct ShowRecordView: View {
                     Color(woodBrown).edgesIgnoringSafeArea(.all)
                     ScrollView{
                         VStack{
-                            RecordImageDisplayView(viewModel: viewModel, record: record, newPhoto: $newPhoto, editingMode: $editingMode)
+                            RecordImageDisplayView(viewModel: viewModel, record: record, newCoverPhoto: $newCoverPhoto, newDiskPhoto: $newDiskPhoto, editingMode: $editingMode)
                             
                             if listeningMode{
                                 ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
@@ -128,7 +130,7 @@ struct ShowRecordView: View {
 
                                     // Save Changes Button
                                     Button(action:{
-                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newPhoto: newPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand)
+                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newCoverPhoto: newCoverPhoto, newDiskPhoto: newDiskPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand)
                                         viewModel.resetPhoto()
                                         editingMode.toggle()
                                     }){

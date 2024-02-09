@@ -15,12 +15,14 @@ struct RecordImageDisplayView: View{
     var record: RecordItem?
     
     @State private var isImagePickerPresented: Bool = false
-    @Binding var newPhoto: Bool
+    @Binding var newCoverPhoto: Bool
+    @Binding var newDiskPhoto: Bool
     
     @Binding var editingMode: Bool
     
     @State private var selectedSourceType: ImagePicker.SourceType? = .camera
-    @State private var isPhotoSourcePopupPresented: Bool = false
+    @State private var isCoverPhotoPopupPresented: Bool = false
+    @State private var isDiskPhotoPopupPresented: Bool = false
     
     @State private var lpOffset: CGFloat = 0.0
     @State private var dragging = false
@@ -31,8 +33,8 @@ struct RecordImageDisplayView: View{
                 // Cover Photo Change Button
                 Button(action:{
                     viewModel.whichPhoto = "Cover"
-                    isPhotoSourcePopupPresented.toggle()
-                    newPhoto = true
+                    isCoverPhotoPopupPresented.toggle()
+                    newCoverPhoto = true
                 }) {
                     ZStack{
                         RoundedRectangle(cornerRadius:10).fill(iconWhite).aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
@@ -58,8 +60,8 @@ struct RecordImageDisplayView: View{
                 // Disc Photo Change Button
                 Button(action:{
                     viewModel.whichPhoto = "LP"
-                    isPhotoSourcePopupPresented.toggle()
-                    newPhoto = true
+                    isDiskPhotoPopupPresented.toggle()
+                    newDiskPhoto = true
                 }) {
                     ZStack{
                         Circle().fill(iconWhite).aspectRatio(contentMode:.fill)
@@ -84,15 +86,29 @@ struct RecordImageDisplayView: View{
                 }.frame(width:100,height:100).offset(x:50,y: 50)
                 
             }.frame(width:screenWidth,height:200)
-                .popover(isPresented: $isPhotoSourcePopupPresented, arrowEdge: .bottom) {
-                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented: $isPhotoSourcePopupPresented,
-                          newPhoto: $newPhoto) {
+                // Popup for cover photo
+                .popover(isPresented: $isCoverPhotoPopupPresented, arrowEdge: .bottom) {
+                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented: $isCoverPhotoPopupPresented,
+                          newPhoto: $newCoverPhoto) {
                         selectedSourceType = .photoLibrary
-                        isPhotoSourcePopupPresented.toggle()
+                        isCoverPhotoPopupPresented.toggle()
                         viewModel.capturePhoto()
                     } onCameraSelected: {
                         selectedSourceType = .camera
-                        isPhotoSourcePopupPresented.toggle()
+                        isCoverPhotoPopupPresented.toggle()
+                        viewModel.capturePhoto()
+                    }
+                }
+                // Popup for disk photo
+                .popover(isPresented: $isDiskPhotoPopupPresented, arrowEdge: .bottom) {
+                    PhotoSourceSelectionPopup(isPhotoSourcePopupPresented: $isDiskPhotoPopupPresented,
+                          newPhoto: $newDiskPhoto) {
+                        selectedSourceType = .photoLibrary
+                        isDiskPhotoPopupPresented.toggle()
+                        viewModel.capturePhoto()
+                    } onCameraSelected: {
+                        selectedSourceType = .camera
+                        isDiskPhotoPopupPresented.toggle()
                         viewModel.capturePhoto()
                     }
                 }
@@ -437,40 +453,6 @@ struct RecordFieldDisplayView: View{
     
 }
 
-extension Date {
-    static func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        return formatter.string(from: date)
-    }
-}
-
-extension String {
-    static func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        return formatter.date(from: string)
-    }
-}
-
-
-class GenreManager: ObservableObject {
-    @Published var genres: [String] = []
-    
-    init(){
-//        print("CREATED NEW GENREMANAGER")
-    }
-    
-    func addGenre(_ genre: String) {
-        if !(genres.contains(genre)){
-            genres.append(genre)
-        }
-    }
-
-    func removeGenre(_ genre: String) {
-        genres.removeAll { $0 == genre }
-    }
-}
 
 
 

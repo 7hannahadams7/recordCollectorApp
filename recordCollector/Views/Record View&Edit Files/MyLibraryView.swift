@@ -7,23 +7,7 @@
 
 import SwiftUI
 
-extension Text {
-    func headlineText() -> some View{
-        self.font(.system(size: 16)).bold()
-    }
-    
-    func mainText() -> some View{
-        self.font(.system(size: 16))
-    }
-    
-    func subtitleText() -> some View {
-        self.font(.system(size: 12))
-    }
-    
-    func italicSubtitleText() -> some View{
-        self.font(.system(size: 12)).italic()
-    }
-}
+
 
 struct MyLibraryView: View {
     @ObservedObject var viewModel: LibraryViewModel
@@ -37,7 +21,7 @@ struct MyLibraryView: View {
     var genreManager = GenreManager()
     
     @State private var filteredGenres: [String] = []
-    @State private var filteredArtists: [String] = ["David Bowie", "Pink Floyd"]
+    @State private var filteredArtists: [String] = []
     
     var body: some View {
         
@@ -284,12 +268,15 @@ struct PersonRowView: View {
     }
 }
 
+
+
+
+
+
 struct MyLibraryView_Previews: PreviewProvider {
-    
     static var previews: some View {
         MyLibraryView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()}
     }
 }
-
 let testViewModel = LibraryViewModel()
 

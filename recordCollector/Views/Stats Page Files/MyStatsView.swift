@@ -9,12 +9,11 @@ import SwiftUI
 
 struct MyStatsView: View {
     @State private var displayTag = 0
-//    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var statsViewModel: StatsViewModel
-//    @ObservedObject var spotifyController: SpotifyController
     
     
     var body: some View {
+        // Consolidated views of all stat types
         let genresView = GenericStatView(viewModel:statsViewModel,viewType:"Genres")
         let artistsView = GenericStatView(viewModel:statsViewModel,viewType:"Artists")
         let decadesView = GenericStatView(viewModel:statsViewModel,viewType:"Decades")
@@ -23,12 +22,11 @@ struct MyStatsView: View {
         
         NavigationView{
             ZStack{
-                
-                //Background Image
-                //                Image("Page-Background").resizable().edgesIgnoringSafeArea(.all)
+
                 Color(woodBrown).edgesIgnoringSafeArea(.all)
                 
                 VStack{
+                    // Buttons for tab selection
                     HStack{
                         Button(action:{displayTag = 0}){
                             Image("GenresTab").resizable().aspectRatio(contentMode: .fit)
@@ -52,6 +50,7 @@ struct MyStatsView: View {
                         
                     }.frame(height:40).padding()
                     
+                    // Alternate between selected views
                     ZStack(alignment:.topLeading){
                         if displayTag == 0{
                             genresView
@@ -75,44 +74,4 @@ struct MyStatsView: View {
         }
     }
             
-    }
-
-struct ArtistsView: View {
-    var body: some View {
-        ZStack{
-            Rectangle().fill(blueGreen)
-            Text("Artists Page")
-        }
-    }
 }
-
-struct DecadesView: View {
-    var body: some View {
-        ZStack{
-            Rectangle().fill(deepBlue)
-            Text("Decades Page")
-        }
-    }
-}
-
-struct StoresView: View {
-    var body: some View {
-        ZStack{
-            Rectangle().fill(pinkRed)
-            Text("Stores Page")
-        }
-    }
-}
-
-struct HistoryView: View {
-    var body: some View {
-        ZStack{
-            Rectangle().fill(yellowOrange)
-            Text("History Page")
-        }
-    }
-}
-
-//#Preview {
-//    MyStatsView(statsViewModel:StatsViewModel(), spotifyController:SpotifyController())
-//}

@@ -91,7 +91,6 @@ struct ArtistRecordShelf: View {
     }
 }
 
-
 struct ArtistInfoChart: View {
     @ObservedObject var viewModel: StatsViewModel //
     var isTabExpanded: Bool

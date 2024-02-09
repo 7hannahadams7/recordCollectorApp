@@ -8,11 +8,6 @@
 import SwiftUI
 import Charts
 
-let typeToImages = [
-    "Genres":["tabImage":"TopGenresTab","proportion":CGFloat(0.5)],
-    "Artists":["tabImage":"TopArtistsTab","proportion":CGFloat(0.4)],
-    "Decades":["tabImage":"TopDecadesTab","proportion":CGFloat(0.2)]
-]
 
 struct GenericStatView: View {
     @ObservedObject var viewModel: StatsViewModel
@@ -20,10 +15,18 @@ struct GenericStatView: View {
     
     @State private var isTabExpanded = false
     
+    let typeToImages = [
+        "Genres":["tabImage":"TopGenresTab","proportion":CGFloat(0.5)],
+        "Artists":["tabImage":"TopArtistsTab","proportion":CGFloat(0.4)],
+        "Decades":["tabImage":"TopDecadesTab","proportion":CGFloat(0.2)]
+    ]
+    
     var body: some View {
+        // Image Selector by Name, Proportion determined above
         let tabImage = typeToImages[viewType]!["tabImage"] as! String
         let proportion: CGFloat = typeToImages[viewType]!["proportion"] as! CGFloat
         
+        // Define views
         let topView = viewWindowCreator(from:viewModel,with:isTabExpanded,viewType: viewType,topFrame: true)
         let bottomView = viewWindowCreator(from:viewModel,with:isTabExpanded,viewType: viewType,topFrame: false)
         

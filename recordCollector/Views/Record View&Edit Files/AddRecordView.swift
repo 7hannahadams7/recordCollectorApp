@@ -6,13 +6,10 @@
 //
 
 import SwiftUI
-import FirebaseDatabase
-import FirebaseStorage
 
 struct AddRecordView: View {
     @ObservedObject var viewModel: LibraryViewModel
-    @ObservedObject private var keyboard = KeyboardResponder()
-    
+
     @State private var recordName = ""
     @State private var artistName = ""
     @State private var releaseYear: Int = 2024
@@ -25,7 +22,8 @@ struct AddRecordView: View {
     @Environment(\.presentationMode) var presentationModeAddItem
     
     @State private var editingMode: Bool = true
-    @State private var newPhoto: Bool = false
+    @State private var newCoverPhoto: Bool = false
+    @State private var newDiskPhoto: Bool = false
     
     @State private var showAlert: Bool = false
     var isFormValid: Bool {
@@ -36,9 +34,6 @@ struct AddRecordView: View {
     
     @State private var newGenre = ""
     
-    
-    var ref: DatabaseReference! = Database.database().reference()
-    
     var body: some View {
         NavigationView{
             ZStack(alignment:.center) {
@@ -46,7 +41,7 @@ struct AddRecordView: View {
                 
                 ScrollView{
                     VStack{
-                        RecordImageDisplayView(viewModel: viewModel,newPhoto: $newPhoto, editingMode: $editingMode)
+                        RecordImageDisplayView(viewModel: viewModel,newCoverPhoto: $newCoverPhoto,newDiskPhoto:$newDiskPhoto, editingMode: $editingMode)
                         
                         RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,
                                                isBand:$isBand,            showAlert: $showAlert, listeningMode: $listeningMode)
@@ -74,7 +69,7 @@ struct AddRecordView: View {
             }
             .onAppear {
                 genreManager.genres = []
-            }.padding(.bottom, keyboard.currentHeight/2)
+            }
         }
     }
     

@@ -17,10 +17,6 @@ struct PhotoSourceSelectionPopup: View {
         VStack {
             Spacer()
             VStack{
-//                Text("Choose Photo Source")
-//                    .font(.headline)
-//                    .padding(.bottom, 20)
-                
                 Button("Photo Library") {
                     onLibrarySelected()
                 }
