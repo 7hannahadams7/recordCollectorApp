@@ -30,8 +30,8 @@
 		BBB8DE472B5055ED008D39E8 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */; };
 		BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */; };
 		BBBDD9812B75BB1000C2E59D /* ClassExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */; };
-		BBBDD9832B75BCE100C2E59D /* Genre-Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBDD9822B75BCE100C2E59D /* Genre-Manager.swift */; };
-		BBBF99542B7A86AE008AA17A /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF99532B7A86AE008AA17A /* Configuration.swift */; };
+		BBBDD9832B75BCE100C2E59D /* GenreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBDD9822B75BCE100C2E59D /* GenreManager.swift */; };
+		BBBF99542B7A86AE008AA17A /* configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF99532B7A86AE008AA17A /* configuration.swift */; };
 		BBD26D392B6831FD0075DA9F /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D382B6831FD0075DA9F /* ViewManager.swift */; };
 		BBD26D3B2B683E8E0075DA9F /* ListenNow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */; };
 		BBDBD57F2B694AEE00EB644B /* SpotifyOptionDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */; };
@@ -67,8 +67,8 @@
 		BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
 		BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyCodables.swift; sourceTree = "<group>"; };
 		BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassExtensions.swift; sourceTree = "<group>"; };
-		BBBDD9822B75BCE100C2E59D /* Genre-Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Genre-Manager.swift"; path = "/Users/Hannah/recordCollector/recordCollector/Other Classes/../Genre-Manager.swift"; sourceTree = "<absolute>"; };
-		BBBF99532B7A86AE008AA17A /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		BBBDD9822B75BCE100C2E59D /* GenreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GenreManager.swift; path = "/Users/Hannah/recordCollector/recordCollector/Other Classes/GenreManager.swift"; sourceTree = "<absolute>"; };
+		BBBF99532B7A86AE008AA17A /* configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = configuration.swift; sourceTree = "<group>"; };
 		BBD26D382B6831FD0075DA9F /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenNow.swift; sourceTree = "<group>"; };
 		BBDBD57E2B694AEE00EB644B /* SpotifyOptionDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyOptionDisplay.swift; sourceTree = "<group>"; };
@@ -149,7 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */,
-				BBBF99532B7A86AE008AA17A /* Configuration.swift */,
+				BBBF99532B7A86AE008AA17A /* configuration.swift */,
 				BBB8DE402B503951008D39E8 /* Views */,
 				BBBDD9842B75BFD100C2E59D /* Other Classes */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
@@ -209,7 +209,7 @@
 			children = (
 				BB9C009B2B659AC100CF02B4 /* SpotifyController.swift */,
 				BB2FEFC32B4DDED700F0DFBB /* ImagePicker.swift */,
-				BBBDD9822B75BCE100C2E59D /* Genre-Manager.swift */,
+				BBBDD9822B75BCE100C2E59D /* GenreManager.swift */,
 				BBD26D382B6831FD0075DA9F /* ViewManager.swift */,
 				BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */,
 			);
@@ -370,7 +370,7 @@
 				BB2FEF992B4C570A00F0DFBB /* RecordItem.swift in Sources */,
 				BB2FEF8B2B4C56EC00F0DFBB /* ContentView.swift in Sources */,
 				BB16B1B62B62BD1B0039BDE2 /* ShowRecordView.swift in Sources */,
-				BBBF99542B7A86AE008AA17A /* Configuration.swift in Sources */,
+				BBBF99542B7A86AE008AA17A /* configuration.swift in Sources */,
 				BBB8DE3C2B4F0DB1008D39E8 /* SettingsView.swift in Sources */,
 				BBF813322B523F8C00654DAA /* GenreViews.swift in Sources */,
 				BB2FEF9C2B4C575100F0DFBB /* LibraryViewModel.swift in Sources */,
@@ -378,7 +378,7 @@
 				BBDBD57F2B694AEE00EB644B /* SpotifyOptionDisplay.swift in Sources */,
 				BBD26D3B2B683E8E0075DA9F /* ListenNow.swift in Sources */,
 				BB2FEFC42B4DDED700F0DFBB /* ImagePicker.swift in Sources */,
-				BBBDD9832B75BCE100C2E59D /* Genre-Manager.swift in Sources */,
+				BBBDD9832B75BCE100C2E59D /* GenreManager.swift in Sources */,
 				BBF813302B52266300654DAA /* GenericStatView.swift in Sources */,
 				BB2FEFC12B4C61AE00F0DFBB /* HomePageView.swift in Sources */,
 				BB2FEF892B4C56EC00F0DFBB /* recordCollectorApp.swift in Sources */,
