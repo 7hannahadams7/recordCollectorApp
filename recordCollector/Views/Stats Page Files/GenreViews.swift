@@ -169,8 +169,6 @@ struct GenreRowView: View {
                             if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
                                 PhotoToPopup(viewModel: viewModel.viewModel, spotifyController: spotifyController, record: record)
                             }
-//                            let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
-//                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
                         }
                     }
                 }.frame(height:60).padding(.all,5).padding(.horizontal,20).background(Rectangle().fill(color).opacity(0.3))
