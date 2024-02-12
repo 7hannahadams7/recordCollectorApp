@@ -149,12 +149,12 @@
 			isa = PBXGroup;
 			children = (
 				BB2FEF882B4C56EC00F0DFBB /* recordCollectorApp.swift */,
+				BBBF99532B7A86AE008AA17A /* Configuration.swift */,
 				BBB8DE402B503951008D39E8 /* Views */,
 				BBBDD9842B75BFD100C2E59D /* Other Classes */,
 				BBB8DE412B5039A5008D39E8 /* Item Management */,
 				BBF813352B52645200654DAA /* ARCHIVE */,
 				BB2FEF8C2B4C56F200F0DFBB /* Assets.xcassets */,
-				BBBF99532B7A86AE008AA17A /* Configuration.swift */,
 				BB2FEF912B4C56F200F0DFBB /* Info.plist */,
 				BBF813392B5328F700654DAA /* GoogleService-Info.plist */,
 				BBB8DE3F2B5036EE008D39E8 /* recordCollector.entitlements */,
