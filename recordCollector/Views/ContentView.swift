@@ -24,7 +24,7 @@ struct ContentView: View {
                     Image(systemName:"filemenu.and.selection")
                     Text("My Library").bold()
                 }.tag(1)
-                MyStatsView(statsViewModel:statsViewModel).tabItem{
+                MyStatsView(statsViewModel:statsViewModel,spotifyController:spotifyController).tabItem{
                     Image(systemName:"chart.pie.fill").foregroundColor(.blue)
                     Text("My Stats").bold()
                 }.tag(2)
