@@ -67,7 +67,7 @@
 		BBB8DE462B5055ED008D39E8 /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
 		BBBA69972B6C14BD0035C739 /* SpotifyCodables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyCodables.swift; sourceTree = "<group>"; };
 		BBBDD9802B75BB1000C2E59D /* ClassExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassExtensions.swift; sourceTree = "<group>"; };
-		BBBDD9822B75BCE100C2E59D /* Genre-Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Genre-Manager.swift"; path = "/Users/Hannah/recordCollector/recordCollector/Genre-Manager.swift"; sourceTree = "<absolute>"; };
+		BBBDD9822B75BCE100C2E59D /* Genre-Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Genre-Manager.swift"; path = "/Users/Hannah/recordCollector/recordCollector/Other Classes/../Genre-Manager.swift"; sourceTree = "<absolute>"; };
 		BBBF99532B7A86AE008AA17A /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		BBD26D382B6831FD0075DA9F /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		BBD26D3A2B683E8E0075DA9F /* ListenNow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenNow.swift; sourceTree = "<group>"; };
