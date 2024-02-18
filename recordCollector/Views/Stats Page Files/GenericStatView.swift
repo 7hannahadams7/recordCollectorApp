@@ -12,6 +12,7 @@ import Charts
 struct GenericStatView: View {
     @ObservedObject var viewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     var viewType: String
     
     @State private var isTabExpanded = false
@@ -84,20 +85,20 @@ struct GenericStatView: View {
             if topFrame{
                 GenrePieChart(viewModel:viewModel,isTabExpanded:isTabExpanded)
             }else{
-                GenreInfoChart(viewModel:viewModel,spotifyController:spotifyController, isTabExpanded:$isTabExpanded)
+                GenreInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
         }else if viewType == "Artists"{
             if topFrame{
-                ArtistRecordShelf(viewModel:viewModel,isTabExpanded:isTabExpanded)
+                ArtistRecordShelf(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                ArtistInfoChart(viewModel:viewModel,isTabExpanded:isTabExpanded)
+                ArtistInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else if viewType == "Decades"{
             if topFrame{
-                DecadeTopGraphic(viewModel:viewModel,isTabExpanded:isTabExpanded)
+                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                DecadeBottomChart(viewModel:viewModel,isTabExpanded:isTabExpanded)
+                DecadeBottomChart(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else{

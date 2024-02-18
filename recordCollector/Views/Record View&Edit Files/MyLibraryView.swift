@@ -18,7 +18,7 @@ struct MyLibraryView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    var genreManager = GenreManager()
+    @ObservedObject var genreManager: GenreManager
     
     @State private var filteredGenres: [String] = []
     @State private var filteredArtists: [String] = []

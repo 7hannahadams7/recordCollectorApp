@@ -8,12 +8,14 @@ import Foundation
 import SwiftUI
 import Charts
 
+// Shelf of 6 top artist record instances, with interaction
 struct ArtistRecordShelf: View {
-    @ObservedObject var viewModel: StatsViewModel //
-    var isTabExpanded: Bool
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
+    @Binding var isTabExpanded: Bool
     @State private var offset = 0.0
-    var images: [Image] = []
-    
+
     var body: some View {
         
         GeometryReader { geometry in
@@ -22,37 +24,31 @@ struct ArtistRecordShelf: View {
             
             let artistBarData = viewModel.topArtists.prefix(6)
             
-            var images: [Image] {
-                var imageArray: [Image] = []
+            var popups: [CoverPhotoToPopupView] {
+                var popupArray: [CoverPhotoToPopupView] = []
 
                 for index in 0..<6 {
-                    let image: Image
-
+                    let popup: CoverPhotoToPopupView
+                    var record = defaultRecordItems[index]
                     if index < artistBarData.count {
                         let recordID = artistBarData[index].records.first
-                        let photo = viewModel.viewModel.fetchPhotoByID(id: recordID!)
-                        if photo != UIImage(named:"TakePhoto"){
-                            image = Image(uiImage: photo!)
-                        }else{
-                            image = Image("DavidBowie")
-                        }
-                    } else {
-                        image = Image("DavidBowie")
+                        record = viewModel.viewModel.recordDictionaryByID[recordID!]!
                     }
+                    popup = CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
 
-                    imageArray.append(image)
+                    popupArray.append(popup)
                 }
 
-                return imageArray
+                return popupArray
             }
             
             VStack{
                 //Top Shelf
                 ZStack(alignment:.bottom){
                     HStack(spacing:recordSpacing){
-                        images[0].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                        images[1].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                        images[2].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        popups[0]
+                        popups[1]
+                        popups[2]
                     }.frame(height: recordStack)
                     Rectangle().frame(width:4*recordStack,height:0.15*recordStack).foregroundColor(lightWoodBrown).offset(y:3)
                     
@@ -60,9 +56,9 @@ struct ArtistRecordShelf: View {
                 //Bottom Shelf
                 ZStack(alignment:.bottom){
                     HStack(spacing:recordSpacing){
-                        images[3].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                        images[4].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                        images[5].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                        popups[3]
+                        popups[4]
+                        popups[5]
                     }.frame(height: recordStack)
                     Rectangle().frame(width:4*recordStack,height:0.15*recordStack).foregroundColor(lightWoodBrown).offset(y:3)
                     
@@ -91,9 +87,12 @@ struct ArtistRecordShelf: View {
     }
 }
 
-struct ArtistInfoChart: View {
-    @ObservedObject var viewModel: StatsViewModel //
-    var isTabExpanded: Bool
+// Artist Information in bottom tab, both expanded and collapsed
+struct ArtistInfoView: View {
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
+    @Binding var isTabExpanded: Bool
     @State private var offset = 0.0
     
     var body: some View {
@@ -114,7 +113,7 @@ struct ArtistInfoChart: View {
                             ForEach(0..<min(6, artistBarData.count), id: \.self) { index in
                                             // Use the index to access elements in the subarray
                                 let item = artistBarData[index]
-                                ArtistBarItem(artist: item.artist, amount: item.amount, color: smallDisplayColors[index%6], total: total, minAmount: minAmount, maxAmount: maxAmount)
+                                ArtistCollapsedBarView(artist: item.artist, amount: item.amount, color: smallDisplayColors[index%6], total: total, minAmount: minAmount, maxAmount: maxAmount)
                                 
                             }
 
@@ -127,7 +126,7 @@ struct ArtistInfoChart: View {
                 }else{
                     ScrollView{
                         ForEach(artistTotalData.indices, id:\.self){index in
-                            ArtistRowView(artistItem:artistTotalData[index],viewModel:viewModel,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
+                            ArtistDetailRowView(artistItem:artistTotalData[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
                             
                         }
                     }.padding(.vertical,30)
@@ -158,7 +157,8 @@ struct ArtistInfoChart: View {
     }
 }
 
-struct ArtistBarItem: View{
+// Individual artist row for collapsed InfoView
+struct ArtistCollapsedBarView: View{
     var artist: String
     var amount: Int
     var color: Color
@@ -185,9 +185,12 @@ struct ArtistBarItem: View{
     }
 }
 
-struct ArtistRowView: View {
+// Individual artist row with interactions, in InfoView when expanded
+struct ArtistDetailRowView: View {
     var artistItem: (artist: String, amount: Int, records: [String]);
-    var viewModel: StatsViewModel
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     var color: Color
     var positionProportion: CGFloat
     @State private var expanded: Bool = false
@@ -200,8 +203,9 @@ struct ArtistRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(artistItem.records, id:\.self){recordID in
-                            let photo = viewModel.viewModel.fetchPhotoByID(id: recordID)
-                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
+                            if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
+                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
+                            }
                         }
                     }
                 }.frame(height:60).padding(.all,5).padding(.horizontal,20).background(Rectangle().fill(color).opacity(0.3))

@@ -16,18 +16,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     FirebaseApp.configure()
-      
-      // Check if the user is already signed in
-      if Auth.auth().currentUser != nil {
-          // User is signed in, proceed to the main part of the app
-          // e.g., set up your main view controller
-          print("User is signed in")
-      } else {
-          // User is not signed in, show the authentication view
-          // e.g., present the sign-in or sign-up view controller
-          print("User is not signed in")
-      }
-
     return true
   }
 }
@@ -42,9 +30,6 @@ struct recordCollectorApp: App {
     
     @StateObject var spotifyController = SpotifyController()
     @StateObject var libraryViewModel = LibraryViewModel()
-    
-    @State private var isSignInPresented = false
-    @State private var isSignUpPresented = false
 
     var body: some Scene {
         WindowGroup {

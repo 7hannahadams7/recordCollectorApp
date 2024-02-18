@@ -11,6 +11,7 @@ import Combine
 struct HomePageView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     
     let topStack: CGFloat = 100
     let bottomStack: CGFloat = 125
@@ -78,7 +79,7 @@ struct HomePageView: View {
                 VStack{
                     HStack{
                         Spacer()
-                        NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:GenreManager())) {
+                        NavigationLink(destination: AddRecordView(viewModel:viewModel,genreManager:genreManager)) {
                             Image("AddButton").resizable().frame(width:80,height:80).shadow(color:Color.black,radius:2)
                         }
                     }.padding(.trailing,15)
@@ -117,9 +118,10 @@ struct HomePageView: View {
         }
     }
     
-    init(viewModel: LibraryViewModel, spotifyController: SpotifyController) {
+    init(viewModel: LibraryViewModel, spotifyController: SpotifyController, genreManager: GenreManager) {
         self.viewModel = viewModel
         self.spotifyController = spotifyController
+        self.genreManager = genreManager
         self._photoDisplayManager = StateObject(wrappedValue: RecordShelfDisplayManager(viewModel: viewModel))
     }
     
@@ -130,7 +132,7 @@ struct HomePageView: View {
         var photoArray: [CoverPhotoToPopupView] = []
         for (index, record) in shownRecords.enumerated() {
             let size = CGFloat((index < 3) ? topStack : bottomStack)
-            let photoToPopup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, record: record, size: size, presentingListener: $presentingListener)
+            let photoToPopup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record: record, size: size, presentingListener: $presentingListener)
             photoArray.append(photoToPopup)
         }
 
@@ -141,6 +143,6 @@ struct HomePageView: View {
             
 struct HomePageView_Previews: PreviewProvider {
     static var previews: some View {
-        HomePageView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
+        HomePageView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(),genreManager:GenreManager())
     }
 }

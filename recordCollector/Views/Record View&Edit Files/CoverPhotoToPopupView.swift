@@ -12,6 +12,7 @@ import SwiftUI
 struct CoverPhotoToPopupView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
 
     var record: RecordItem
     var size: CGFloat
@@ -21,9 +22,10 @@ struct CoverPhotoToPopupView: View{
     // Listener for ShowRecordView popup on HomePageView only (to pause updates while presenting)
     @Binding var presentingListener: Bool
     
-    init(viewModel: LibraryViewModel, spotifyController: SpotifyController, record: RecordItem, size: CGFloat, presentingListener: Binding<Bool>? = Binding.constant(false)) {
+    init(viewModel: LibraryViewModel, spotifyController: SpotifyController, genreManager: GenreManager, record: RecordItem, size: CGFloat, presentingListener: Binding<Bool>? = Binding.constant(false)) {
         self.viewModel = viewModel
         self.spotifyController = spotifyController
+        self.genreManager = genreManager
         self.record = record
         self.size = size
         _presentingListener = presentingListener!
@@ -42,7 +44,7 @@ struct CoverPhotoToPopupView: View{
         }.popover(isPresented: $showRecordPopupPresented, content: {
             ZStack{
                 Color(woodBrown)
-                ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: GenreManager()).padding(.top)
+                ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: genreManager).padding(.top)
             }.onDisappear {
                 presentingListener = false
             }

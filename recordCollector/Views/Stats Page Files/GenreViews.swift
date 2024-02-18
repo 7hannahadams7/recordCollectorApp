@@ -8,6 +8,7 @@
 import SwiftUI
 import Charts
 
+// Distributed Pie Chart
 struct GenrePieChart: View {
     @ObservedObject var viewModel: StatsViewModel //
     var isTabExpanded: Bool
@@ -61,9 +62,11 @@ struct GenrePieChart: View {
         }
 }
 
-struct GenreInfoChart: View {
+// Genre Information in bottom tab, both expanded and collapsed
+struct GenreInfoView: View {
     @ObservedObject var viewModel: StatsViewModel //
     @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
     
     @State private var offset = 0.0
@@ -108,7 +111,7 @@ struct GenreInfoChart: View {
                     //Expanded Genre Info
                     ScrollView{
                         ForEach(genreTotalData.indices, id: \.self) {index in
-                            GenreRowView(genreItem:genreTotalData[index],viewModel:viewModel,spotifyController:spotifyController, color:fullDisplayColors[index%totalDisplayColors])
+                            GenreDetailRowView(genreItem:genreTotalData[index],viewModel:viewModel,spotifyController:spotifyController, genreManager: genreManager,  color:fullDisplayColors[index%totalDisplayColors])
                         }
                     }.padding(.vertical,30)
                         .id(2)
@@ -128,10 +131,12 @@ struct GenreInfoChart: View {
     }
 }
 
-struct GenreRowView: View {
+// Individual genre row with interactions, in InfoView when expanded
+struct GenreDetailRowView: View {
     var genreItem: (genre: String, amount: Int, records: [String])
     @ObservedObject var viewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     
     var color: Color
     
@@ -145,7 +150,7 @@ struct GenreRowView: View {
                     HStack{
                         ForEach(genreItem.records, id:\.self){recordID in
                             if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
-                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, record: record,size:50)
+                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
                             }
                         }
                     }

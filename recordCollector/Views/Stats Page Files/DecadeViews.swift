@@ -8,49 +8,45 @@
 import SwiftUI
 import Charts
 
+// Shelf of 3 artist instances from top decades, with interaction
 struct DecadeTopGraphic: View {
     @ObservedObject var viewModel: StatsViewModel
-    var isTabExpanded: Bool
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
+    @Binding var isTabExpanded: Bool
     @State private var offset = 0.0
     
-    var images: [Image] = []
-    
     var body: some View {
-        let decadeBarData = viewModel.topDecades.prefix(4)
-        
-        var images: [Image] {
-            var imageArray: [Image] = []
-
-            for index in 0..<6 {
-                let image: Image
-
-                if index < decadeBarData.count {
-                    let recordID = decadeBarData[index].records.first
-                    let photo = viewModel.viewModel.fetchPhotoByID(id: recordID!)
-                    if photo != UIImage(named:"TakePhoto"){
-                        image = Image(uiImage: photo!)
-                    }else{
-                        image = Image("DavidBowie")
-                    }
-                } else {
-                    image = Image("DavidBowie")
-                }
-
-                imageArray.append(image)
-            }
-
-            return imageArray
-        }
-        
         GeometryReader { geometry in
             let recordStack: CGFloat = geometry.size.height*0.85
             let recordSpacing: CGFloat = min(recordStack/3,(geometry.size.width-3*recordStack)/3)
+            
+            let decadeBarData = viewModel.topDecades.prefix(4)
+        
+            var popups: [CoverPhotoToPopupView] {
+                var popupArray: [CoverPhotoToPopupView] = []
+
+                for index in 0..<3 {
+                    let popup: CoverPhotoToPopupView
+                    var record = defaultRecordItems[index]
+                    if index < decadeBarData.count {
+                        let recordID = decadeBarData[index].records.first
+                        record = viewModel.viewModel.recordDictionaryByID[recordID!]!
+                    }
+                    popup = CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
+
+                    popupArray.append(popup)
+                }
+
+                return popupArray
+            }
+            
             ZStack{
                 ZStack(alignment:.bottom){
                         HStack(spacing:recordSpacing){
-                            images[0].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                            images[1].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
-                            images[2].resizable().frame(width:recordStack, height:recordStack).scaledToFill().clipped()
+                            popups[0]
+                            popups[1]
+                            popups[2]
                         }.frame(height: recordStack)
                         Rectangle().frame(width:4*recordStack,height:0.15*recordStack).foregroundColor(lightWoodBrown).offset(y:3)
                         
@@ -80,9 +76,14 @@ struct DecadeTopGraphic: View {
     }
 }
 
+// Decade Information in bottom tab, both expanded and collapsed
 struct DecadeBottomChart: View{
-    @ObservedObject var viewModel: StatsViewModel //
-    var isTabExpanded: Bool
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
+    
+    @Binding var isTabExpanded: Bool
+    
     @State private var selectedTab = 1
     @State private var selectedBar: Int?
 
@@ -104,7 +105,7 @@ struct DecadeBottomChart: View{
                                 let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
                                 ForEach(decadeBarData.indices, id:\.self){index in
                                     let item = decadeBarData[index]
-                                    DecadeBarItem(decade: item.decade, amount: item.amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
+                                    DecadeCollapsedBarView(decade: item.decade, amount: item.amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
                                 }
                             }
 //                            Spacer()
@@ -121,14 +122,14 @@ struct DecadeBottomChart: View{
                                         let minAmount = decadeSortedData.map { $0.amount }.min() ?? 1
                                         let maxAmount = decadeSortedData.map { $0.amount }.max() ?? 1
                                         ForEach(decadeSortedData.indices, id: \.self) { index in
-                                            BubbleItem(decadeItem:decadeSortedData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadeSortedData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width, tapped: $tapped, infoExpanded: $infoExpanded)
+                                            DecadeBubbleView(decadeItem:decadeSortedData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadeSortedData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width, tapped: $tapped, infoExpanded: $infoExpanded)
                                         }
                                     }.padding()
                                 }
                                 
                                 if infoExpanded{
                                     ZStack(alignment:.topLeading){
-                                        BubbleItemInfo(viewModel:viewModel,decade:tapped)
+                                        DecadeBubbleInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,decade:tapped)
                                         Button(action:{infoExpanded.toggle()}){
                                             Image(systemName: "xmark").padding()
                                         }
@@ -153,7 +154,8 @@ struct DecadeBottomChart: View{
         
 }
 
-struct BubbleItem: View {
+// Decade bubbles, sizes and offsets adjust to create flowing display, in InfoView when expanded
+struct DecadeBubbleView: View {
     let decadeItem: (decade: Int, amount: Int, records: [String])
     var color: Color
     var index: Int
@@ -196,8 +198,11 @@ struct BubbleItem: View {
     
 }
 
-struct BubbleItemInfo: View{
-    var viewModel: StatsViewModel
+// Individual decade details, lists years in decade with interactive record instances, in InfoView when expanded
+struct DecadeBubbleInfoView: View{
+    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    @ObservedObject var genreManager: GenreManager
     let decade: Int
     
     var body: some View{
@@ -211,10 +216,10 @@ struct BubbleItemInfo: View{
                                 Text(String(yearsInDecade[index].0))
                                 ScrollView(.horizontal){
                                     HStack{
-                                        ForEach(yearsInDecade[index].2, id:\.self){record in
-                                            let photo = viewModel.viewModel.fetchPhotoByID(id: record)
-                                            // BUTTON WITH NAVIGATION HERE
-                                            Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
+                                        ForEach(yearsInDecade[index].2, id:\.self){recordID in
+                                            if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
+                                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
+                                            }
                                         }
                                     }.padding()
                                 }.background(fullDisplayColors[index%totalDisplayColors].opacity(0.3))
@@ -227,7 +232,8 @@ struct BubbleItemInfo: View{
     }
 }
 
-struct DecadeBarItem: View{
+// Individual decade bar for collapsed view
+struct DecadeCollapsedBarView: View{
     var decade: Int
     var amount: Int
     var color: Color

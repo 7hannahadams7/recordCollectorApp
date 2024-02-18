@@ -14,6 +14,7 @@ struct ContentView: View {
     @ObservedObject var authManager = AuthenticationManager()
 
     @StateObject private var statsViewModel: StatsViewModel
+    @StateObject private var genreManager = GenreManager()
 
     init(viewModel: LibraryViewModel, spotifyController: SpotifyController) {
         self.viewModel = viewModel
@@ -22,21 +23,21 @@ struct ContentView: View {
     }
     
     var body: some View {
+        // Present SignInView if user not signed into a valid Firebase account
         if !authManager.isUserSignedIn {
-            // Present SignInView if user not signed into a valid Firebase account
             SignInView(authManager: authManager)
         } else {
             ZStack {
                 TabView {
-                    HomePageView(viewModel: viewModel, spotifyController: spotifyController).tabItem {
+                    HomePageView(viewModel: viewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
                         Image(systemName: "house.fill")
                         Text("Home").bold()
                     }.tag(0)
-                    MyLibraryView(viewModel: viewModel, spotifyController: spotifyController).tabItem {
+                    MyLibraryView(viewModel: viewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
                         Image(systemName: "filemenu.and.selection")
                         Text("My Library").bold()
                     }.tag(1)
-                    MyStatsView(statsViewModel: statsViewModel, spotifyController: spotifyController).tabItem {
+                    MyStatsView(statsViewModel: statsViewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
                         Image(systemName: "chart.pie.fill").foregroundColor(.blue)
                         Text("My Stats").bold()
                     }.tag(2)
