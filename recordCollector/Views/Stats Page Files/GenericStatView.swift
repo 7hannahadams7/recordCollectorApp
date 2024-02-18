@@ -109,7 +109,3 @@ struct GenericStatView: View {
     
     
 }
-
-#Preview {
-    GenericStatView(viewModel:StatsViewModel(viewModel:LibraryViewModel()),spotifyController:SpotifyController(),viewType:"Artists")
-}

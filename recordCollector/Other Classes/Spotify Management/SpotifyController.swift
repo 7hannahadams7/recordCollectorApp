@@ -111,13 +111,6 @@ extension SpotifyController: SPTAppRemoteDelegate {
     }
 }
 
-//extension SpotifyController: SPTAppRemotePlayerStateDelegate {
-//    func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-//        debugPrint("Track name: %@", playerState.track.name)
-//    }
-//
-//}
-
 extension SpotifyController {
     func playFromSpotify(uri: String) {
         if appRemote.isConnected {

@@ -11,7 +11,6 @@ class GenreManager: ObservableObject {
     @Published var genres: [String] = []
     
     init(){
-//        print("CREATED NEW GENREMANAGER")
     }
     
     func addGenre(_ genre: String) {

@@ -12,7 +12,6 @@ struct MyStatsView: View {
     @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     
-    
     var body: some View {
         // Consolidated views of all stat types
         let genresView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,viewType:"Genres")

@@ -40,8 +40,8 @@ struct recordCollectorApp: App {
     let urlImageService = URLImageService(fileStore: URLImageFileStore(),
                                               inMemoryStore: URLImageInMemoryStore())
     
-    @ObservedObject var spotifyController = SpotifyController()
-    @ObservedObject var libraryViewModel = LibraryViewModel()
+    @StateObject var spotifyController = SpotifyController()
+    @StateObject var libraryViewModel = LibraryViewModel()
     
     @State private var isSignInPresented = false
     @State private var isSignUpPresented = false
