@@ -36,14 +36,14 @@ class RecordShelfDisplayManager: ObservableObject {
     // Fill initial arrays and show defaults if needed
     private func pullInitialRecords() {
         randomizedRecords = Array(viewModel.recordDictionaryByID.values).shuffled()
-        
-        if randomizedRecords.count >= 7 {
-            shownRecords = Array(randomizedRecords.prefix(7))
-        } else {
-            // If library is too small, use default RecordItems
-            shownRecords = randomizedRecords + defaultRecordItems.prefix(7 - randomizedRecords.count)
+        if randomizedRecords.count < 7 {
+            let additionalInstancesNeeded = 7 - randomizedRecords.count
+            let additionalInstances = defaultRecordItems.prefix(additionalInstancesNeeded)
+            randomizedRecords += additionalInstances
         }
-        instanceMarker = shownRecords.count //Marker for next item for change
+        shownRecords = Array(randomizedRecords.prefix(7))
+        
+        instanceMarker = shownRecords.count % randomizedRecords.count //Marker for next item for change
         fullSize = randomizedRecords.count //Total items
     }
 

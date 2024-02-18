@@ -286,23 +286,33 @@ class LibraryViewModel: ObservableObject {
         allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
             let dispatchGroup = DispatchGroup()
 
+            // COMMENT THIS FOR FULL BUILD
+            let maxChildrenToFetch = 6
+            var childrenCount = 0
+            
             for child in snapshot.children {
+                // COMMENT FOR FULL BUILD
+//                guard childrenCount < maxChildrenToFetch else {
+//                    // Break the loop if the maximum number of children is reached
+//                    break
+//                }
+                
                 let snap = child as! DataSnapshot
                 let elementDict = snap.value as! [String: Any]
-
+                
                 let artist = elementDict["artist"] as! String
                 
                 let name = elementDict["name"] as! String
                 let releaseYear = elementDict["releaseYear"] as! Int
                 let dateAdded = elementDict["dateAdded"] as! String
                 let isBand = elementDict["isBand"] as! Bool
-
+                
                 // Set to default images
                 var coverPhoto = UIImage(named:"TakePhoto")
                 var discPhoto = UIImage(named:"TakePhoto")
-
+                
                 var genres: [String] = []
-
+                
                 // Pull genres to array
                 if let genresDict = elementDict["genres"] as? [String: Bool] {
                     for (genre, value) in genresDict {
@@ -311,7 +321,7 @@ class LibraryViewModel: ObservableObject {
                         }
                     }
                 }
-
+                
                 // Pull cover image from storage
                 if let im = elementDict["imageURL"] {
                     let fileRef = storageRef.child(im as! String)
@@ -323,7 +333,7 @@ class LibraryViewModel: ObservableObject {
                         dispatchGroup.leave()
                     })
                 }
-
+                
                 // Pull disk image from storage
                 if let im = elementDict["discImageURL"] {
                     let fileRef = storageRef.child(im as! String)
@@ -335,13 +345,14 @@ class LibraryViewModel: ObservableObject {
                         dispatchGroup.leave()
                     })
                 }
-
+                
                 // Add record to local library
                 dispatchGroup.notify(queue: .main) {
-//                    print("IN QUEUE")
+                    //                    print("IN QUEUE")
                     self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand)
                     completion()
                 }
+                childrenCount += 1
             }
         })
     }
