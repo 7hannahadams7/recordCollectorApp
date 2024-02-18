@@ -124,16 +124,15 @@ struct ArtistInfoView: View {
                         .animation(.easeInOut(duration:0.5).delay(0.05),value:isTabExpanded)
                         .transition( .move(edge: .leading))
                 }else{
-                    ScrollView{
-                        ForEach(artistTotalData.indices, id:\.self){index in
-                            ArtistDetailRowView(artistItem:artistTotalData[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
-                            
-                        }
-                    }.padding(.vertical,30)
-                        .id(2)
-                        .animation(.easeInOut(duration:0.5).delay(0.15))
-                        .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .leading)))
-                    
+                        ScrollView{
+                            ForEach(artistTotalData.indices, id:\.self){index in
+                                ArtistDetailRowView(artistItem:artistTotalData[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
+                                
+                            }
+                        }.padding(.vertical,30)
+                            .id(2)
+//                            .animation(.easeInOut(duration:0.5).delay(0.15))
+                            .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .leading)))
                 }
                 
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
@@ -218,7 +217,9 @@ struct ArtistDetailRowView: View {
                         }
                     }
                     Button(action:{
-                        expanded.toggle()
+                        withAnimation(.easeInOut(duration: 0.5).delay(0.15)) {
+                            expanded.toggle()
+                        }
                     }){
                         Text(String(artistItem.amount))
                     }.padding()

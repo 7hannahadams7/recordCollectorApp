@@ -30,7 +30,6 @@ class StatsViewModel: ObservableObject {
 
                 let recordID = snap.key
                 if let artist = elementDict["artist"] as? String {
-                    let recordID = snap.key
                     if let index = artistData.firstIndex(where: { $0.0 == artist }) {
                         // Artist already exists in the array, update count and add record ID
                         artistData[index].1 += 1

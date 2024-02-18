@@ -115,7 +115,7 @@ struct GenreInfoView: View {
                         }
                     }.padding(.vertical,30)
                         .id(2)
-                        .animation(.easeInOut(duration:0.5))
+//                        .animation(.easeInOut(duration:0.5))
                         .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                 }
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()
@@ -158,7 +158,9 @@ struct GenreDetailRowView: View {
             }.frame(height:expanded ? 150:70)
             HStack{
                 Button(action:{
-                    expanded.toggle()
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        expanded.toggle()
+                    }
                 }){
                     Circle().foregroundColor(color).scaledToFit().padding()
                     HStack {
