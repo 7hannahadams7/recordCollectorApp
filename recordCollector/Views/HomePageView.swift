@@ -6,21 +6,25 @@
 //
 
 import SwiftUI
-
-
-let screenWidth = UIScreen.main.bounds.size.width
-let screenHeight = UIScreen.main.bounds.size.height
-
+import Combine
 
 struct HomePageView: View {
     @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var spotifyController: SpotifyController
     
+    let topStack: CGFloat = 100
+    let bottomStack: CGFloat = 125
+
     @State private var isAddItemSheetPresented = false
+    @StateObject private var photoDisplayManager: RecordShelfDisplayManager
+    @State private var timer: Timer?
     
-    var topStack: CGFloat = 100
-    var bottomStack: CGFloat = 125
+    @State var presentingListener: Bool = false
 
     var body: some View {
+        
+        // Pull current photos to display
+        let photoPopups = photoPopupEntries(shownRecords: photoDisplayManager.shownRecords)
         
         NavigationView{
             
@@ -37,26 +41,33 @@ struct HomePageView: View {
                     Spacer()
                     
                     //Top Record Shelf
-                    ZStack{
+                    ZStack(alignment:.bottom){
+                        
+                        // Records
                         HStack{
-                            Image("TalkingHeads").resizable().frame(width: topStack, height: topStack, alignment: .center)
-                            Image("DavidBowie").resizable().frame(width: topStack, height: topStack, alignment: .center)
-                            Image("PinkFloyd").resizable().frame(width: topStack, height: topStack, alignment: .center)
-                            
-                        }.shadow(color:Color.black,radius:2)
-                        Image("topShelf").resizable().frame( alignment: .bottom).aspectRatio(contentMode: .fit).offset(y:topStack/2)
-                    }.frame(height: topStack+25, alignment: .center)
+                            photoPopups[0]
+                            photoPopups[1]
+                            photoPopups[2]
+                        }.shadow(color:Color.black,radius:2).offset(y:-10)
+                        
+                        //Shelf
+                        RoundedRectangle(cornerRadius:2).fill(lightWoodBrown).shadow(color:recordBlack,radius:2).frame(height:20).padding(.horizontal)
+                        
+                    }.frame(height: topStack+25)
                     
                     //Bottom Shelves
                     ZStack(alignment:.top){
+                        
+                        //Records
                         HStack{
-                            Image("Radiohead").resizable().frame(width: bottomStack, height: bottomStack, alignment: .center)
-                            Image("S&G").resizable().frame(width: bottomStack, height: bottomStack, alignment: .center)
-                            Image("LedZeppelin").resizable().frame(width: bottomStack, height: bottomStack, alignment: .center)
-                            Image("TheSmiths").resizable().frame(width: bottomStack, height: bottomStack, alignment: .center)
+                            photoPopups[3]
+                            photoPopups[4]
+                            photoPopups[5]
+                            photoPopups[6]
                             
                         }.shadow(color:Color.black,radius:3).offset(y:-bottomStack+20)
                         
+                        // Front Shelving Display
                         Image("frontShelves-1").resizable().aspectRatio(contentMode: .fit)
                         
                     }.frame(width: screenWidth, height:screenWidth+bottomStack+50,alignment:.bottom)
@@ -77,16 +88,59 @@ struct HomePageView: View {
                 
             }
             
+        }.onChange(of: presentingListener, { _, presenting in
+            print("Change in Presenting Mode")
+            if presenting{
+                // Pause timer when a ShowRecordView instance displayed
+                print("PAUSING")
+                timer?.invalidate()
+            } else {
+                // Restart timer
+                timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        photoDisplayManager.updateArray()
+                    }
+                }
+            }
+        })
+        .onAppear {
+            // Start update timer
+            timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+                withAnimation(.easeInOut(duration:1.0)) {
+                    photoDisplayManager.updateArray()
+                }
+            }
         }
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
         }
     }
+    
+    init(viewModel: LibraryViewModel, spotifyController: SpotifyController) {
+        self.viewModel = viewModel
+        self.spotifyController = spotifyController
+        self._photoDisplayManager = StateObject(wrappedValue: RecordShelfDisplayManager(viewModel: viewModel))
+    }
+    
+    // creating PhotoToPopup instances with photoDisplayManager listening, UI updates automatically when .updateArray() called
+    private func photoPopupEntries(shownRecords: [RecordItem]) -> [CoverPhotoToPopupView] {
+        print("Updating Popups")
+        
+        var photoArray: [CoverPhotoToPopupView] = []
+        for (index, record) in shownRecords.enumerated() {
+            let size = CGFloat((index < 3) ? topStack : bottomStack)
+            let photoToPopup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, record: record, size: size, presentingListener: $presentingListener)
+            photoArray.append(photoToPopup)
+        }
+
+        return photoArray
+    }
+        
+}
             
-
-
-
-
 struct HomePageView_Previews: PreviewProvider {
     static var previews: some View {
-        HomePageView(viewModel:LibraryViewModel())
+        HomePageView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
     }
 }

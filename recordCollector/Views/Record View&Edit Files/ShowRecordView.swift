@@ -51,7 +51,7 @@ struct ShowRecordView: View {
                             RecordImageDisplayView(viewModel: viewModel, record: record, newCoverPhoto: $newCoverPhoto, newDiskPhoto: $newDiskPhoto, editingMode: $editingMode)
                             
                             if listeningMode{
-                                ListenNow(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
+                                ListenNowView(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
                             }else{
                                 RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded, isBand: $isBand, showAlert: $showAlert, listeningMode: $listeningMode)
                             }
@@ -89,7 +89,7 @@ struct ShowRecordView: View {
                                         VStack {
                                             VStack{
                                                 Text("Confirm Delete")
-                                                    .headlineText().padding()
+                                                    .smallHeadlineText().padding()
                                                 
                                                 Text("Are you sure you want to delete this record? This action cannot be undone.").mainText()
                                                     .multilineTextAlignment(.center).padding()
@@ -99,7 +99,7 @@ struct ShowRecordView: View {
                                                     Button{
                                                         confirmDeletePopup.toggle()
                                                     }label:{
-                                                        Text("Cancel").headlineText()
+                                                        Text("Cancel").smallHeadlineText()
                                                     }
                                                     .padding()
                                                     .foregroundColor(.blue)
@@ -117,7 +117,7 @@ struct ShowRecordView: View {
                                                         // Close the confirmation alert
                                                         confirmDeletePopup.toggle()
                                                     } label:{
-                                                        Text("Delete").headlineText()
+                                                        Text("Delete").smallHeadlineText()
                                                     }
                                                     .padding()
                                                     .foregroundColor(.red)

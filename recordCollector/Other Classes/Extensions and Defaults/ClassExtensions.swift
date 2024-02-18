@@ -8,8 +8,13 @@
 import Foundation
 import SwiftUI
 
+// Text consistency
 extension Text {
-    func headlineText() -> some View{
+    func largeHeadlineText() -> some View{
+        self.font(.system(size:20)).bold()
+    }
+    
+    func smallHeadlineText() -> some View{
         self.font(.system(size: 16)).bold()
     }
     
@@ -26,6 +31,23 @@ extension Text {
     }
 }
 
+// For removing duplicates of Spotify results
+extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var result = [Element]()
+        var seen = Set<Element>()
+
+        for element in self {
+            if seen.insert(element).inserted {
+                result.append(element)
+            }
+        }
+
+        return result
+    }
+}
+
+// Converting a Date to String for dateAdded editing and fetching
 extension Date {
     static func dateToString(date: Date, format: String = "MM-dd-yyyy") -> String {
         let formatter = DateFormatter()
@@ -34,6 +56,7 @@ extension Date {
     }
 }
 
+// Converting a String to Date for dateAdded editing and fetching
 extension String {
     static func stringToDate(from string: String, format: String = "MM-dd-yyyy") -> Date? {
         let formatter = DateFormatter()
@@ -42,6 +65,7 @@ extension String {
     }
 }
 
+// For converting my custom hex colors
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -68,32 +92,3 @@ extension Color {
         )
     }
 }
-
-//Custom Color Definitions
-
-let woodBrown = Color(hex:"BC8F5E")
-let lightWoodBrown = Color(hex:"E2AB74")
-let woodAccent = Color(hex:"9E7852")
-
-let recordBlack = Color(hex:"0C0C0C")
-let decorBlack = Color(hex:"1A1A1A")
-let iconWhite = Color(hex:"FBFFFE")
-let decorWhite = Color(hex:"EAE7E4")
-
-let mintGreen = Color(hex: "BFC8AD")
-let seaweedGreen = Color(hex: "475841")
-let blueGreen = Color(hex: "2B4141")
-let grayBlue = Color(hex: "7D869C")
-let deepBlue = Color(hex: "2E294E")
-
-let yellowOrange = Color(hex: "CC8229")
-let paleRed = Color(hex: "A97C73")
-let pinkRed = Color(hex:"A63A50")
-let redBrown = Color(hex:"3F0D12")
-let darkRedBrown = Color(hex:"1E000E")
-
-let smallDisplayColors: [Color] = [seaweedGreen,blueGreen,deepBlue,redBrown,pinkRed,yellowOrange]
-
-let fullDisplayColors: [Color] = [seaweedGreen, blueGreen,deepBlue,darkRedBrown,redBrown,pinkRed,yellowOrange,lightWoodBrown,paleRed,grayBlue,mintGreen]
-let totalDisplayColors = fullDisplayColors.count
-

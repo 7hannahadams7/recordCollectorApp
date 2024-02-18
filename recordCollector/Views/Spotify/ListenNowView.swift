@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ListenNow: View {
+struct ListenNowView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @State var record: RecordItem
@@ -25,7 +25,7 @@ struct ListenNow: View {
         ZStack{
             // Wait to display results after fetch from Spotify
             if displayResults{
-                SpotifyOptionDisplay(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
+                SpotifyResultsView(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
             }
         }.onAppear(){
             // Search for Album/Artist

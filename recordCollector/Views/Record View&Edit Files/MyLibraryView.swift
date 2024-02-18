@@ -59,7 +59,7 @@ struct MyLibraryView: View {
                         Button{
                             sortingDirection.toggle()
                         }label: {
-                            Text(sortingFactor).headlineText().foregroundStyle(recordBlack)
+                            Text(sortingFactor).smallHeadlineText().foregroundStyle(recordBlack)
                             Image(systemName:sortingDirection ? "chevron.down" : "chevron.up").foregroundStyle(recordBlack)
                         }
                         Spacer()
@@ -131,7 +131,8 @@ struct MyLibraryView: View {
                     
                     //Library Listing
                     List {
-                        ForEach(sortingHeaders, id:\.self) {
+                        // Apply direction change here, library instances are called according to headers anyway
+                        ForEach(sortingDirection ? sortingHeaders : sortingHeaders.reversed(), id:\.self) {
                             char in
                             Section(header: Text(String(char))) {
                                 ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
@@ -162,8 +163,6 @@ struct MyLibraryView: View {
             
         }.onAppear{
             // Reset and redefine library view when navigated to
-            print("APPEAR")
-//            viewModel.gatherAllFilterOptions()
             filteredGenres = []
 //            viewModel.refreshData()
         }
@@ -183,12 +182,7 @@ struct MyLibraryView: View {
                 
                 return genresMatch && artistsMatch
             }
-            
-            if !sortingDirection {
-                filteredRecords = filteredRecords.reversed()
-            }
         }
-        
         return filteredRecords
     }
 
@@ -258,7 +252,7 @@ struct PersonRowView: View {
                     .frame(width:75,height: 75).clipped().border(decorWhite, width: 3).offset(x:-5)
             }
             VStack(alignment: .leading, spacing: 3) {
-                Text(record.name).headlineText().minimumScaleFactor(0.9)
+                Text(record.name).smallHeadlineText().minimumScaleFactor(0.9)
                 Text(record.artist).mainText()
                 Text(String(record.releaseYear)).subtitleText()
                 Text(record.dateAdded).subtitleText()

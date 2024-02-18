@@ -20,11 +20,3 @@ struct RecordItem: Identifiable {
     var isBand: Bool
     // Add other properties as needed
 }
-//
-//struct RecordItem2: Codable {
-//    var id: String
-//    var name: String
-//    var artist: String
-//    var photo: UIImage?
-//    // Add other properties as needed
-//}

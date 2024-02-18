@@ -128,28 +128,6 @@ struct GenreInfoChart: View {
     }
 }
 
-struct PhotoToPopup: View{
-    @ObservedObject var viewModel: LibraryViewModel
-    @ObservedObject var spotifyController: SpotifyController
-    
-    var record: RecordItem
-    
-    @State var showRecordPopupPresented: Bool = false
-    var body: some View{
-        VStack{
-            Button{
-                showRecordPopupPresented = true
-            }label:{
-                let photo = viewModel.fetchPhotoByID(id: record.id)
-                // BUTTON WITH NAVIGATION HERE
-                Image(uiImage: photo!).resizable().frame(width:50, height:50).scaledToFill().clipped()
-            }
-        }.popover(isPresented: $showRecordPopupPresented, content: {
-            ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: GenreManager())
-        })
-    }
-}
-
 struct GenreRowView: View {
     var genreItem: (genre: String, amount: Int, records: [String])
     @ObservedObject var viewModel: StatsViewModel
@@ -167,7 +145,7 @@ struct GenreRowView: View {
                     HStack{
                         ForEach(genreItem.records, id:\.self){recordID in
                             if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
-                                PhotoToPopup(viewModel: viewModel.viewModel, spotifyController: spotifyController, record: record)
+                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, record: record,size:50)
                             }
                         }
                     }

@@ -9,23 +9,8 @@ import SwiftUI
 import URLImage
 import URLImageStore
 
-extension Array where Element: Hashable {
-    func removingDuplicates() -> [Element] {
-        var result = [Element]()
-        var seen = Set<Element>()
 
-        for element in self {
-            if seen.insert(element).inserted {
-                result.append(element)
-            }
-        }
-
-        return result
-    }
-}
-
-
-struct SpotifyOptionDisplay: View {
+struct SpotifyResultsView: View {
     @ObservedObject var spotifyController: SpotifyController
     @Binding var albumDataString: String
     @Binding var remasterDataString: String
