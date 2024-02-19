@@ -261,7 +261,7 @@ struct RecordFieldDisplayView: View{
                 recordName = record?.name ?? ""
                 artistName = record?.artist ?? ""
                 releaseYear = record?.releaseYear ?? 2024
-                dateAdded = String.stringToDate(from: record?.dateAdded ?? "01-01-0001")!
+                dateAdded = String.stringToDate(from: record?.dateAdded ?? Date.dateToString(date: Date.now))!
                 isBand = record?.isBand ?? false
                 genreManager.genres = record?.genres ?? []
             }

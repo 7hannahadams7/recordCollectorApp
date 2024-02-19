@@ -27,39 +27,67 @@ struct ListenNowView: View {
             if displayResults{
                 SpotifyResultsView(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
             }
-        }.onAppear(){
-            // Search for Album/Artist
-            searchSpotifyAlbum(albumName: record.name, artistName: record.artist) { result in
-                switch result {
-                case .success(let data):
-                    albumDataString = String(data: data, encoding: .utf8)!
-                case .failure(let error):
-                    print("Error: \(error)")
-                }
-            }
-            // Search for Album/Artist with Remaster
-            searchSpotifyAlbum(albumName: record.name, artistName: record.artist, remaster: true) { result in
-                switch result {
-                case .success(let data):
-                    remasterDataString = String(data: data, encoding: .utf8)!
-                case .failure(let error):
-                    print("Error: \(error)")
-                }
-            }
-            //Search for Playlist by Album/Artist
-            searchSpotifyPlaylist(albumName: record.name, artistName: record.artist) { result in
-                switch result {
-                case .success(let data):
-                    playlistDataString = String(data: data, encoding: .utf8)!
-                case .failure(let error):
-                    print("Error: \(error)")
-                }
-            }
+        }
+        .onAppear(){
+            searchSpotifyData(albumName: record.name, artistName: record.artist)
             displayResults.toggle()
         }
     }
     
-    func searchSpotifyPlaylist(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
+    func searchSpotifyData(albumName: String, artistName: String, remaster: Bool = false) {
+        let group = DispatchGroup()
+
+        var albumData: Data?
+        var remasterData: Data?
+        var playlistData: Data?
+
+        group.enter()
+        searchSpotifyAlbum(albumName: albumName, artistName: artistName) { result in
+            defer { group.leave() }
+            switch result {
+            case .success(let data):
+                albumData = data
+            case .failure(let error):
+                print("Error searching album:", error)
+            }
+        }
+
+        group.enter()
+        searchSpotifyAlbum(albumName: albumName, artistName: artistName, remaster: true) { result in
+            defer { group.leave() }
+            switch result {
+            case .success(let data):
+                remasterData = data
+            case .failure(let error):
+                print("Error searching remaster:", error)
+            }
+        }
+
+        group.enter()
+        searchSpotifyPlaylist(albumName: albumName, artistName: artistName) { result in
+            defer { group.leave() }
+            switch result {
+            case .success(let data):
+                playlistData = data
+            case .failure(let error):
+                print("Error searching playlist:", error)
+            }
+        }
+
+        group.notify(queue: DispatchQueue.main) {
+            if let albumData = albumData {
+                self.albumDataString = String(data: albumData, encoding: .utf8)!
+            }
+            if let remasterData = remasterData {
+                self.remasterDataString = String(data: remasterData, encoding: .utf8)!
+            }
+            if let playlistData = playlistData {
+                self.playlistDataString = String(data: playlistData, encoding: .utf8)!
+            }
+        }
+    }
+    
+    private func searchSpotifyPlaylist(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
         let baseEndpoint = "https://api.spotify.com/v1/search"
         
         // Construct the query string
@@ -89,7 +117,7 @@ struct ListenNowView: View {
         }.resume()
     }
     
-    func searchSpotifyAlbum(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
+    private func searchSpotifyAlbum(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
         let baseEndpoint = "https://api.spotify.com/v1/search"
         
         // Construct the query string

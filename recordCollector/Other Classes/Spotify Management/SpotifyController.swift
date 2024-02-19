@@ -70,10 +70,13 @@ class SpotifyController: NSObject, ObservableObject {
     }
     
     func connect() {
+        print("Entered connect")
         guard let _ = self.appRemote.connectionParameters.accessToken else {
+            print("No access token?")
             self.appRemote.authorizeAndPlayURI("")
             return
         }
+        print("Call .connect()")
         appRemote.connect()
     }
     
@@ -131,8 +134,8 @@ extension SpotifyController {
             })
         } else {
             // Handle not connected error
-            debugPrint("Error: Spotify App Remote is not connected.")
-            appRemote.connect()
+            debugPrint("Error: Spotify App Remote is not connected. Attempting reconnect")
+            self.connect()
         }
     }
     func pauseSpotifyPlayback() {
@@ -145,8 +148,8 @@ extension SpotifyController {
                 }
             }
         } else {
-            debugPrint("Error: Spotify App Remote is not connected.")
-            // Handle the case where the app remote is not connected.
+            debugPrint("Error: Spotify App Remote is not connected. Attempting reconnect")
+            self.connect()
         }
     }
     func resumeSpotifyPlayback() {
@@ -159,8 +162,8 @@ extension SpotifyController {
                 }
             }
         } else {
-            debugPrint("Error: Spotify App Remote is not connected.")
-            // Handle the case where the app remote is not connected.
+            debugPrint("Error: Spotify App Remote is not connected. Attempting reconnect")
+            self.connect()
         }
     }
 }

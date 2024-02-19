@@ -124,7 +124,7 @@ struct DecadeBottomChart: View{
                                         ForEach(decadeSortedData.indices, id: \.self) { index in
                                             DecadeBubbleView(decadeItem:decadeSortedData[index],color:fullDisplayColors[index%totalDisplayColors],index: index,prevAmount: (index != 0) ? decadeSortedData[index-1].amount : minAmount, minAmount: minAmount, maxAmount: maxAmount, width: geometry.size.width, tapped: $tapped, infoExpanded: $infoExpanded)
                                         }
-                                    }.padding()
+                                    }.padding(.top,30)
                                 }
                                 
                                 if infoExpanded{
