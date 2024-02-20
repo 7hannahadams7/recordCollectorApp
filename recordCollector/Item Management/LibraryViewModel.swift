@@ -23,6 +23,8 @@ class LibraryViewModel: ObservableObject {
     
     @Published var whichPhoto: String = "Cover"
     
+    @Published var isRefreshing: Bool = false
+    
     // Re-sorting local library on change of sorting factor
     @Published var sortingFactor: SortingFactor = .artist {
         didSet {
@@ -360,10 +362,12 @@ class LibraryViewModel: ObservableObject {
     // Reset local libraries and re-fetch and sort data
     func refreshData(){
         print("REFRESHING DATA")
-        recordLibrary = []
-        recordDictionaryByID = [:]
-        fetchData{
+        self.isRefreshing = true
+        self.recordLibrary = []
+        self.recordDictionaryByID = [:]
+        self.fetchData{
             self.sortRecords()
+            self.isRefreshing = false
         }
     }
     

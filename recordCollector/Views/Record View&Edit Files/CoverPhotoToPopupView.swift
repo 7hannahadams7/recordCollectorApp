@@ -37,9 +37,9 @@ struct CoverPhotoToPopupView: View{
                 showRecordPopupPresented = true
                 presentingListener = true
             }label:{
-                let photo = viewModel.fetchPhotoByID(id: record.id)
+//                let photo = viewModel.fetchPhotoByID(id: record.id)
                 // BUTTON WITH NAVIGATION HERE
-                Image(uiImage: photo!).resizable().frame(width:size, height:size).scaledToFill().clipped()
+                Image(uiImage: record.coverPhoto).resizable().frame(width:size, height:size).scaledToFill().clipped()
             }
         }.popover(isPresented: $showRecordPopupPresented, content: {
             ZStack{
