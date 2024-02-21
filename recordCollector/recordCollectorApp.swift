@@ -35,13 +35,8 @@ struct recordCollectorApp: App {
         WindowGroup {
             ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)
             .onOpenURL { url in
-                print("CALLING OPENURL")
                 spotifyController.setAccessToken(from: url)
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification), perform: { _ in
-                print("TRIGGERING CONNECT")
-                spotifyController.connect()
-            })
             .environment(\.colorScheme, .light)
             .environment(\.urlImageService, urlImageService)
         }

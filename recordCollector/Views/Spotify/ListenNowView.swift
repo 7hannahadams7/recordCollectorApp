@@ -27,14 +27,22 @@ struct ListenNowView: View {
             if displayResults{
                 SpotifyResultsView(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
             }
-        }
-        .onAppear(){
+        }.onChange(of: spotifyController.accessToken, { _, _ in
             searchSpotifyData(albumName: record.name, artistName: record.artist)
             displayResults.toggle()
+        })
+        .onAppear(){
+            if spotifyController.connectionFailure{
+                spotifyController.connect()
+            }else{
+                searchSpotifyData(albumName: record.name, artistName: record.artist)
+                displayResults.toggle()
+            }
         }
     }
     
     func searchSpotifyData(albumName: String, artistName: String, remaster: Bool = false) {
+        print("PERFORMING SEARCH")
         let group = DispatchGroup()
 
         var albumData: Data?
@@ -76,6 +84,7 @@ struct ListenNowView: View {
 
         group.notify(queue: DispatchQueue.main) {
             if let albumData = albumData {
+                print("Set string")
                 self.albumDataString = String(data: albumData, encoding: .utf8)!
             }
             if let remasterData = remasterData {

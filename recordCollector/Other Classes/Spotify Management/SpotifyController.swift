@@ -13,35 +13,38 @@ class SpotifyController: NSObject, ObservableObject {
     let spotifyClientID = SpotifyConfiguration.spotifyClientID
     let spotifyRedirectURL = SpotifyConfiguration.spotifyRedirectURL
     
-    var accessToken: String? = nil
+    @Published var accessToken: String? = nil
     
     @Published var currentPlaying: String = ""
     @Published var playerPaused: Bool = false
     
-    @Published var connectionFailure: Bool = false
+    @Published var connectionFailure: Bool = true
     
     private var connectCancellable: AnyCancellable?
     
+    
     private var disconnectCancellable: AnyCancellable?
     
-    override init() {
-        print("INIT")
-        super.init()
-        connectCancellable = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { _ in
-                print("FIRST")
-                self.connect()
-            }
-        
-        disconnectCancellable = NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { _ in
-                print("SECOND")
-                self.disconnect()
-            }
-
-    }
+    @Published var isConnected: Bool = false
+    
+//    override init() {
+//        print("INIT")
+//        super.init()
+//        connectCancellable = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+//            .receive(on: DispatchQueue.main)
+//            .sink { _ in
+//                print("FIRST")
+//                self.connect()
+//            }
+//        
+//        disconnectCancellable = NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+//            .receive(on: DispatchQueue.main)
+//            .sink { _ in
+//                print("SECOND")
+//                self.disconnect()
+//            }
+//
+//    }
         
     lazy var configuration = SPTConfiguration(
         clientID: spotifyClientID,
@@ -62,7 +65,7 @@ class SpotifyController: NSObject, ObservableObject {
         if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
             appRemote.connectionParameters.accessToken = accessToken
             self.accessToken = accessToken
-            print("Setting Access Token: ",accessToken)
+            self.connect()
         } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
             print(errorDescription)
         }
@@ -70,13 +73,11 @@ class SpotifyController: NSObject, ObservableObject {
     }
     
     func connect() {
-        print("Entered connect")
         guard let _ = self.appRemote.connectionParameters.accessToken else {
             print("No access token?")
             self.appRemote.authorizeAndPlayURI("")
             return
         }
-        print("Call .connect()")
         appRemote.connect()
     }
     
@@ -98,14 +99,13 @@ extension SpotifyController: SPTAppRemoteDelegate {
             }
             
         })
+        connectionFailure = false
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         connectionFailure = true
-        print("failed", connectionFailure)
 //        self.accessToken = nil
 //        self.appRemote.connect()
-        
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
