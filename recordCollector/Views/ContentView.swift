@@ -62,6 +62,7 @@ struct ContentView: View {
                     RotatingLoadingButton()
                 }
             }.onAppear{
+                // Pull data once logged in
                 viewModel.refreshData()
             }
         }

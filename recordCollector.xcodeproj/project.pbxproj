@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		94CCA83492A5AA9E66882AA2 /* Pods_recordCollector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0016FBBEB17030B8446C423 /* Pods_recordCollector.framework */; };
+		BB085D492B8655FE0024B47C /* RotatingLoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB085D482B8655FE0024B47C /* RotatingLoadingButton.swift */; };
 		BB16B1B62B62BD1B0039BDE2 /* ShowRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */; };
 		BB2149512B827BD300E09593 /* RecordShelfDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2149502B827BD300E09593 /* RecordShelfDisplayManager.swift */; };
 		BB2149532B827DC000E09593 /* RecordImageDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2149522B827DC000E09593 /* RecordImageDisplayView.swift */; };
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		06CE01F5E8A14FCC63D4A76C /* Pods-recordCollector.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-recordCollector.debug.xcconfig"; path = "Target Support Files/Pods-recordCollector/Pods-recordCollector.debug.xcconfig"; sourceTree = "<group>"; };
+		BB085D482B8655FE0024B47C /* RotatingLoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatingLoadingButton.swift; sourceTree = "<group>"; };
 		BB16B1B52B62BD1B0039BDE2 /* ShowRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRecordView.swift; sourceTree = "<group>"; };
 		BB2149502B827BD300E09593 /* RecordShelfDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordShelfDisplayManager.swift; sourceTree = "<group>"; };
 		BB2149522B827DC000E09593 /* RecordImageDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordImageDisplayView.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2FEF8A2B4C56EC00F0DFBB /* ContentView.swift */,
+				BB085D482B8655FE0024B47C /* RotatingLoadingButton.swift */,
 				BBB8DE3B2B4F0DB1008D39E8 /* SettingsView.swift */,
 				BBA93B482B7D322100E0B8A7 /* SignInView.swift */,
 				BB2FEFC02B4C61AE00F0DFBB /* HomePageView.swift */,
@@ -428,6 +431,7 @@
 				BB2FEF892B4C56EC00F0DFBB /* recordCollectorApp.swift in Sources */,
 				BBBDD9812B75BB1000C2E59D /* ClassExtensions.swift in Sources */,
 				BBBA69982B6C14BD0035C739 /* SpotifyCodables.swift in Sources */,
+				BB085D492B8655FE0024B47C /* RotatingLoadingButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

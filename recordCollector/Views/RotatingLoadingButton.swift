@@ -2,7 +2,7 @@
 //  RotatingLoadingButton.swift
 //  recordCollector
 //
-//  Created by Hannah Adams on 2/20/24.
+//  Created by Hannah Adams on 2/21/24.
 //
 
 import SwiftUI
@@ -11,7 +11,8 @@ struct RotatingLoadingButton: View {
     @State private var isAnimating = false
 
     var body: some View {
-        VStack{
+        ZStack{
+            Color(decorWhite.opacity(0.1)).edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
             Image(systemName: "arrow.2.circlepath")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -19,7 +20,7 @@ struct RotatingLoadingButton: View {
                 .rotationEffect(.degrees(isAnimating ? 360 : 0))
                 .animation(
                     Animation.linear(duration: 1.0)
-                        .repeatForever(autoreverses: false)
+                        .repeatForever(autoreverses: false),value:isAnimating
                 )
                 .foregroundColor(decorBlack.opacity(0.5))
         }
