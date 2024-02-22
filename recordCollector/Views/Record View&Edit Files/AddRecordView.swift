@@ -15,6 +15,8 @@ struct AddRecordView: View {
     @State private var releaseYear: Int = 2024
     @State private var dateAdded = Date()
     @State private var isBand: Bool = false
+    @State private var storeName = ""
+    @State private var location = ""
     
     @State private var listeningMode: Bool = true
     
@@ -43,12 +45,11 @@ struct AddRecordView: View {
                     VStack{
                         RecordImageDisplayView(viewModel: viewModel,newCoverPhoto: $newCoverPhoto,newDiskPhoto:$newDiskPhoto, editingMode: $editingMode)
                         
-                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,
-                                               isBand:$isBand,            showAlert: $showAlert, listeningMode: $listeningMode)
+                        RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,isBand:$isBand,storeName:$storeName,location:$location   ,showAlert: $showAlert, listeningMode: $listeningMode)
                         
                         Button(action:{
                             if isFormValid{
-                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand)
+                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand,boughtFrom:["storeName":storeName,"location":location])
                                 
                                 presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
                             }else{

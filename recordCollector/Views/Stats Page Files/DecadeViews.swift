@@ -192,7 +192,6 @@ struct DecadeBubbleView: View {
             .onTapGesture {
                 tapped = decade
                 infoExpanded = true
-                print("Tapped \(decadeItem.decade%100)s")
             }
     }
     

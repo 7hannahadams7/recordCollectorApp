@@ -11,22 +11,23 @@ import FirebaseAuth
 struct ContentView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
-    @ObservedObject var authManager = AuthenticationManager()
+    @ObservedObject var authManager: AuthenticationManager
 
     @StateObject private var statsViewModel: StatsViewModel
     @StateObject private var genreManager = GenreManager()
 
-    init(viewModel: LibraryViewModel, spotifyController: SpotifyController) {
+    init(viewModel: LibraryViewModel, spotifyController: SpotifyController, authManager: AuthenticationManager) {
         self.viewModel = viewModel
         self.spotifyController = spotifyController
+        self.authManager = authManager
         self._statsViewModel = StateObject(wrappedValue: StatsViewModel(viewModel: viewModel))
     }
     
     var body: some View {
         // Present SignInView if user not signed into a valid Firebase account
-        if !authManager.isUserSignedIn {
-            SignInView(authManager: authManager)
-        } else {
+//        if !authManager.isUserSignedIn {
+//            SignInView(authManager: authManager)
+//        } else {
             ZStack {
                 TabView {
                     HomePageView(viewModel: viewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
@@ -41,7 +42,7 @@ struct ContentView: View {
                         Image(systemName: "chart.pie.fill").foregroundColor(.blue)
                         Text("My Stats").bold()
                     }.tag(2)
-                    SettingsView(authManager: authManager).tabItem {
+                    SettingsView(authManager: authManager,spotifyController:spotifyController).tabItem {
                         Image(systemName: "gearshape")
                         Text("Settings").bold()
                     }.tag(3)
@@ -65,13 +66,13 @@ struct ContentView: View {
                 // Pull data once logged in
                 viewModel.refreshData()
             }
-        }
+//        }
     }
 }
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController())
+        ContentView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(),authManager:AuthenticationManager())
     }
 }

@@ -55,13 +55,11 @@ struct ImagePicker: UIViewControllerRepresentable {
             } else if let originalImage = info[.originalImage] as? UIImage {
                 selectedImage = originalImage
             }
-            print("Finished picking")
             parent.imageCallback(selectedImage)
             parent.isPresented = false
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            print("Finished picking")
             parent.isPresented = false
         }
     }

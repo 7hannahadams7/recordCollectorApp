@@ -169,8 +169,6 @@ struct MyLibraryView: View {
     }
     
     private func filteredLibrary() -> [RecordItem] {
-        print("Performing Filter")
-        
         var filteredRecords: [RecordItem]
         
         if filteredGenres.isEmpty && filteredArtists.isEmpty {
@@ -188,7 +186,6 @@ struct MyLibraryView: View {
 
     
     private func filteredHeaders(filteredLibrary: [RecordItem]) -> [String]{
-        print("Extracting Headers")
         var headers: [String] = []
         for record in filteredLibrary{
             if sortingFactor == "Artist"{

@@ -90,10 +90,8 @@ struct HomePageView: View {
             }
             
         }.onChange(of: presentingListener, { _, presenting in
-            print("Change in Presenting Mode")
             if presenting{
                 // Pause timer when a ShowRecordView instance displayed
-                print("PAUSING")
                 timer?.invalidate()
             } else {
                 // Restart timer
@@ -127,7 +125,6 @@ struct HomePageView: View {
     
     // creating PhotoToPopup instances with photoDisplayManager listening, UI updates automatically when .updateArray() called
     private func photoPopupEntries(shownRecords: [RecordItem]) -> [CoverPhotoToPopupView] {
-        print("Updating Popups")
         
         var photoArray: [CoverPhotoToPopupView] = []
         for (index, record) in shownRecords.enumerated() {

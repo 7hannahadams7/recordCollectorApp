@@ -24,6 +24,9 @@ struct RecordFieldDisplayView: View{
     @Binding var dateAdded: Date
     @Binding var isBand: Bool
     
+    @Binding var storeName: String
+    @Binding var location: String
+    
     @State private var newGenre = ""
     
     @Binding var showAlert: Bool
@@ -31,10 +34,14 @@ struct RecordFieldDisplayView: View{
     
     @State private var isDatePickerVisible: Bool = false
     
-    
-    var showList: Bool {
+    var showGenreList: Bool {
         // Show genre options to choose from if user is typing and there are genres available
         return !newGenre.isEmpty && !filteredGenres.isEmpty
+    }
+    
+    var showStoreList: Bool {
+        // Show store options to choose from if user is typing and there are stores available
+        return !storeName.isEmpty && !filteredStores.isEmpty
     }
     
     var filteredGenres: [String] {
@@ -47,6 +54,22 @@ struct RecordFieldDisplayView: View{
                 return words.contains { $0.hasPrefix(lowercasedInput) }
             }
             .filter { !genreManager.genres.contains($0) }
+    }
+    
+    var filteredStores: [String] {
+        let lowercaseInput = storeName.lowercased()
+        
+        let matchingItems = viewModel.fullStores.keys.filter { store in
+            let words = store.lowercased().components(separatedBy: " ")
+            return words.contains { $0.hasPrefix(lowercaseInput) }
+        }
+        
+        // Check if there's only one item left and it matches the input exactly
+        if matchingItems.count == 1, matchingItems.first?.lowercased() == lowercaseInput {
+            return [] // Return an empty list
+        } else {
+            return matchingItems
+        }
     }
     
     var body: some View{
@@ -161,7 +184,7 @@ struct RecordFieldDisplayView: View{
                                 }
                             }.frame(height:50)
                             // Dropdown list of selectable genres
-                            if showList {
+                            if showGenreList {
                                 List{
                                     ForEach(filteredGenres, id: \.self) { genre in
                                         Button(action: {
@@ -172,7 +195,7 @@ struct RecordFieldDisplayView: View{
                                             Text(genre).font(.system(size:15)).clipped()
                                         }/*.listRowInsets(EdgeInsets(top:-20,leading:10,bottom:-20,trailing:10))*/
                                     }
-                                }.listStyle(.inset)/*.padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0))*/.background(iconWhite).frame(height: showList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
+                                }.listStyle(.inset)/*.padding(EdgeInsets(top: -10, leading: 0, bottom: -10, trailing: 0))*/.background(iconWhite).frame(height: showGenreList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
                                 
                             }
                         }
@@ -206,7 +229,28 @@ struct RecordFieldDisplayView: View{
                         Spacer()
                     }.frame(width:screenWidth/4)
                     // Text Field
-                    TextField("Location", text: $recordName).padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
+                    VStack{
+                        TextField("Store", text: $storeName)
+                        Divider()
+                        ZStack{
+                            TextField("Location", text: $location)
+                            // Dropdown list of selectable genres
+                            if showStoreList {
+                                List{
+                                    ForEach(filteredStores, id: \.self) { store in
+                                        Button(action: {
+                                            storeName = store
+                                            location = viewModel.fullStores[store]!
+                                        }) {
+                                            Text(store).font(.system(size:15)).clipped()
+                                        }
+                                    }
+                                }.listStyle(.inset).background(iconWhite).frame(height: showStoreList ? 50 : 0).clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+
+                        }
+                    }.padding()
+                        .background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
                         .shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                     Spacer()
                 }
@@ -237,9 +281,7 @@ struct RecordFieldDisplayView: View{
                                     ZStack{
                                         RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
                                         HStack{
-                                            Text(genre).italicSubtitleText().onAppear{
-                                                print(genre)
-                                            }
+                                            Text(genre).italicSubtitleText()
                                         }.padding(.horizontal)
                                     }.frame(height:30)
                                 }
@@ -251,7 +293,11 @@ struct RecordFieldDisplayView: View{
                     }
                     VStack(alignment:.leading){
                         Text("Date Added: " + (Date.dateToString(date: dateAdded))).subtitleText()
-                        Text("Location Bought: " + (record?.name ?? "")).subtitleText()
+                        HStack{
+                            Text("Location Bought: " + (record?.boughtFrom["storeName"] ?? "")).subtitleText()
+                            Text(record?.boughtFrom["location"] ?? "").italicSubtitleText()
+                            Spacer()
+                        }
                     }.padding(.vertical,5)
                 }
             }
@@ -264,10 +310,11 @@ struct RecordFieldDisplayView: View{
                 dateAdded = String.stringToDate(from: record?.dateAdded ?? Date.dateToString(date: Date.now))!
                 isBand = record?.isBand ?? false
                 genreManager.genres = record?.genres ?? []
+                storeName = record?.boughtFrom["storeName"] ?? ""
+                storeName = record?.boughtFrom["location"] ?? ""
             }
             .onChange(of: editingMode) { _, _ in
                 genreManager.genres = record?.genres ?? []
-                print("IN DISPLAY: ", genreManager.genres)
             }
         
     }

@@ -30,15 +30,21 @@ struct recordCollectorApp: App {
     
     @StateObject var spotifyController = SpotifyController()
     @StateObject var libraryViewModel = LibraryViewModel()
+    @StateObject var authManager = AuthenticationManager()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel:libraryViewModel,spotifyController: spotifyController)
-            .onOpenURL { url in
-                spotifyController.setAccessToken(from: url)
+            if !authManager.isUserSignedIn {
+                SignInView(authManager: authManager)
+            } else {
+                ContentView(viewModel:libraryViewModel,spotifyController: spotifyController,authManager:authManager)
+                    .onOpenURL { url in
+                        // Pull token after coming back from Spotify app with URL
+                        spotifyController.setAccessToken(from: url)
+                    }
+                    .environment(\.colorScheme, .light)
+                    .environment(\.urlImageService, urlImageService)
             }
-            .environment(\.colorScheme, .light)
-            .environment(\.urlImageService, urlImageService)
         }
     }
 }

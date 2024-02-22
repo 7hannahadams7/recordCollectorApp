@@ -20,6 +20,8 @@ struct ShowRecordView: View {
     @State private var releaseYear: Int = 2024
     @State private var dateAdded = Date()
     @State private var isBand: Bool = false
+    @State private var storeName = ""
+    @State private var location = ""
     
     @State private var editingMode: Bool = false
     
@@ -53,7 +55,7 @@ struct ShowRecordView: View {
                             if listeningMode{
                                 ListenNowView(viewModel:viewModel,spotifyController:spotifyController,record:record).frame(height:screenHeight/3 + 100)
                             }else{
-                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded, isBand: $isBand, showAlert: $showAlert, listeningMode: $listeningMode)
+                                RecordFieldDisplayView(viewModel: viewModel, genreManager: genreManager, record: record, editingMode: $editingMode, recordName: $recordName, artistName: $artistName, releaseYear: $releaseYear, dateAdded: $dateAdded,isBand:$isBand,storeName:$storeName,location:$location,showAlert: $showAlert, listeningMode: $listeningMode)
                             }
                             
                             // BOTTOM BUTTONS
@@ -66,7 +68,6 @@ struct ShowRecordView: View {
                                         viewModel.resetPhoto()
                                         editingMode.toggle()
                                         genreManager.genres = record.genres
-                                        print(genreManager.genres)
                                     }){
                                         ZStack{
                                             Circle().fill(decorWhite)
@@ -130,7 +131,7 @@ struct ShowRecordView: View {
 
                                     // Save Changes Button
                                     Button(action:{
-                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newCoverPhoto: newCoverPhoto, newDiskPhoto: newDiskPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand)
+                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newCoverPhoto: newCoverPhoto, newDiskPhoto: newDiskPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand,boughtFrom:["storeName":storeName,"location":location])
                                         viewModel.resetPhoto()
                                         editingMode.toggle()
                                     }){

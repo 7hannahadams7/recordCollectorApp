@@ -52,7 +52,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1971,
         dateAdded: "01-01-2020",
-        isBand: false
+        isBand: false,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default2",
@@ -62,7 +63,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1977,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default3",
@@ -72,7 +74,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1973,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default4",
@@ -82,7 +85,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1995,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default5",
@@ -92,7 +96,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1970,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default6",
@@ -102,7 +107,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1971,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
     RecordItem(
         id:"Default7",
@@ -112,7 +118,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1984,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         )
 ]
 

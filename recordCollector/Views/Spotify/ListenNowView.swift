@@ -28,12 +28,20 @@ struct ListenNowView: View {
                 SpotifyResultsView(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
             }
         }.onChange(of: spotifyController.accessToken, { _, _ in
+            // Perform search once connected with valid token
             searchSpotifyData(albumName: record.name, artistName: record.artist)
             displayResults.toggle()
         })
         .onAppear(){
             if spotifyController.connectionFailure{
+                // If not connected, trigger connect here
                 spotifyController.connect()
+                
+                // Perform search if access token already exists but controller was disconnected
+                if spotifyController.accessToken != nil{
+                    searchSpotifyData(albumName: record.name, artistName: record.artist)
+                    displayResults.toggle()
+                }
             }else{
                 searchSpotifyData(albumName: record.name, artistName: record.artist)
                 displayResults.toggle()
@@ -41,8 +49,8 @@ struct ListenNowView: View {
         }
     }
     
-    func searchSpotifyData(albumName: String, artistName: String, remaster: Bool = false) {
-        print("PERFORMING SEARCH")
+    // Gather all spotify data for given record search
+    private func searchSpotifyData(albumName: String, artistName: String, remaster: Bool = false) {
         let group = DispatchGroup()
 
         var albumData: Data?
@@ -84,7 +92,6 @@ struct ListenNowView: View {
 
         group.notify(queue: DispatchQueue.main) {
             if let albumData = albumData {
-                print("Set string")
                 self.albumDataString = String(data: albumData, encoding: .utf8)!
             }
             if let remasterData = remasterData {
@@ -96,6 +103,7 @@ struct ListenNowView: View {
         }
     }
     
+    // Pull search data for playlists
     private func searchSpotifyPlaylist(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
         let baseEndpoint = "https://api.spotify.com/v1/search"
         
@@ -126,6 +134,7 @@ struct ListenNowView: View {
         }.resume()
     }
     
+    // Pull search data for albums and remastered versions
     private func searchSpotifyAlbum(albumName: String, artistName: String, remaster: Bool? = false, completion: @escaping (Result<Data, Error>) -> Void) {
         let baseEndpoint = "https://api.spotify.com/v1/search"
         
