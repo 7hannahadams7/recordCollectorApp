@@ -64,15 +64,17 @@ struct HistoryInfoView: View {
                                         let (itemDateComponent, _) = item.date.dateAndTimeComponents()
                                         return (tabSelectedValue != "All" ? (item.type == tabSelectedValue) : true) && itemDateComponent == date
                                     }, id: \.self.id){item in
-                                        HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
-                                            .swipeActions {
-                                                                    Button("Delete") {
-                                                                        Task{
-                                                                            await viewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
-                                                                        }
-                                                                    }
-                                                                    .tint(.red)
-                                                                }
+                                        NavigationLink(destination: ShowRecordView(viewModel:viewModel.viewModel,spotifyController:spotifyController, record:viewModel.viewModel.recordDictionaryByID[item.recordID]!, genreManager: genreManager)) {
+                                            HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
+                                                .swipeActions {
+                                                    Button("Delete") {
+                                                        Task{
+                                                            await viewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
+                                                        }
+                                                    }
+                                                    .tint(.red)
+                                                }
+                                        }
                                     }
                                 }
                             }

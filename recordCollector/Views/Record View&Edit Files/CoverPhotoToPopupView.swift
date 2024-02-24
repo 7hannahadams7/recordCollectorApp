@@ -17,8 +17,6 @@ struct CoverPhotoToPopupView: View{
     var record: RecordItem
     var size: CGFloat
     
-    @State var showRecordPopupPresented: Bool = false
-    
     // Listener for ShowRecordView popup on HomePageView only (to pause updates while presenting)
     @Binding var presentingListener: Bool
     
@@ -32,22 +30,13 @@ struct CoverPhotoToPopupView: View{
     }
     
     var body: some View{
-        VStack{
-            Button{
-                showRecordPopupPresented = true
-                presentingListener = true
-            }label:{
-//                let photo = viewModel.fetchPhotoByID(id: record.id)
-                // BUTTON WITH NAVIGATION HERE
+            NavigationLink(destination: ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: genreManager)) {
                 Image(uiImage: record.coverPhoto).resizable().frame(width:size, height:size).scaledToFill().clipped()
+                    .onAppear{
+                        presentingListener = true
+                    }.onDisappear{
+                        presentingListener = false
+                    }
             }
-        }.popover(isPresented: $showRecordPopupPresented, content: {
-            ZStack{
-                Color(woodBrown)
-                ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: genreManager).padding(.top)
-            }.onDisappear {
-                presentingListener = false
-            }
-        })
     }
 }
