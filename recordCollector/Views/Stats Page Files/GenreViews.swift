@@ -1,6 +1,6 @@
 //
 //  GenreViews.swift
-//  test3
+//  recordCollector
 //
 //  Created by Hannah Adams on 1/12/24.
 //

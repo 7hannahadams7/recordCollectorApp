@@ -1,6 +1,6 @@
 //
 //  StatsViewModel.swift
-//  test3
+//  recordCollector
 //
 //  Created by Hannah Adams on 1/11/24.
 //
@@ -173,9 +173,6 @@ class StatsViewModel: ObservableObject {
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()
-//        self.viewModel.historyViewModel.fetchData{
-//            print("Complete")
-//        }
     }
     
     func refreshData(){

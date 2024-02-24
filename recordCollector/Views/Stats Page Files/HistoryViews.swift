@@ -64,17 +64,15 @@ struct HistoryInfoView: View {
                                         let (itemDateComponent, _) = item.date.dateAndTimeComponents()
                                         return (tabSelectedValue != "All" ? (item.type == tabSelectedValue) : true) && itemDateComponent == date
                                     }, id: \.self.id){item in
-                                        NavigationLink(destination: ShowRecordView(viewModel:viewModel.viewModel,spotifyController:spotifyController, record:viewModel.viewModel.recordDictionaryByID[item.recordID]!, genreManager: genreManager)) {
-                                            HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
-                                                .swipeActions {
-                                                    Button("Delete") {
-                                                        Task{
-                                                            await viewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
-                                                        }
+                                        HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
+                                            .swipeActions {
+                                                Button("Delete") {
+                                                    Task{
+                                                        await viewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
                                                     }
-                                                    .tint(.red)
                                                 }
-                                        }
+                                                .tint(.red)
+                                            }
                                     }
                                 }
                             }
@@ -92,7 +90,6 @@ struct HistoryInfoView: View {
                         offset = 0.0
                     }
                 })
-            
         }
 
     }
@@ -127,32 +124,34 @@ struct HistoryItemDetailView: View{
                 return "plus.square.on.square"
             }
         }
-        HStack{
-            ZStack{
-                Image(uiImage:record.discPhoto)
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:75,height: 75).clipped().offset(x:5)
-                Image(uiImage:record.coverPhoto)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width:75,height: 75).clipped().border(decorWhite, width: 3).offset(x:-5)
-            }
+        NavigationLink(destination: ShowRecordView(viewModel:viewModel.viewModel,spotifyController:spotifyController, record:viewModel.viewModel.recordDictionaryByID[historyItem.recordID]!, genreManager: genreManager)) {
             HStack{
-                VStack(alignment:.leading){
-                    Text(typeString).subtitleText()
-                    Text(record.name).smallHeadlineText()
-                    Text(record.artist).smallHeadlineText()
+                ZStack{
+                    Image(uiImage:record.discPhoto)
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/).frame(width:75,height: 75).clipped().offset(x:5)
+                    Image(uiImage:record.coverPhoto)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width:75,height: 75).clipped().border(decorWhite, width: 3).offset(x:-5)
                 }
+                HStack{
+                    VStack(alignment:.leading){
+                        Text(typeString).subtitleText()
+                        Text(record.name).smallHeadlineText()
+                        Text(record.artist).smallHeadlineText()
+                    }
+                    Spacer()
+                    VStack(alignment:.trailing){
+                        Image(systemName: typeImage).resizable().aspectRatio(contentMode: .fit)
+                        Text(dateString).foregroundStyle(decorBlack.opacity(0.5)).italicSubtitleText()
+                        Text(timeString).foregroundStyle(decorBlack.opacity(0.5)).italicSubtitleText()
+                    }
+                }.padding(.all,10.0)
                 Spacer()
-                VStack(alignment:.trailing){
-                    Image(systemName: typeImage).resizable().aspectRatio(contentMode: .fit)
-                    Text(dateString).foregroundStyle(decorBlack.opacity(0.5)).italicSubtitleText()
-                    Text(timeString).foregroundStyle(decorBlack.opacity(0.5)).italicSubtitleText()
-                }
-            }.padding(.all,10.0)
-            Spacer()
-        }.padding(.horizontal, 10.0).frame(height:75)
+            }.padding(.horizontal, 10.0).frame(height:75)
+        }
     }
     
     private func itemBuilder(item:HistoryItem) -> (String,RecordItem){

@@ -1,6 +1,6 @@
 //
 //  AddRecordView.swift
-//  test3
+//  recordCollector
 //
 //  Created by Hannah Adams on 1/8/24.
 //

@@ -1,6 +1,6 @@
 //
-//  GenreViews.swift
-//  test3
+//  ArtistViews.swift
+//  recordCollector
 //
 //  Created by Hannah Adams on 1/12/24.
 //
@@ -208,25 +208,25 @@ struct ArtistDetailRowView: View {
                         }
                     }
                 }.frame(height:60).padding(.all,5).padding(.horizontal,20).background(Rectangle().fill(color).opacity(0.3))
-            }.frame(height:expanded ? 150:70)
-            HStack{
+            }.frame(height:expanded ? 150:70).opacity(expanded ? 1.0 : 0.0)
+            Button(action:{
+                withAnimation(.easeInOut(duration: 0.5).delay(0.15)) {
+                    expanded.toggle()
+                }
+            }){
                 HStack{
-                    ZStack{
-                        RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .trailing) {
-                            Text(artistItem.artist).bold().foregroundStyle(iconWhite).padding()
+                    HStack{
+                        ZStack{
+                            RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .trailing) {
+                                Text(artistItem.artist).bold().foregroundStyle(iconWhite).padding()
+                            }
                         }
-                    }
-                    Button(action:{
-                        withAnimation(.easeInOut(duration: 0.5).delay(0.15)) {
-                            expanded.toggle()
-                        }
-                    }){
-                        Text(String(artistItem.amount))
-                    }.padding()
+                        Text(String(artistItem.amount)).padding()
+                        Spacer()
+                    }.padding(5).frame(width:screenWidth*0.75+100*positionProportion,height:75).offset(x:-30)
                     Spacer()
-                }.padding(5).frame(width:screenWidth*0.75+100*positionProportion,height:75).offset(x:-30)
-                Spacer()
-            }.background(decorWhite)
+                }.background(decorWhite)
+            }
         }.padding(.trailing, 20.0).frame(height:expanded ? 150:75)
     }
 }

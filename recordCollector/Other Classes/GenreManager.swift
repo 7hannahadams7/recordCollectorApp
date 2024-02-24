@@ -1,6 +1,6 @@
 //
-//  OtherClasses.swift
-//  
+//  GenreManager.swift
+//  recordCollector
 //
 //  Created by Hannah Adams on 2/8/24.
 //

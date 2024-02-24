@@ -4,6 +4,8 @@
 //
 //  Created by Hannah Adams on 1/8/24.
 //
+//  RecordItem.swift
+//  recordCollector
 
 import Foundation
 import SwiftUI
