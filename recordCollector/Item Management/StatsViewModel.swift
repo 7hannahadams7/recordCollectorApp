@@ -173,6 +173,9 @@ class StatsViewModel: ObservableObject {
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()
+//        self.viewModel.historyViewModel.fetchData{
+//            print("Complete")
+//        }
     }
     
     func refreshData(){

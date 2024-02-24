@@ -14,6 +14,8 @@ class LibraryViewModel: ObservableObject {
     @Published var recordLibrary = [RecordItem]()
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
+    @ObservedObject var historyViewModel = HistoryViewModel()
+    
     @Published var fullGenres = Set<String>()
     @Published var fullArtists = Set<String>()
     @Published var fullStores: [String:String] = [:]
@@ -92,6 +94,7 @@ class LibraryViewModel: ObservableObject {
         
         print("Added New Record, ID #: ", id)
         
+        self.historyViewModel.uploadNewHistoryItem(type: "Add", recordID: id)
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
@@ -252,11 +255,13 @@ class LibraryViewModel: ObservableObject {
         self.gatherAllFilterOptions()
 
         print("Updated Record, ID #: ", id)
+        self.historyViewModel.uploadNewHistoryItem(type: "Edit", recordID: id)
     }
     
     // Delete entry locally and from db, and images from storage, called via ShowRecordView
     func deleteRecordEntry(id: String) async {
         print("Deleting Entry: ", id)
+        
         let ref: DatabaseReference! = Database.database().reference()
         let storageRef = Storage.storage().reference()
         
@@ -286,7 +291,7 @@ class LibraryViewModel: ObservableObject {
         do{
             try await ref.child("Records").child(id).removeValue()
         } catch{
-            
+            print("Error deleting record \(id)")
         }
     }
     
@@ -389,6 +394,9 @@ class LibraryViewModel: ObservableObject {
         self.fetchData{
             self.sortRecords()
             self.isRefreshing = false
+        }
+        self.historyViewModel.fetchData {
+            print("Fetching history")
         }
     }
     

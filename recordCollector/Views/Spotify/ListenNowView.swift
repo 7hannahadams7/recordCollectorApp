@@ -25,7 +25,7 @@ struct ListenNowView: View {
         ZStack{
             // Wait to display results after fetch from Spotify
             if displayResults{
-                SpotifyResultsView(spotifyController:spotifyController,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
+                SpotifyResultsView(viewModel:viewModel,spotifyController:spotifyController,record:record,albumDataString:$albumDataString, remasterDataString: $remasterDataString,playlistDataString:$playlistDataString)
             }
         }.onChange(of: spotifyController.accessToken, { _, _ in
             // Perform search once connected with valid token

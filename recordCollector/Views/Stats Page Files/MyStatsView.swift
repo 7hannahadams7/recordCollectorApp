@@ -19,7 +19,7 @@ struct MyStatsView: View {
         let artistsView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
         let decadesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
         let storesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
-        let historyView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
+        let historyView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
         
         NavigationView{
             ZStack{
@@ -79,7 +79,8 @@ struct MyStatsView: View {
 
 struct MyStatsView_Previews: PreviewProvider {
     static var previews: some View {
-        MyStatsView(statsViewModel:testStatModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()}
+        MyStatsView(statsViewModel:testStatModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()
+            testStatModel.refreshData()}
     }
 }
 //let testViewModel = LibraryViewModel()

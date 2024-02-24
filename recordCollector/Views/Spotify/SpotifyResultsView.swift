@@ -11,7 +11,9 @@ import URLImageStore
 
 
 struct SpotifyResultsView: View {
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
+    @State var record: RecordItem
     @Binding var albumDataString: String
     @Binding var remasterDataString: String
     @Binding var playlistDataString: String
@@ -27,7 +29,7 @@ struct SpotifyResultsView: View {
                         let allAlbums = ((albumSearchResult?.albums.items ?? []) + (remasterSearchResult?.albums.items ?? [])).removingDuplicates()
 
                         ForEach(allAlbums) { album in
-                            SpotifyDisplayRow(album: album, spotifyController: spotifyController)
+                            SpotifyDisplayRow(viewModel:viewModel,spotifyController: spotifyController,record:record,album: album)
                                 .padding(.vertical, 8)
                         }
                     }
@@ -37,7 +39,7 @@ struct SpotifyResultsView: View {
                         // Pull Playlist items from Search Results
                         if let playlists = playlistSearchResult?.playlists.items {
                             ForEach(playlists, id: \.id) { playlist in
-                                SpotifyDisplayRow(playlist: playlist, spotifyController: spotifyController)
+                                SpotifyDisplayRow(viewModel:viewModel,spotifyController: spotifyController,record:record,playlist: playlist)
                             }
                         }
                     }
@@ -123,9 +125,11 @@ struct SoundWaveView: View {
 
 
 struct SpotifyDisplayRow: View {
+    @ObservedObject var viewModel: LibraryViewModel
+    @ObservedObject var spotifyController: SpotifyController
+    var record: RecordItem
     var album: Album? = nil
     var playlist: Playlist? = nil
-    @ObservedObject var spotifyController: SpotifyController
     
     @State private var imageURL: URL? = nil
 
@@ -244,6 +248,8 @@ struct SpotifyDisplayRow: View {
                 }else{
                     Button(action: {
                         spotifyController.playFromSpotify(uri: uri)
+                        viewModel.historyViewModel.uploadNewHistoryItem(type: "Listen", recordID: record.id)
+                        
                     }) {
                         Image("playButton")
                             .resizable()

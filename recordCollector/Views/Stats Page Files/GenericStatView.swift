@@ -20,7 +20,9 @@ struct GenericStatView: View {
     let typeToImages = [
         "Genres":["tabImage":"TopGenresTab","proportion":CGFloat(0.5)],
         "Artists":["tabImage":"TopArtistsTab","proportion":CGFloat(0.4)],
-        "Decades":["tabImage":"TopDecadesTab","proportion":CGFloat(0.2)]
+        "Decades":["tabImage":"TopDecadesTab","proportion":CGFloat(0.2)],
+        "Stores":["tabImage":"MyStoresTab","proportion":CGFloat(0.2)],
+        "History":["tabImage":"MyHistoryTab","proportion":CGFloat(0.2)]
     ]
     
     var body: some View {
@@ -99,6 +101,13 @@ struct GenericStatView: View {
                 DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
                 DecadeBottomChart(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+            }
+
+        }else if viewType == "History"{
+            if topFrame{
+                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+            }else{
+                HistoryInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else{

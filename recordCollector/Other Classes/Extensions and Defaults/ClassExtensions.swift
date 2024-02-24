@@ -54,6 +54,20 @@ extension Date {
         formatter.dateFormat = format
         return formatter.string(from: date)
     }
+    
+    // Converting a Date to a tuple of date and time components
+    func dateAndTimeComponents() -> (date: String, time: String) {
+        let dateFormatter = DateFormatter()
+        let timeFormatter = DateFormatter()
+
+        dateFormatter.dateFormat = "MM-dd-yyyy"
+        timeFormatter.dateFormat = "HH:mm:ss"
+
+        let dateComponent = dateFormatter.string(from: self)
+        let timeComponent = timeFormatter.string(from: self)
+
+        return (dateComponent, timeComponent)
+    }
 }
 
 // Converting a String to Date for dateAdded editing and fetching
