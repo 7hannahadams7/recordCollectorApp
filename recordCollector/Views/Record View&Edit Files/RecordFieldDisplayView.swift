@@ -251,7 +251,6 @@ struct RecordFieldDisplayView: View{
                         }
                     }.padding()
                         .background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2)
-                        .shadow(color:(showAlert && recordName.isEmpty) ? Color.red : Color.clear, radius: 10)
                     Spacer()
                 }
                 
