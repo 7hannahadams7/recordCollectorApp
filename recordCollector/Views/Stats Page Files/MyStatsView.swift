@@ -18,7 +18,7 @@ struct MyStatsView: View {
         let genresView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager, viewType:"Genres")
         let artistsView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
         let decadesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
-        let storesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
+        let storesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Stores")
         let historyView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
         
         NavigationView{

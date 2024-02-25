@@ -110,6 +110,13 @@ struct GenericStatView: View {
                 HistoryInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
+        }else if viewType == "Stores"{
+            if topFrame{
+                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+            }else{
+                StoresInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+            }
+
         }else{
             EmptyView()
         }

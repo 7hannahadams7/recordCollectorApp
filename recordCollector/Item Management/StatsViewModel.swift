@@ -8,6 +8,15 @@
 import Foundation
 import SwiftUI
 import FirebaseDatabase
+import MapKit
+
+struct RecordStore: Identifiable {
+    var id: String
+    var name: String
+    var addressString: String
+    var location: CLLocationCoordinate2D?
+    var recordIDs: [String]
+}
 
 class StatsViewModel: ObservableObject {
     @ObservedObject var viewModel: LibraryViewModel
@@ -16,6 +25,7 @@ class StatsViewModel: ObservableObject {
     @Published var topGenres: [(genre: String, amount: Int, records: [String])] = []
     @Published var topDecades: [(decade: Int, amount: Int, records: [String])] = []
     @Published var topYears: [(year: Int, amount: Int, records: [String])] = []
+    @Published var topStores: [RecordStore] = []
 
     func fetchTopArtists() {
         // Firebase query to get top artists and their record counts
@@ -121,28 +131,6 @@ class StatsViewModel: ObservableObject {
                 }
 
             }
-            
-//            decadeData.append((2000, 6,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-//            decadeData.append((2010, 4,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-//            decadeData.append((1990, 1,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-//            decadeData.append((1950, 2,["16FBA54D-1A8E-423D-8252-BA3CF06AF727"]))
-//            
-//            yearlyData.append((2001, 1,[]))
-//            yearlyData.append((2004, 1,[]))
-//            yearlyData.append((2007, 1,[]))
-//            yearlyData.append((2003, 1,[]))
-//            yearlyData.append((2005, 1,[]))
-//            yearlyData.append((2004, 1,[]))
-//            
-//            yearlyData.append((2012, 2,[]))
-//            yearlyData.append((2014, 1,[]))
-//            yearlyData.append((2017, 1,[]))
-//            
-//            yearlyData.append((1992, 1,[]))
-//            
-//            yearlyData.append((1953, 1,[]))
-//            yearlyData.append((1957, 1,[]))
-
 
             // Sort artists by count in descending order
             self.topDecades = decadeData.sorted { $0.1 > $1.1 }
@@ -151,6 +139,26 @@ class StatsViewModel: ObservableObject {
             
         }
         
+    }
+    
+    func forwardGeocoding(address: String, completion: @escaping (CLLocation?) -> Void) {
+        let geocoder = CLGeocoder()
+
+        geocoder.geocodeAddressString(address) { (placemarks, error) in
+            if let error = error {
+                print("Failed to retrieve location with error: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+
+            guard let placemark = placemarks?.first, let location = placemark.location else {
+                print("No matching location found")
+                completion(nil)
+                return
+            }
+
+            completion(location)
+        }
     }
     
     func fetchYearsByDecade(decade: Int) -> [(Int, Int, [String])]{
@@ -167,18 +175,61 @@ class StatsViewModel: ObservableObject {
 
     }
     
+    func fetchStoreCoordinates() {
+        let recordsRef = Database.database().reference().child("Records")
+
+        recordsRef.observeSingleEvent(of: .value) { snapshot in
+            var allStores: [RecordStore] = []
+            let group = DispatchGroup()
+
+            for child in snapshot.children {
+                let snap = child as! DataSnapshot
+                let elementDict = snap.value as! [String: Any]
+
+                if let boughtFromDict = elementDict["boughtFrom"] as? [String: String],
+                   let storeName = boughtFromDict["storeName"],
+                   let location = boughtFromDict["location"] {
+
+                    group.enter()
+
+                    self.forwardGeocoding(address: location) { geocodedLocation in
+                        defer {
+                            group.leave()
+                        }
+
+                        // Check if the storeName already exists in allStores
+                        if let existingStoreIndex = allStores.firstIndex(where: { $0.name == storeName }) {
+                            // Store name already exists, append record ID to the existing item
+                            allStores[existingStoreIndex].recordIDs.append(snap.key)
+                        } else {
+                            // Store name doesn't exist, create a new RecordStore item
+                            let recordStore = RecordStore(id: UUID().uuidString, name: storeName, addressString: location, location: geocodedLocation?.coordinate, recordIDs: [snap.key])
+                            allStores.append(recordStore)
+                        }
+                    }
+                }
+            }
+
+            group.notify(queue: .main) {
+                self.topStores = allStores.sorted { $0.recordIDs.count > $1.recordIDs.count }
+            }
+        }
+    }
+    
     
     init(viewModel: LibraryViewModel) {
         self.viewModel = viewModel
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()
+        fetchStoreCoordinates()
     }
     
     func refreshData(){
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()
+        fetchStoreCoordinates()
     }
     
 }
