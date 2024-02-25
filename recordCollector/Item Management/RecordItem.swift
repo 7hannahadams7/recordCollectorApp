@@ -20,6 +20,7 @@ struct RecordItem: Identifiable {
     var genres: [String] = []
     var dateAdded: String
     var isBand: Bool
-    var boughtFrom: [String:String]
+    var store: (String, String)?
+//    var boughtFrom: [String:String]
     // Add other properties as needed
 }

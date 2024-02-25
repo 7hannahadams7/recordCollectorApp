@@ -259,8 +259,8 @@ struct RecordFieldDisplayView: View{
                 VStack(alignment:.leading){
                     HStack{
                         VStack(alignment:.leading){
-                            Text(recordName).smallHeadlineText()
-                            Text(artistName + (isBand ? "" : "ª")).mainText()
+                            Text(recordName).largeHeadlineText()
+                            Text(artistName + (isBand ? "" : "ª")).smallHeadlineText()
                             Text("Released: " +  String(releaseYear)).subtitleText()
                         }.padding(.bottom,5)
                         Spacer()
@@ -291,10 +291,17 @@ struct RecordFieldDisplayView: View{
                         genreManager.genres = record?.genres ?? []
                     }
                     VStack(alignment:.leading){
-                        Text("Date Added: " + (Date.dateToString(date: dateAdded))).subtitleText()
                         HStack{
-                            Text("Location Bought: " + (record?.boughtFrom["storeName"] ?? "")).subtitleText()
-                            Text(record?.boughtFrom["location"] ?? "").italicSubtitleText()
+                            Text("Date Bought:").subtitleText().padding(.trailing,5).frame(width:85,alignment:.leading)
+                            Text(Date.dateToString(date: dateAdded)).subtitleText()
+                            Spacer()
+                        }.padding(.bottom,5)
+                        HStack(alignment:.top){
+                            Text("Bought From:").subtitleText().padding(.trailing,5).frame(width:85,alignment:.leading)
+                            VStack(alignment:.leading){
+                                Text(record?.store?.0 ?? "").subtitleText()
+                                Text(record?.store?.1 ?? "").italicSubtitleText()
+                            }
                             Spacer()
                         }
                     }.padding(.vertical,5)
@@ -309,8 +316,7 @@ struct RecordFieldDisplayView: View{
                 dateAdded = String.stringToDate(from: record?.dateAdded ?? Date.dateToString(date: Date.now))!
                 isBand = record?.isBand ?? false
                 genreManager.genres = record?.genres ?? []
-                storeName = record?.boughtFrom["storeName"] ?? ""
-                storeName = record?.boughtFrom["location"] ?? ""
+                (storeName,location) = record?.store ?? ("","")
             }
             .onChange(of: editingMode) { _, _ in
                 genreManager.genres = record?.genres ?? []

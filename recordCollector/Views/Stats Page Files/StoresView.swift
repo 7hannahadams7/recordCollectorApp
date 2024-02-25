@@ -63,7 +63,7 @@ struct StoresInfoView: View {
                                     .tint(fullDisplayColors[index%totalDisplayColors])
                             }
                         }
-                    }
+                    }.padding(25)
                 }
                 
             }.frame(width:geometry.size.width,height:geometry.size.height).clipped()

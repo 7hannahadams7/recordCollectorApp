@@ -49,7 +49,7 @@ struct AddRecordView: View {
                         
                         Button(action:{
                             if isFormValid{
-                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand,boughtFrom:["storeName":storeName,"location":location])
+                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand,storeName:storeName, location:location)
                                 
                                 presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
                             }else{

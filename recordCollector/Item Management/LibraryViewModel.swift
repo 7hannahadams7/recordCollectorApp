@@ -68,7 +68,7 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Record Updating/Init
 
     // Upload new entry to database and local library, called via AddRecordView
-    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, boughtFrom:[String:String]){
+    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, storeName: String, location: String){
         // UUID of entry
         let id = UUID().uuidString
         
@@ -84,9 +84,13 @@ class LibraryViewModel: ObservableObject {
             let path = "\(genre)"
             ref.child("Records").child(id).child("genres").child(path).setValue(true)
         }
+        if storeName != ""{
+            ref.child("Records").child(id).child("boughtFrom").child("storeName").setValue(storeName)
+            ref.child("Records").child(id).child("boughtFrom").child("location").setValue(location)
+        }
         
         // Create new item in local library with data (leaves photo empty)
-        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, boughtFrom:boughtFrom)
+        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, storeName: storeName, location: location)
 
         // Attempt photo upload, will handle adding to db if photo available
         uploadAddPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
@@ -98,10 +102,14 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, boughtFrom: [String:String]) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, storeName: String, location: String) {
         // Add New Instance of Record Data to Local Library
         
-        let newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, boughtFrom:boughtFrom)
+        
+        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand)
+        if storeName != ""{
+            newItem.store = (storeName, location)
+        }
         
         // Add to array for library sorting, add to dictionary for fetching
         recordLibrary.append(newItem)
@@ -113,9 +121,9 @@ class LibraryViewModel: ObservableObject {
             fullGenres.insert(genre)
         }
         
-        if boughtFrom["storeName"] != ""{
-            fullStores[boughtFrom["storeName"]!] = boughtFrom["location"]!
-            fullLocations.insert(boughtFrom["location"]!)
+        if storeName != ""{
+            fullStores[storeName] = location
+            fullLocations.insert(location)
         }
     }
     
@@ -181,7 +189,7 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Edit existing entry in db and local library, called via ShowRecordView
-    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, boughtFrom:[String:String]){
+    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, storeName: String, location: String){
 
         print("Editing Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
@@ -207,8 +215,10 @@ class LibraryViewModel: ObservableObject {
             self.recordLibrary[recordIndex].genres = genres
             self.recordDictionaryByID[id]?.genres = genres
             
-            self.recordLibrary[recordIndex].boughtFrom = boughtFrom
-            self.recordDictionaryByID[id]?.boughtFrom = boughtFrom
+            if storeName != nil{
+                self.recordLibrary[recordIndex].store = (storeName,location)
+                self.recordDictionaryByID[id]?.store = (storeName,location)
+            }
             
             // Re-sort with new edited elements
             sortRecords()
@@ -246,9 +256,9 @@ class LibraryViewModel: ObservableObject {
             }
         }
         
-        if boughtFrom["storeName"] != ""{
-            ref.child("Records").child(id).child("boughtFrom").child("storeName").setValue(boughtFrom["storeName"])
-            ref.child("Records").child(id).child("boughtFrom").child("location").setValue(boughtFrom["location"])
+        if storeName != ""{
+            ref.child("Records").child(id).child("boughtFrom").child("storeName").setValue(storeName)
+            ref.child("Records").child(id).child("boughtFrom").child("location").setValue(location)
         }
         
         // Reset and re-gather all filter options when one is edited
@@ -343,11 +353,14 @@ class LibraryViewModel: ObservableObject {
                     }
                 }
                 
-                var boughtFrom: [String: String] = ["storeName": "", "location": ""]
+                var storeName: String = ""
+                var location: String = ""
+//                var boughtFrom: [String: String] = ["storeName": "", "location": ""]
                 
                 if let boughtFromDict = elementDict["boughtFrom"] as? [String: String]{
-                    boughtFrom = boughtFromDict
-                    print(boughtFrom)
+                    storeName = boughtFromDict["storeName"]!
+                    location = boughtFromDict["location"]!
+                    print(storeName, location)
                 }
                 
                 // Pull cover image from storage
@@ -377,7 +390,7 @@ class LibraryViewModel: ObservableObject {
                 // Add record to local library
                 dispatchGroup.notify(queue: .main) {
                     //                    print("IN QUEUE")
-                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand,boughtFrom:boughtFrom)
+                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand,storeName: storeName, location: location)
                     completion()
                 }
                 childrenCount += 1
