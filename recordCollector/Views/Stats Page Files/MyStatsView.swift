@@ -15,11 +15,11 @@ struct MyStatsView: View {
     
     var body: some View {
         // Consolidated views of all stat types
-        let genresView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager, viewType:"Genres")
-        let artistsView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
-        let decadesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
-        let storesView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Stores")
-        let historyView = GenericStatView(viewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
+        let genresView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager, viewType:"Genres")
+        let artistsView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
+        let decadesView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
+        let storesView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Stores")
+        let historyView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
         
         NavigationView{
             ZStack{

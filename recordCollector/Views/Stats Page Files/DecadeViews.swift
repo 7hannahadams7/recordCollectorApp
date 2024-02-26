@@ -10,7 +10,7 @@ import Charts
 
 // Shelf of 3 artist instances from top decades, with interaction
 struct DecadeTopGraphic: View {
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
@@ -21,7 +21,7 @@ struct DecadeTopGraphic: View {
             let recordStack: CGFloat = geometry.size.height*0.85
             let recordSpacing: CGFloat = min(recordStack/3,(geometry.size.width-3*recordStack)/3)
             
-            let decadeBarData = viewModel.topDecades.prefix(4)
+            let decadeBarData = statsViewModel.topDecades.prefix(4)
         
             var popups: [CoverPhotoToPopupView] {
                 var popupArray: [CoverPhotoToPopupView] = []
@@ -31,9 +31,9 @@ struct DecadeTopGraphic: View {
                     var record = defaultRecordItems[index]
                     if index < decadeBarData.count {
                         let recordID = decadeBarData[index].records.first
-                        record = viewModel.viewModel.recordDictionaryByID[recordID!]!
+                        record = statsViewModel.viewModel.recordDictionaryByID[recordID!]!
                     }
-                    popup = CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
+                    popup = CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
 
                     popupArray.append(popup)
                 }
@@ -78,7 +78,7 @@ struct DecadeTopGraphic: View {
 
 // Decade Information in bottom tab, both expanded and collapsed
 struct DecadeBottomChart: View{
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     
@@ -92,8 +92,8 @@ struct DecadeBottomChart: View{
     @State private var infoExpanded = false
         
         var body: some View {
-            let decadeBarData = viewModel.topDecades.prefix(4)
-            let decadeSortedData = viewModel.topDecades.sorted(by: { $0.decade > $1.decade })
+            let decadeBarData = statsViewModel.topDecades.prefix(4)
+            let decadeSortedData = statsViewModel.topDecades.sorted(by: { $0.decade > $1.decade })
             GeometryReader{geometry in
                 VStack{
                     if !isTabExpanded{
@@ -129,7 +129,7 @@ struct DecadeBottomChart: View{
                                 
                                 if infoExpanded{
                                     ZStack(alignment:.topLeading){
-                                        DecadeBubbleInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,decade:tapped)
+                                        DecadeBubbleInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,decade:tapped)
                                         Button(action:{infoExpanded.toggle()}){
                                             Image(systemName: "xmark").padding()
                                         }
@@ -199,13 +199,13 @@ struct DecadeBubbleView: View {
 
 // Individual decade details, lists years in decade with interactive record instances, in InfoView when expanded
 struct DecadeBubbleInfoView: View{
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     let decade: Int
     
     var body: some View{
-        let yearsInDecade = viewModel.fetchYearsByDecade(decade: decade)
+        let yearsInDecade = statsViewModel.fetchYearsByDecade(decade: decade)
         GeometryReader{geometry in
             ZStack{
                 ScrollView{
@@ -216,8 +216,8 @@ struct DecadeBubbleInfoView: View{
                                 ScrollView(.horizontal){
                                     HStack{
                                         ForEach(yearsInDecade[index].2, id:\.self){recordID in
-                                            if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
-                                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
+                                            if let record = statsViewModel.viewModel.recordDictionaryByID[recordID]{
+                                                CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
                                             }
                                         }
                                     }.padding()

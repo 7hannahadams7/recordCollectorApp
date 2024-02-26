@@ -10,12 +10,12 @@ import Charts
 
 // Distributed Pie Chart
 struct GenrePieChart: View {
-    @ObservedObject var viewModel: StatsViewModel //
+    @ObservedObject var statsViewModel: StatsViewModel //
     var isTabExpanded: Bool
     @State private var rotation = 0.0
     
     var body: some View {
-        let genrePieData = viewModel.topGenres.prefix(6)
+        let genrePieData = statsViewModel.topGenres.prefix(6)
 
         GeometryReader { geometry in
             // Pie Chart
@@ -64,7 +64,7 @@ struct GenrePieChart: View {
 
 // Genre Information in bottom tab, both expanded and collapsed
 struct GenreInfoView: View {
-    @ObservedObject var viewModel: StatsViewModel //
+    @ObservedObject var statsViewModel: StatsViewModel //
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
@@ -72,8 +72,8 @@ struct GenreInfoView: View {
     @State private var offset = 0.0
     
     var body: some View {
-        let genrePieData = viewModel.topGenres.prefix(6)
-        let genreTotalData = viewModel.topGenres
+        let genrePieData = statsViewModel.topGenres.prefix(6)
+        let genreTotalData = statsViewModel.topGenres
         
         GeometryReader { geometry in
             let infoRowWidth: CGFloat = geometry.size.width/2-10
@@ -111,7 +111,7 @@ struct GenreInfoView: View {
                     //Expanded Genre Info
                     ScrollView{
                         ForEach(genreTotalData.indices, id: \.self) {index in
-                            GenreDetailRowView(genreItem:genreTotalData[index],viewModel:viewModel,spotifyController:spotifyController, genreManager: genreManager,  color:fullDisplayColors[index%totalDisplayColors])
+                            GenreDetailRowView(genreItem:genreTotalData[index],statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager: genreManager,  color:fullDisplayColors[index%totalDisplayColors])
                         }
                     }.padding(.vertical,30)
                         .id(2)
@@ -134,7 +134,7 @@ struct GenreInfoView: View {
 // Individual genre row with interactions, in InfoView when expanded
 struct GenreDetailRowView: View {
     var genreItem: (genre: String, amount: Int, records: [String])
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     
@@ -149,8 +149,8 @@ struct GenreDetailRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(genreItem.records, id:\.self){recordID in
-                            if let record = viewModel.viewModel.recordDictionaryByID[recordID]{
-                                CoverPhotoToPopupView(viewModel: viewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
+                            if let record = statsViewModel.viewModel.recordDictionaryByID[recordID]{
+                                CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
                             }
                         }
                     }

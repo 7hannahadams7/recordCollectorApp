@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct HistoryInfoView: View {
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
@@ -22,12 +22,12 @@ struct HistoryInfoView: View {
         var uniqueDates: [String] {
             var dates = Set<String>()
             if tabSelectedValue == "All"{
-                for item in viewModel.viewModel.historyViewModel.allHistory{
+                for item in statsViewModel.viewModel.historyViewModel.allHistory{
                     let (dateComponent,_) = item.date.dateAndTimeComponents()
                     dates.insert(dateComponent)
                 }
             }else{
-                for item in viewModel.viewModel.historyViewModel.allHistory.filter({$0.type == tabSelectedValue}){
+                for item in statsViewModel.viewModel.historyViewModel.allHistory.filter({$0.type == tabSelectedValue}){
                     let (dateComponent,_) = item.date.dateAndTimeComponents()
                     dates.insert(dateComponent)
                 }
@@ -42,8 +42,8 @@ struct HistoryInfoView: View {
                 if !isTabExpanded{
                     VStack{
                         VStack{
-                            ForEach(viewModel.viewModel.historyViewModel.allHistory.prefix(3),id:\.self.id){item in
-                                HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
+                            ForEach(statsViewModel.viewModel.historyViewModel.allHistory.prefix(3),id:\.self.id){item in
+                                HistoryItemDetailView(statsViewModel: statsViewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
                             }
                         }.padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10.0)).padding()
                             
@@ -60,15 +60,15 @@ struct HistoryInfoView: View {
                         List{
                             ForEach(uniqueDates,id:\.self){date in
                                 Section(header: Text(date)){
-                                    ForEach(viewModel.viewModel.historyViewModel.allHistory.filter { item in
+                                    ForEach(statsViewModel.viewModel.historyViewModel.allHistory.filter { item in
                                         let (itemDateComponent, _) = item.date.dateAndTimeComponents()
                                         return (tabSelectedValue != "All" ? (item.type == tabSelectedValue) : true) && itemDateComponent == date
                                     }, id: \.self.id){item in
-                                        HistoryItemDetailView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
+                                        HistoryItemDetailView(statsViewModel: statsViewModel, spotifyController: spotifyController, genreManager: genreManager, historyItem: item)
                                             .swipeActions {
                                                 Button("Delete") {
                                                     Task{
-                                                        await viewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
+                                                        await statsViewModel.viewModel.historyViewModel.deleteHistoryItem(id: item.id)
                                                     }
                                                 }
                                                 .tint(.red)
@@ -95,14 +95,14 @@ struct HistoryInfoView: View {
     }
 }
 struct HistoryItemDetailView: View{
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     
     var historyItem: HistoryItem
     
     var body: some View{
-        let record = viewModel.viewModel.recordDictionaryByID[historyItem.recordID]!
+        let record = statsViewModel.viewModel.recordDictionaryByID[historyItem.recordID]!
         let type = historyItem.type
         let (dateString,timeString) = historyItem.date.dateAndTimeComponents()
         
@@ -124,7 +124,7 @@ struct HistoryItemDetailView: View{
                 return "plus.square.on.square"
             }
         }
-        NavigationLink(destination: ShowRecordView(viewModel:viewModel.viewModel,spotifyController:spotifyController, record:viewModel.viewModel.recordDictionaryByID[historyItem.recordID]!, genreManager: genreManager)) {
+        NavigationLink(destination: ShowRecordView(viewModel:statsViewModel.viewModel,spotifyController:spotifyController, record:statsViewModel.viewModel.recordDictionaryByID[historyItem.recordID]!, genreManager: genreManager)) {
             HStack{
                 ZStack{
                     Image(uiImage:record.discPhoto)
@@ -155,7 +155,7 @@ struct HistoryItemDetailView: View{
     }
     
     private func itemBuilder(item:HistoryItem) -> (String,RecordItem){
-        let recordItem = viewModel.viewModel.recordDictionaryByID[item.recordID]!
+        let recordItem = statsViewModel.viewModel.recordDictionaryByID[item.recordID]!
         
         let dateString = "on \(Date.dateToString(date: item.date,format: "MM-dd-yyyy HH:mm:ss"))"
         let recordString = "\(recordItem.name) by \(recordItem.artist)"

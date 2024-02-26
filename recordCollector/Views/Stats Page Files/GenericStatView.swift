@@ -10,7 +10,7 @@ import Charts
 
 
 struct GenericStatView: View {
-    @ObservedObject var viewModel: StatsViewModel
+    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     var viewType: String
@@ -31,8 +31,8 @@ struct GenericStatView: View {
         let proportion: CGFloat = typeToImages[viewType]!["proportion"] as! CGFloat
         
         // Define views
-        let topView = viewWindowCreator(from:viewModel,with:isTabExpanded,viewType: viewType,topFrame: true)
-        let bottomView = viewWindowCreator(from:viewModel,with:isTabExpanded,viewType: viewType,topFrame: false)
+        let topView = viewWindowCreator(from:statsViewModel,with:isTabExpanded,viewType: viewType,topFrame: true)
+        let bottomView = viewWindowCreator(from:statsViewModel,with:isTabExpanded,viewType: viewType,topFrame: false)
         
         GeometryReader { geometry in
             
@@ -81,40 +81,40 @@ struct GenericStatView: View {
     
     // Function to create a View based on viewModel and a boolean value
     @ViewBuilder
-    private func viewWindowCreator(from viewModel: StatsViewModel, with isTabExpanded: Bool,viewType: String,topFrame: Bool) -> some View {
+    private func viewWindowCreator(from statsViewModel: StatsViewModel, with isTabExpanded: Bool,viewType: String,topFrame: Bool) -> some View {
         
         if viewType == "Genres"{
             if topFrame{
-                GenrePieChart(viewModel:viewModel,isTabExpanded:isTabExpanded)
+                GenrePieChart(statsViewModel:statsViewModel,isTabExpanded:isTabExpanded)
             }else{
-                GenreInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                GenreInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
         }else if viewType == "Artists"{
             if topFrame{
-                ArtistRecordShelf(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                ArtistRecordShelf(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                ArtistInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                ArtistInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else if viewType == "Decades"{
             if topFrame{
-                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                DecadeTopGraphic(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                DecadeBottomChart(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                DecadeBottomChart(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else if viewType == "History"{
             if topFrame{
-                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                DecadeTopGraphic(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                HistoryInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                HistoryInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else if viewType == "Stores"{
             if topFrame{
-                DecadeTopGraphic(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                DecadeTopGraphic(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }else{
-                StoresInfoView(viewModel:viewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
+                StoresInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController, genreManager:genreManager, isTabExpanded:$isTabExpanded)
             }
 
         }else{
