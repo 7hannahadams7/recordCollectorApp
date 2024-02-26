@@ -13,21 +13,20 @@ struct ContentView: View {
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var authManager: AuthenticationManager
 
-    @StateObject private var statsViewModel: StatsViewModel
+//    @StateObject private var statsViewModel: StatsViewModel
     @StateObject private var genreManager = GenreManager()
 
     init(viewModel: LibraryViewModel, spotifyController: SpotifyController, authManager: AuthenticationManager) {
         self.viewModel = viewModel
         self.spotifyController = spotifyController
         self.authManager = authManager
-        self._statsViewModel = StateObject(wrappedValue: StatsViewModel(viewModel: viewModel))
     }
     
     var body: some View {
         // Present SignInView if user not signed into a valid Firebase account
-//        if !authManager.isUserSignedIn {
-//            SignInView(authManager: authManager)
-//        } else {
+        if !authManager.isUserSignedIn {
+            SignInView(authManager: authManager)
+        } else {
             ZStack {
                 TabView {
                     HomePageView(viewModel: viewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
@@ -38,7 +37,7 @@ struct ContentView: View {
                         Image(systemName: "filemenu.and.selection")
                         Text("My Library").bold()
                     }.tag(1)
-                    MyStatsView(statsViewModel: statsViewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
+                    MyStatsView(viewModel:viewModel, spotifyController: spotifyController,genreManager:genreManager).tabItem {
                         Image(systemName: "chart.pie.fill").foregroundColor(.blue)
                         Text("My Stats").bold()
                     }.tag(2)
@@ -66,7 +65,7 @@ struct ContentView: View {
                 // Pull data once logged in
                 viewModel.refreshData()
             }
-//        }
+        }
     }
 }
 

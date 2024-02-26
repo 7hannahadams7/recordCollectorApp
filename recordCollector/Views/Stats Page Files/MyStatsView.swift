@@ -9,17 +9,18 @@ import SwiftUI
 
 struct MyStatsView: View {
     @State private var displayTag = 0
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
+//    @ObservedObject var statsViewModel: StatsViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     
     var body: some View {
         // Consolidated views of all stat types
-        let genresView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager, viewType:"Genres")
-        let artistsView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
-        let decadesView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
-        let storesView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Stores")
-        let historyView = GenericStatView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
+        let genresView = GenericStatView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager, viewType:"Genres")
+        let artistsView = GenericStatView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Artists")
+        let decadesView = GenericStatView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Decades")
+        let storesView = GenericStatView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"Stores")
+        let historyView = GenericStatView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,viewType:"History")
         
         NavigationView{
             ZStack{
@@ -79,10 +80,9 @@ struct MyStatsView: View {
 
 struct MyStatsView_Previews: PreviewProvider {
     static var previews: some View {
-        MyStatsView(statsViewModel:testStatModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()
-            testStatModel.refreshData()}
+        MyStatsView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()}
     }
 }
 //let testViewModel = LibraryViewModel()
-let testStatModel = StatsViewModel(viewModel:testViewModel)
+//let testStatModel = StatsViewModel(viewModel:testViewModel)
 

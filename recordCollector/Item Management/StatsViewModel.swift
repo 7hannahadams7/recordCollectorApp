@@ -19,7 +19,7 @@ struct RecordStore: Identifiable {
 }
 
 class StatsViewModel: ObservableObject {
-    @ObservedObject var viewModel: LibraryViewModel
+//    @ObservedObject var viewModel: LibraryViewModel
     
     @Published var topArtists: [(artist: String, amount: Int, records: [String])] = []
     @Published var topGenres: [(genre: String, amount: Int, records: [String])] = []
@@ -217,8 +217,8 @@ class StatsViewModel: ObservableObject {
     }
     
     
-    init(viewModel: LibraryViewModel) {
-        self.viewModel = viewModel
+    init(/*viewModel: LibraryViewModel*/) {
+//        self.viewModel = viewModel
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()

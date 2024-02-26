@@ -20,6 +20,25 @@ class HistoryViewModel: ObservableObject {
         allHistory.sort { $0.date > $1.date }
     }
     
+    func clearRecordIDInstances(recordID: String) async{
+        print("removing from history elements")
+        
+        let ref: DatabaseReference! = Database.database().reference()
+        for historyItem in allHistory{
+            if historyItem.recordID == recordID{
+                do{
+                    try await ref.child("History").child(historyItem.id).removeValue()
+                } catch{
+                    print("Error deleting historyItem \(historyItem.id)")
+                }
+            }
+        }
+        
+        allHistory = allHistory.filter { $0.recordID != recordID }
+    }
+    
+    
+    
     func uploadNewHistoryItem(type:String,recordID:String){
         let id = UUID().uuidString
         

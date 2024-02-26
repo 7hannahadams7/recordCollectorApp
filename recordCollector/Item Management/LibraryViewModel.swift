@@ -15,6 +15,7 @@ class LibraryViewModel: ObservableObject {
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
     @ObservedObject var historyViewModel = HistoryViewModel()
+    @ObservedObject var statsViewModel = StatsViewModel()
     
     @Published var fullGenres = Set<String>()
     @Published var fullArtists = Set<String>()
@@ -99,6 +100,7 @@ class LibraryViewModel: ObservableObject {
         print("Added New Record, ID #: ", id)
         
         self.historyViewModel.uploadNewHistoryItem(type: "Add", recordID: id)
+        self.statsViewModel.refreshData()
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
@@ -215,7 +217,7 @@ class LibraryViewModel: ObservableObject {
             self.recordLibrary[recordIndex].genres = genres
             self.recordDictionaryByID[id]?.genres = genres
             
-            if storeName != nil{
+            if storeName != ""{
                 self.recordLibrary[recordIndex].store = (storeName,location)
                 self.recordDictionaryByID[id]?.store = (storeName,location)
             }
@@ -266,11 +268,14 @@ class LibraryViewModel: ObservableObject {
 
         print("Updated Record, ID #: ", id)
         self.historyViewModel.uploadNewHistoryItem(type: "Edit", recordID: id)
+        self.statsViewModel.refreshData()
     }
     
     // Delete entry locally and from db, and images from storage, called via ShowRecordView
     func deleteRecordEntry(id: String) async {
         print("Deleting Entry: ", id)
+        
+        await self.historyViewModel.clearRecordIDInstances(recordID: id)
         
         let ref: DatabaseReference! = Database.database().reference()
         let storageRef = Storage.storage().reference()
@@ -278,12 +283,6 @@ class LibraryViewModel: ObservableObject {
         // Create a reference to the files to delete
         let coverImageRef = storageRef.child("recordImages").child(id + ".jpg")
         let discImageRef = storageRef.child("discImages").child(id + ".jpg")
-        
-        // Remove from local library
-        if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
-            self.recordLibrary.remove(at: recordIndex)
-            self.recordDictionaryByID[id] = nil
-        }
 
         // Attempt cover image delete from storage
         do {
@@ -303,6 +302,16 @@ class LibraryViewModel: ObservableObject {
         } catch{
             print("Error deleting record \(id)")
         }
+        
+        // Remove from local library
+        if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
+            print("removing from local library")
+            self.recordLibrary.remove(at: recordIndex)
+            self.recordDictionaryByID[id] = nil
+        }
+        
+        self.statsViewModel.refreshData()
+    
     }
     
     
@@ -411,6 +420,7 @@ class LibraryViewModel: ObservableObject {
         self.historyViewModel.fetchData {
             print("Fetching history")
         }
+        self.statsViewModel.refreshData()
     }
     
     // Iterate through library, gather all Genres and Artists in library for Filters

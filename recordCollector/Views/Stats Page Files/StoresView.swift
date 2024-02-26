@@ -10,7 +10,7 @@ import SwiftUI
 import MapKit
 
 struct StoresInfoView: View {
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
@@ -21,7 +21,7 @@ struct StoresInfoView: View {
     @State private var infoColor: Color = seaweedGreen
     
     var body: some View {
-        let storeCollapsedData = statsViewModel.topStores.prefix(6)
+        let storeCollapsedData = viewModel.statsViewModel.topStores.prefix(6)
         
         GeometryReader { geometry in
             let infoRowWidth: CGFloat = geometry.size.width/2-10
@@ -59,8 +59,8 @@ struct StoresInfoView: View {
                     GeometryReader{geometry in
                         ZStack(alignment:.center){
                             Map() {
-                                ForEach(statsViewModel.topStores.indices, id: \.self) { index in
-                                    let store = statsViewModel.topStores[index]
+                                ForEach(viewModel.statsViewModel.topStores.indices, id: \.self) { index in
+                                    let store = viewModel.statsViewModel.topStores[index]
                                     if let loc = store.location{
                                         Annotation(coordinate: loc) {
                                             ZStack{
@@ -79,7 +79,7 @@ struct StoresInfoView: View {
                             }
                             if infoExpanded{
                                 ZStack(alignment:.topLeading){
-                                    LocationInfoView(statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,storeName:tapped,color:infoColor)
+                                    LocationInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,storeName:tapped,color:infoColor)
                                     Button(action:{infoExpanded.toggle()}){
                                         Image(systemName: "xmark").padding()
                                     }
@@ -104,7 +104,7 @@ struct StoresInfoView: View {
 
 // Individual location details
 struct LocationInfoView: View{
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     let storeName: String
@@ -114,11 +114,11 @@ struct LocationInfoView: View{
     let size: Int = 70
     
     var body: some View{
-        let store = statsViewModel.topStores.first(where: { $0.name == storeName})!
+        let store = viewModel.statsViewModel.topStores.first(where: { $0.name == storeName})!
         var records: [RecordItem] {
             var output: [RecordItem] = []
             for recordID in store.recordIDs{
-                if let record = statsViewModel.viewModel.recordDictionaryByID[recordID]{
+                if let record = viewModel.recordDictionaryByID[recordID]{
                     output.append(record)
                 }
             }
@@ -150,7 +150,7 @@ struct LocationInfoView: View{
                                     let cols = min(3, records.count - row * 3)
                                     ForEach(0..<cols,id:\.self) { column in
                                         let record = records[row * 3 + column]
-                                        CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:70)
+                                        CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:70)
                                     }
                                     ForEach(0..<(3-cols), id: \.self) { _ in
                                         Rectangle().fill(Color.clear).frame(width:70,height:70)
@@ -162,20 +162,6 @@ struct LocationInfoView: View{
                 }.padding()
             }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)
         }
-        
-//        GeometryReader{geometry in
-//            ZStack{
-//                ScrollView(.horizontal){
-//                    HStack{
-//                        ForEach(storeInfo.recordIDs, id:\.self){recordID in
-//                            if let record = statsViewModel.viewModel.recordDictionaryByID[recordID]{
-//                                CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
-//                            }
-//                        }
-//                    }.padding()
-//                }.background(recordBlack).padding().padding(.top,30)
-//            }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)
-//        }
     }
 }
 

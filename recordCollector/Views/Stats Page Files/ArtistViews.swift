@@ -10,7 +10,7 @@ import Charts
 
 // Shelf of 6 top artist record instances, with interaction
 struct ArtistRecordShelf: View {
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
@@ -22,7 +22,7 @@ struct ArtistRecordShelf: View {
             let recordStack: CGFloat = geometry.size.height/2*0.85
             let recordSpacing: CGFloat = min(recordStack/3,(geometry.size.width-3*recordStack)/3)
             
-            let artistBarData = statsViewModel.topArtists.prefix(6)
+            let artistBarData = viewModel.statsViewModel.topArtists.prefix(6)
             
             var popups: [CoverPhotoToPopupView] {
                 var popupArray: [CoverPhotoToPopupView] = []
@@ -32,9 +32,9 @@ struct ArtistRecordShelf: View {
                     var record = defaultRecordItems[index]
                     if index < artistBarData.count {
                         let recordID = artistBarData[index].records.first
-                        record = statsViewModel.viewModel.recordDictionaryByID[recordID!]!
+                        record = viewModel.recordDictionaryByID[recordID!]!
                     }
-                    popup = CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
+                    popup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
 
                     popupArray.append(popup)
                 }
@@ -89,15 +89,15 @@ struct ArtistRecordShelf: View {
 
 // Artist Information in bottom tab, both expanded and collapsed
 struct ArtistInfoView: View {
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     @Binding var isTabExpanded: Bool
     @State private var offset = 0.0
     
     var body: some View {
-        let artistBarData = statsViewModel.topArtists.prefix(6)
-        let artistTotalData = statsViewModel.topArtists
+        let artistBarData = viewModel.statsViewModel.topArtists.prefix(6)
+        let artistTotalData = viewModel.statsViewModel.topArtists
         let totalArtists = artistTotalData.count
         
         GeometryReader { geometry in
@@ -126,7 +126,7 @@ struct ArtistInfoView: View {
                 }else{
                         ScrollView{
                             ForEach(artistTotalData.indices, id:\.self){index in
-                                ArtistDetailRowView(artistItem:artistTotalData[index],statsViewModel:statsViewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
+                                ArtistDetailRowView(artistItem:artistTotalData[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
                                 
                             }
                         }.padding(.vertical,30)
@@ -187,7 +187,7 @@ struct ArtistCollapsedBarView: View{
 // Individual artist row with interactions, in InfoView when expanded
 struct ArtistDetailRowView: View {
     var artistItem: (artist: String, amount: Int, records: [String]);
-    @ObservedObject var statsViewModel: StatsViewModel
+    @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
     var color: Color
@@ -202,8 +202,8 @@ struct ArtistDetailRowView: View {
                 ScrollView(.horizontal){
                     HStack{
                         ForEach(artistItem.records, id:\.self){recordID in
-                            if let record = statsViewModel.viewModel.recordDictionaryByID[recordID]{
-                                CoverPhotoToPopupView(viewModel: statsViewModel.viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
+                            if let record = viewModel.recordDictionaryByID[recordID]{
+                                CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
                             }
                         }
                     }
