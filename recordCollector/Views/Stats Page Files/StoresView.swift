@@ -8,6 +8,63 @@
 import Foundation
 import SwiftUI
 import MapKit
+import Charts
+
+struct StoresInfoView_Previews: PreviewProvider {
+    static var previews: some View {
+        StoresInfoView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager(), isTabExpanded: .constant(false)).onAppear{testViewModel.refreshData()}.frame(width:350,height:350)
+    }
+}
+
+struct StoresMenuView: View{
+    @ObservedObject var viewModel: LibraryViewModel
+    @Binding var isMenuExpanded: Bool
+    @Binding var camera: MapCameraPosition
+    
+    let radius: CGFloat = 10.0
+    
+    var body: some View{
+        GeometryReader{geometry in
+            HStack(spacing:-2*radius){
+                Spacer()
+                ZStack(alignment:.leading){
+                    RoundedRectangle(cornerRadius: radius).foregroundStyle(lightWoodBrown).shadow(radius: 3)
+                    Button{
+                        isMenuExpanded.toggle()
+                    }label:{
+                        Image(systemName: isMenuExpanded ? "chevron.compact.right" :  "chevron.compact.left").resizable().frame(width:8).aspectRatio(contentMode:.fit).foregroundStyle(woodAccent).padding(5)
+                    }
+                }.frame(width:30,height:60)
+                ZStack{
+                    RoundedRectangle(cornerRadius: radius).foregroundStyle(lightWoodBrown).shadow(radius: 3)
+                    if isMenuExpanded{
+                        ScrollView{
+                            VStack(alignment:.leading){
+                                ForEach(viewModel.statsViewModel.topStores.indices, id: \.self) { index in
+                                    let store = viewModel.statsViewModel.topStores[index]
+                                    if let loc = store.location{
+                                        Button{
+                                            camera = .region(MKCoordinateRegion(center: loc, latitudinalMeters: 600, longitudinalMeters: 600))
+                                            isMenuExpanded.toggle()
+                                        }label:{
+                                            HStack(alignment:.center){
+                                                ZStack{
+                                                    Circle().fill(fullDisplayColors[index%totalDisplayColors])
+                                                    Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
+                                                }
+                                                Text(store.name).foregroundStyle(recordBlack)
+                                            }
+                                        }.frame(height:30)
+                                    }
+                                }
+                            }
+                        }.padding()
+                    }
+                }.frame(width: isMenuExpanded ? 3*geometry.size.width/4 : 15,height:geometry.size.height).offset(x:radius/2+1)
+            }.clipped()
+        }
+    }
+}
 
 struct StoresInfoView: View {
     @ObservedObject var viewModel: LibraryViewModel
@@ -19,46 +76,86 @@ struct StoresInfoView: View {
     @State private var tapped: String = ""
     @State private var infoExpanded = false
     @State private var infoColor: Color = seaweedGreen
+    @State private var menuExpanded = false
+    
+    @State var camera: MapCameraPosition = .automatic
     
     var body: some View {
-        let storeCollapsedData = viewModel.statsViewModel.topStores.prefix(6)
         
         GeometryReader { geometry in
-            let infoRowWidth: CGFloat = geometry.size.width/2-10
-            let infoIconSize: CGFloat = geometry.size.height/4
+
+            var usedPercentage: Int{
+                if viewModel.recordLibrary.count != 0{
+                    let percentage = Double(viewModel.statsViewModel.usedTotal) / Double(viewModel.recordLibrary.count) * 100.0
+                    return Int(percentage)
+                }
+                return 0
+            }
+            var onlinePercentage: Int{
+                if viewModel.recordLibrary.count != 0{
+                    let percentage = Double(viewModel.statsViewModel.onlineTotal) / Double(viewModel.recordLibrary.count) * 100.0
+                    return Int(percentage)
+                }
+                return 0
+            }
             // Table Graphic
             VStack{
                 if !isTabExpanded{
-                        // Collapsed Genre Info
-                        HStack{
-                            let cols = Int(storeCollapsedData.count / 3 + min(storeCollapsedData.count % 3, 1))
-                            ForEach(0..<cols, id:\.self) { chunkIndex in
-                                // Iterate through top genres in chunks of 3, adjust to fewer than 3 genres used
-                                
-                                VStack (alignment:.leading){
-                                    // Iterate through elements in the current chunk
-                                    let rows = min(3, storeCollapsedData.count - chunkIndex * 3)
-                                    
-                                    ForEach(0..<rows, id:\.self) { index in
-                                        let i = index+3*chunkIndex
-                                        HStack(alignment:.center){
-                                            ZStack{
-                                                Circle().fill(smallDisplayColors[i]).frame(width:infoIconSize,height:infoIconSize)
-                                                Text(String(storeCollapsedData[i].recordIDs.count)).foregroundStyle(iconWhite)
-                                            }
-                                            Text(storeCollapsedData[i].name).foregroundStyle(recordBlack)
-                                        }
-                                    }
-                                }.padding().frame(width:infoRowWidth,height:geometry.size.height)
+                    HStack{
+                        Chart{
+                            SectorMark(
+                                angle: .value("Used", viewModel.statsViewModel.usedTotal),
+                                innerRadius: .ratio(0.5),
+                                angularInset: 1.5
+                            ).foregroundStyle(pinkRed)
+                            SectorMark(
+                                angle: .value("New", viewModel.recordLibrary.count - viewModel.statsViewModel.usedTotal),
+                                innerRadius: .ratio(0.5)
+                            ).foregroundStyle(paleRed)
+                        }.padding(10).chartBackground { chartProxy in
+                            GeometryReader { geometry in
+                                let frame = geometry[chartProxy.plotFrame!]
+                                VStack {
+                                    Text("Used")
+                                        .font(.callout)
+                                        .foregroundStyle(.secondary)
+                                    Text("\(usedPercentage)%")
+                                        .font(.title2.bold())
+                                        .foregroundColor(.primary)
+                                }
+                                .position(x: frame.midX, y: frame.midY)
                             }
                         }
-                        .id(1)
-                        .animation(.easeInOut(duration:0.5),value: true)
-                        .transition(AsymmetricTransition(insertion:.move(edge:.trailing), removal: .move(edge:.leading)))
+                        Chart{
+                            SectorMark(
+                                angle: .value("Used", viewModel.statsViewModel.onlineTotal),
+                                innerRadius: .ratio(0.5),
+                                angularInset: 1.5
+                            ).foregroundStyle(deepBlue)
+                            SectorMark(
+                                angle: .value("New", viewModel.recordLibrary.count - viewModel.statsViewModel.onlineTotal),
+                                innerRadius: .ratio(0.5)
+                            ).foregroundStyle(grayBlue)
+                        }.padding(10).chartBackground { chartProxy in
+                            GeometryReader { geometry in
+                                let frame = geometry[chartProxy.plotAreaFrame]
+                                VStack {
+                                    Text("Online")
+                                        .font(.callout)
+                                        .foregroundStyle(.secondary)
+                                    Text("\(onlinePercentage)%")
+                                        .font(.title2.bold())
+                                        .foregroundColor(.primary)
+                                }
+                                .position(x: frame.midX, y: frame.midY)
+                            }
+                        }
+                    }.padding(10).animation(.easeInOut(duration:0.5),value: true)
+                        .transition(.move(edge:.leading))
                 }else{
                     GeometryReader{geometry in
                         ZStack(alignment:.center){
-                            Map() {
+                            Map(position: $camera) {
                                 ForEach(viewModel.statsViewModel.topStores.indices, id: \.self) { index in
                                     let store = viewModel.statsViewModel.topStores[index]
                                     if let loc = store.location{
@@ -77,6 +174,7 @@ struct StoresInfoView: View {
                                     }
                                 }
                             }
+                            StoresMenuView(viewModel:viewModel,isMenuExpanded: $menuExpanded, camera: $camera)
                             if infoExpanded{
                                 ZStack(alignment:.topLeading){
                                     LocationInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,storeName:tapped,color:infoColor)
@@ -85,7 +183,7 @@ struct StoresInfoView: View {
                                     }
                                 }.padding().frame(width: geometry.size.width, height: 3*geometry.size.height/4)
                             }
-                        }
+                        }.animation(.easeInOut(duration:0.5),value:isTabExpanded)
                     }.padding(30)
                 }
                 

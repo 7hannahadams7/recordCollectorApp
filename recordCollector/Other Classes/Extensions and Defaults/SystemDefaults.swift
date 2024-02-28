@@ -52,7 +52,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1971,
         dateAdded: "01-01-2020",
-        isBand: false
+        isBand: false,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -64,7 +65,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1977,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -76,7 +78,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1973,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -88,7 +91,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1995,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -100,7 +104,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1970,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -112,7 +117,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1971,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -124,7 +130,8 @@ let defaultRecordItems: [RecordItem] = [
         discPhoto: UIImage(named:"TakePhoto")!,
         releaseYear: 1984,
         dateAdded: "01-01-2020",
-        isBand: true
+        isBand: true,
+        isUsed: true
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         )

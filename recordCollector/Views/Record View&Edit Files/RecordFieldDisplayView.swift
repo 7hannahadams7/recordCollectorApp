@@ -23,6 +23,7 @@ struct RecordFieldDisplayView: View{
     @Binding var releaseYear: Int
     @Binding var dateAdded: Date
     @Binding var isBand: Bool
+    @Binding var isUsed: Bool
     
     @Binding var storeName: String
     @Binding var location: String
@@ -210,14 +211,27 @@ struct RecordFieldDisplayView: View{
                 HStack{
                     // Label
                     HStack{
-                        Text("Date Added: ").minimumScaleFactor(0.8)
+                        Text("Date Bought: ").minimumScaleFactor(0.8)
                         Spacer()
                     }.frame(width:screenWidth/4)
                     // Date Picker
                     DatePicker("", selection: $dateAdded, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(CompactDatePickerStyle())
                         .labelsHidden()
-                        .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2,alignment:.leading)
+                        .padding().background(iconWhite).clipShape(RoundedRectangle(cornerRadius: 10)).frame(width:screenWidth/2-40,alignment:.leading)
+                    // Band Selector
+                    VStack{
+                        Text("Used").font(.system(size:12))
+                        Button {
+                            isUsed.toggle()
+                        } label: {
+                            if isUsed{
+                                Image(systemName:"checkmark.square.fill").foregroundColor(paleRed)
+                            }else{
+                                Image(systemName:"checkmark.square").foregroundColor(paleRed)
+                            }
+                        }
+                    }
                     Spacer()
                 }
                 
@@ -291,9 +305,12 @@ struct RecordFieldDisplayView: View{
                         genreManager.genres = record?.genres ?? []
                     }
                     VStack(alignment:.leading){
-                        HStack{
+                        HStack(alignment:.top){
                             Text("Date Bought:").subtitleText().padding(.trailing,5).frame(width:85,alignment:.leading)
-                            Text(Date.dateToString(date: dateAdded)).subtitleText()
+                            VStack(alignment:.leading){
+                                Text(Date.dateToString(date: dateAdded)).subtitleText()
+                                Text(isUsed ? "Used" : "New").italicSubtitleText()
+                            }
                             Spacer()
                         }.padding(.bottom,5)
                         HStack(alignment:.top){
@@ -315,6 +332,7 @@ struct RecordFieldDisplayView: View{
                 releaseYear = record?.releaseYear ?? 2024
                 dateAdded = String.stringToDate(from: record?.dateAdded ?? Date.dateToString(date: Date.now))!
                 isBand = record?.isBand ?? false
+                isUsed = record?.isUsed ?? false
                 genreManager.genres = record?.genres ?? []
                 (storeName,location) = record?.store ?? ("","")
             }

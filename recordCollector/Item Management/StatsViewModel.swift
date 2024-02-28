@@ -10,14 +10,6 @@ import SwiftUI
 import FirebaseDatabase
 import MapKit
 
-struct RecordStore: Identifiable {
-    var id: String
-    var name: String
-    var addressString: String
-    var location: CLLocationCoordinate2D?
-    var recordIDs: [String]
-}
-
 class StatsViewModel: ObservableObject {
 //    @ObservedObject var viewModel: LibraryViewModel
     
@@ -26,6 +18,30 @@ class StatsViewModel: ObservableObject {
     @Published var topDecades: [(decade: Int, amount: Int, records: [String])] = []
     @Published var topYears: [(year: Int, amount: Int, records: [String])] = []
     @Published var topStores: [RecordStore] = []
+    @Published var usedTotal: Int = 0
+    @Published var onlineTotal: Int = 0
+    
+    func fetchUsedDistribution(){
+        // Firebase query to get top artists and their record counts
+        let recordsRef = Database.database().reference().child("Records")
+
+        recordsRef.observeSingleEvent(of: .value) { snapshot in
+            var usedCount = 0
+
+            for child in snapshot.children {
+                let snap = child as! DataSnapshot
+                let elementDict = snap.value as! [String: Any]
+
+                let recordID = snap.key
+                if let isUsed = elementDict["isUsed"] as? Bool {
+                    if isUsed{
+                        usedCount += 1
+                    }
+                }
+            }
+            self.usedTotal = usedCount
+        }
+    }
 
     func fetchTopArtists() {
         // Firebase query to get top artists and their record counts
@@ -180,6 +196,7 @@ class StatsViewModel: ObservableObject {
 
         recordsRef.observeSingleEvent(of: .value) { snapshot in
             var allStores: [RecordStore] = []
+            var onlineCount: Int = 0
             let group = DispatchGroup()
 
             for child in snapshot.children {
@@ -190,6 +207,9 @@ class StatsViewModel: ObservableObject {
                    let storeName = boughtFromDict["storeName"],
                    let location = boughtFromDict["location"] {
 
+                    if location == "Online"{
+                        onlineCount += 1
+                    }
                     group.enter()
 
                     self.forwardGeocoding(address: location) { geocodedLocation in
@@ -212,17 +232,18 @@ class StatsViewModel: ObservableObject {
 
             group.notify(queue: .main) {
                 self.topStores = allStores.sorted { $0.recordIDs.count > $1.recordIDs.count }
+                self.onlineTotal = onlineCount
             }
         }
     }
     
     
-    init(/*viewModel: LibraryViewModel*/) {
-//        self.viewModel = viewModel
+    init() {
         fetchTopArtists()
         fetchTopGenres()
         fetchTopYears()
         fetchStoreCoordinates()
+        fetchUsedDistribution()
     }
     
     func refreshData(){
@@ -230,6 +251,7 @@ class StatsViewModel: ObservableObject {
         fetchTopGenres()
         fetchTopYears()
         fetchStoreCoordinates()
+        fetchUsedDistribution()
     }
     
 }

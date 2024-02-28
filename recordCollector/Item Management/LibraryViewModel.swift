@@ -69,7 +69,7 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Record Updating/Init
 
     // Upload new entry to database and local library, called via AddRecordView
-    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, storeName: String, location: String){
+    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String, location: String){
         // UUID of entry
         let id = UUID().uuidString
         
@@ -81,6 +81,7 @@ class LibraryViewModel: ObservableObject {
         ref.child("Records").child(id).child("releaseYear").setValue(releaseYear)
         ref.child("Records").child(id).child("dateAdded").setValue(dateAdded)
         ref.child("Records").child(id).child("isBand").setValue(isBand)
+        ref.child("Records").child(id).child("isUsed").setValue(isUsed)
         for genre in genres{
             let path = "\(genre)"
             ref.child("Records").child(id).child("genres").child(path).setValue(true)
@@ -91,7 +92,7 @@ class LibraryViewModel: ObservableObject {
         }
         
         // Create new item in local library with data (leaves photo empty)
-        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, storeName: storeName, location: location)
+        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, isUsed: isUsed, storeName: storeName, location: location)
 
         // Attempt photo upload, will handle adding to db if photo available
         uploadAddPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
@@ -104,11 +105,11 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, storeName: String, location: String) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, isUsed: Bool, storeName: String, location: String) {
         // Add New Instance of Record Data to Local Library
         
         
-        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand)
+        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed)
         if storeName != ""{
             newItem.store = (storeName, location)
         }
@@ -191,7 +192,7 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Edit existing entry in db and local library, called via ShowRecordView
-    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, storeName: String, location: String){
+    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String, location: String){
 
         print("Editing Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
@@ -213,6 +214,9 @@ class LibraryViewModel: ObservableObject {
 
             self.recordLibrary[recordIndex].isBand = isBand
             self.recordDictionaryByID[id]?.isBand = isBand
+            
+            self.recordLibrary[recordIndex].isUsed = isUsed
+            self.recordDictionaryByID[id]?.isUsed = isUsed
 
             self.recordLibrary[recordIndex].genres = genres
             self.recordDictionaryByID[id]?.genres = genres
@@ -242,6 +246,7 @@ class LibraryViewModel: ObservableObject {
         ref.child("Records").child(id).child("releaseYear").setValue(releaseYear)
         ref.child("Records").child(id).child("dateAdded").setValue(dateAdded)
         ref.child("Records").child(id).child("isBand").setValue(isBand)
+        ref.child("Records").child(id).child("isUsed").setValue(isUsed)
 
         // Add new genres and deleted any removed from list by user
         if let previousGenres = self.recordDictionaryByID[id]?.genres{
@@ -346,6 +351,7 @@ class LibraryViewModel: ObservableObject {
                 let releaseYear = elementDict["releaseYear"] as! Int
                 let dateAdded = elementDict["dateAdded"] as! String
                 let isBand = elementDict["isBand"] as! Bool
+                let isUsed = elementDict["isUsed"] as! Bool
                 
                 // Set to default images
                 var coverPhoto = UIImage(named:"TakePhoto")
@@ -399,7 +405,7 @@ class LibraryViewModel: ObservableObject {
                 // Add record to local library
                 dispatchGroup.notify(queue: .main) {
                     //                    print("IN QUEUE")
-                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand,storeName: storeName, location: location)
+                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName, location: location)
                     completion()
                 }
                 childrenCount += 1
