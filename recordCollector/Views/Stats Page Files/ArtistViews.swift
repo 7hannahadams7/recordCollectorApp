@@ -97,26 +97,23 @@ struct ArtistInfoView: View {
     
     var body: some View {
         let artistBarData = viewModel.statsViewModel.topArtists.prefix(6)
-        let artistTotalData = viewModel.statsViewModel.topArtists
-        let totalArtists = artistTotalData.count
+//        let artistTotalData = viewModel.statsViewModel.topArtists
+//        let totalArtists = artistTotalData.count
         
         GeometryReader { geometry in
                 
             // Table Graphic
             VStack{
                 if !isTabExpanded{
-                    let minAmount = artistBarData.map { $0.amount }.min() ?? 1
-                    let maxAmount = artistBarData.map { $0.amount }.max() ?? 1
-                    let total = artistBarData.count
+                    let minAmount = Array(viewModel.statsViewModel.topArtists.prefix(6)).map { $0.amount }.min() ?? 1
+                    let maxAmount = Array(viewModel.statsViewModel.topArtists.prefix(6)).map { $0.amount }.max() ?? 1
+                    let total = min(6,viewModel.statsViewModel.topArtists.count)
                     ZStack{
                         VStack{
-                            ForEach(0..<min(6, artistBarData.count), id: \.self) { index in
-                                            // Use the index to access elements in the subarray
-                                let item = artistBarData[index]
-                                ArtistCollapsedBarView(artist: item.artist, amount: item.amount, color: smallDisplayColors[index%6], total: total, minAmount: minAmount, maxAmount: maxAmount)
-                                
+                            ForEach(Array(viewModel.statsViewModel.topArtists.prefix(6)).indices, id: \.self) { index in
+                                // Use the item directly
+                                ArtistCollapsedBarView(artist: viewModel.statsViewModel.topArtists[index], color: smallDisplayColors[index % 6], total: total, minAmount: minAmount, maxAmount: maxAmount)
                             }
-
                         }.padding(.vertical)
                     }.frame(width:geometry.size.width,height:geometry.size.height)
                         .background(isTabExpanded ? Color.clear: decorWhite)
@@ -125,8 +122,8 @@ struct ArtistInfoView: View {
                         .transition( .move(edge: .leading))
                 }else{
                         ScrollView{
-                            ForEach(artistTotalData.indices, id:\.self){index in
-                                ArtistDetailRowView(artistItem:artistTotalData[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: totalArtists))
+                            ForEach(viewModel.statsViewModel.topArtists.indices, id:\.self){index in
+                                ArtistDetailRowView(artistItem:viewModel.statsViewModel.topArtists[index],viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,color:fullDisplayColors[index%totalDisplayColors],positionProportion:fractionalValue(for: index, totalCount: viewModel.statsViewModel.topArtists.count))
                                 
                             }
                         }.padding(.vertical,30)
@@ -158,8 +155,7 @@ struct ArtistInfoView: View {
 
 // Individual artist row for collapsed InfoView
 struct ArtistCollapsedBarView: View{
-    var artist: String
-    var amount: Int
+    var artist: StatsNameItem
     var color: Color
     var total: Int
     var minAmount: Int
@@ -168,14 +164,14 @@ struct ArtistCollapsedBarView: View{
     var body: some View{
         GeometryReader{geometry in
 
-            let proportionalSize = CGFloat(amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.width - 100) + 100
+            let proportionalSize = CGFloat(artist.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.width - 100) + 100
             
             HStack{
                 HStack{
                     RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .trailing) {
-                        Text(artist).bold().foregroundStyle(iconWhite).padding()
+                        Text(artist.name).bold().foregroundStyle(iconWhite).padding()
                     }
-                    Text(String(amount))
+                    Text(String(artist.amount))
                     Spacer()
                 }.frame(width:proportionalSize,height:geometry.size.height).offset(x:-30)
                 Spacer()
@@ -186,7 +182,7 @@ struct ArtistCollapsedBarView: View{
 
 // Individual artist row with interactions, in InfoView when expanded
 struct ArtistDetailRowView: View {
-    var artistItem: (artist: String, amount: Int, records: [String]);
+    var artistItem: StatsNameItem
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
@@ -218,7 +214,7 @@ struct ArtistDetailRowView: View {
                     HStack{
                         ZStack{
                             RoundedRectangle(cornerRadius: 25.0).fill(color).overlay(alignment: .trailing) {
-                                Text(artistItem.artist).bold().foregroundStyle(iconWhite).padding()
+                                Text(artistItem.name).bold().foregroundStyle(iconWhite).padding()
                             }
                         }
                         Text(String(artistItem.amount)).padding()

@@ -290,7 +290,7 @@ struct RecordFieldDisplayView: View{
                         Text("Genres: ").italicSubtitleText()
                         ScrollView(.horizontal) {
                             HStack{
-                                ForEach(genreManager.genres.reversed(), id: \.self){genre in
+                                ForEach(record?.genres.reversed() ?? [], id: \.self){genre in
                                     ZStack{
                                         RoundedRectangle(cornerRadius: 5).foregroundColor(iconWhite)
                                         HStack{

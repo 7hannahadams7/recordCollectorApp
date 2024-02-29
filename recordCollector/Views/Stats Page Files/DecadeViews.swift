@@ -93,19 +93,19 @@ struct DecadeBottomChart: View{
         
         var body: some View {
             let decadeBarData = viewModel.statsViewModel.topDecades.prefix(4)
-            let decadeSortedData = viewModel.statsViewModel.topDecades.sorted(by: { $0.decade > $1.decade })
+            let decadeSortedData = viewModel.statsViewModel.topDecades.sorted(by: { $0.value > $1.value })
             GeometryReader{geometry in
                 VStack{
                     if !isTabExpanded{
                         HStack{
 
                             HStack{
-                                let total = decadeBarData.count
-                                let minAmount = decadeBarData.map { $0.amount }.min() ?? 1
-                                let maxAmount = decadeBarData.map { $0.amount }.max() ?? 1
-                                ForEach(decadeBarData.indices, id:\.self){index in
-                                    let item = decadeBarData[index]
-                                    DecadeCollapsedBarView(decade: item.decade, amount: item.amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
+                                let total = min(4,viewModel.statsViewModel.topDecades.count)
+                                let minAmount = Array(viewModel.statsViewModel.topDecades.prefix(4)).map { $0.amount }.min() ?? 1
+                                let maxAmount = Array(viewModel.statsViewModel.topDecades.prefix(4)).map { $0.amount }.max() ?? 1
+                                ForEach(Array(viewModel.statsViewModel.topDecades.prefix(4)).indices, id:\.self){index in
+//                                    let item = decadeBarData[index]
+                                    DecadeCollapsedBarView(decade: viewModel.statsViewModel.topDecades[index].value, amount: viewModel.statsViewModel.topDecades[index].amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
                                 }
                             }
 //                            Spacer()
@@ -156,7 +156,8 @@ struct DecadeBottomChart: View{
 
 // Decade bubbles, sizes and offsets adjust to create flowing display, in InfoView when expanded
 struct DecadeBubbleView: View {
-    let decadeItem: (decade: Int, amount: Int, records: [String])
+//    let decadeItem: (decade: Int, amount: Int, records: [String])
+    let decadeItem: StatsValueItem
     var color: Color
     var index: Int
     var prevAmount: Int
@@ -167,14 +168,14 @@ struct DecadeBubbleView: View {
     @Binding var infoExpanded: Bool
 
     var body: some View {
-        let decade = decadeItem.decade
+        let decade = decadeItem.value
         let amount = decadeItem.amount
         
         let radius = CGFloat(amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (width/6) + 50
         let shift = width/2 - radius - 10
         let offset = (index%2 == 0) ? shift : -1 * shift
 
-        let height = 2 * radius - 15 * (CGFloat(maxAmount/amount)-1)
+        let height = 3*radius/2 + radius * CGFloat(amount/maxAmount)
         
         ZStack {
             Circle()
@@ -212,10 +213,10 @@ struct DecadeBubbleInfoView: View{
                     VStack{
                         ForEach(yearsInDecade.indices, id:\.self){index in
                             VStack(alignment:.leading){
-                                Text(String(yearsInDecade[index].0))
+                                Text(String(yearsInDecade[index].value))
                                 ScrollView(.horizontal){
                                     HStack{
-                                        ForEach(yearsInDecade[index].2, id:\.self){recordID in
+                                        ForEach(yearsInDecade[index].records, id:\.self){recordID in
                                             if let record = viewModel.recordDictionaryByID[recordID]{
                                                 CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)
                                             }

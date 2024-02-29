@@ -101,7 +101,7 @@ class LibraryViewModel: ObservableObject {
         print("Added New Record, ID #: ", id)
         
         self.historyViewModel.uploadNewHistoryItem(type: "Add", recordID: id)
-        self.statsViewModel.refreshData()
+        self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
@@ -273,7 +273,7 @@ class LibraryViewModel: ObservableObject {
 
         print("Updated Record, ID #: ", id)
         self.historyViewModel.uploadNewHistoryItem(type: "Edit", recordID: id)
-        self.statsViewModel.refreshData()
+        self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
     }
     
     // Delete entry locally and from db, and images from storage, called via ShowRecordView
@@ -315,8 +315,7 @@ class LibraryViewModel: ObservableObject {
             self.recordDictionaryByID[id] = nil
         }
         
-        self.statsViewModel.refreshData()
-    
+        self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
     }
     
     
@@ -330,17 +329,17 @@ class LibraryViewModel: ObservableObject {
 
         allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
             let dispatchGroup = DispatchGroup()
-
+            
             // COMMENT THIS FOR FULL BUILD
             let maxChildrenToFetch = 6
             var childrenCount = 0
             
             for child in snapshot.children {
                 // COMMENT FOR FULL BUILD
-//                guard childrenCount < maxChildrenToFetch else {
-//                    // Break the loop if the maximum number of children is reached
-//                    break
-//                }
+                //                guard childrenCount < maxChildrenToFetch else {
+                //                    // Break the loop if the maximum number of children is reached
+                //                    break
+                //                }
                 
                 let snap = child as! DataSnapshot
                 let elementDict = snap.value as! [String: Any]
@@ -370,12 +369,11 @@ class LibraryViewModel: ObservableObject {
                 
                 var storeName: String = ""
                 var location: String = ""
-//                var boughtFrom: [String: String] = ["storeName": "", "location": ""]
+                //                var boughtFrom: [String: String] = ["storeName": "", "location": ""]
                 
                 if let boughtFromDict = elementDict["boughtFrom"] as? [String: String]{
                     storeName = boughtFromDict["storeName"]!
                     location = boughtFromDict["location"]!
-                    print(storeName, location)
                 }
                 
                 // Pull cover image from storage
@@ -406,10 +404,14 @@ class LibraryViewModel: ObservableObject {
                 dispatchGroup.notify(queue: .main) {
                     //                    print("IN QUEUE")
                     self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName, location: location)
-                    completion()
                 }
                 childrenCount += 1
             }
+            
+            dispatchGroup.notify(queue: .main) {
+                completion()
+            }
+            
         })
     }
     
@@ -421,12 +423,12 @@ class LibraryViewModel: ObservableObject {
         self.recordDictionaryByID = [:]
         self.fetchData{
             self.sortRecords()
+            self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)     
             self.isRefreshing = false
         }
         self.historyViewModel.fetchData {
             print("Fetching history")
         }
-        self.statsViewModel.refreshData()
     }
     
     // Iterate through library, gather all Genres and Artists in library for Filters

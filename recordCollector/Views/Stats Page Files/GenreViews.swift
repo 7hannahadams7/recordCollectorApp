@@ -72,8 +72,6 @@ struct GenreInfoView: View {
     @State private var offset = 0.0
     
     var body: some View {
-        let genrePieData = viewModel.statsViewModel.topGenres.prefix(6)
-        let genreTotalData = viewModel.statsViewModel.topGenres
         
         GeometryReader { geometry in
             let infoRowWidth: CGFloat = geometry.size.width/2-10
@@ -83,26 +81,28 @@ struct GenreInfoView: View {
                 if !isTabExpanded{
                     // Collapsed Genre Info
                     HStack{
-                        let cols = Int(genrePieData.count / 3 + min(genrePieData.count % 3, 1))
-                        ForEach(0..<cols, id:\.self) { chunkIndex in
-                            // Iterate through top genres in chunks of 3, adjust to fewer than 3 genres used
-                            
+                        let count = min(6, viewModel.statsViewModel.topGenres.count)
+                        let cols = Int(ceil(Double(count) / 3.0))
+
+                        ForEach(0..<cols, id: \.self) { chunkIndex in
+//                            // Iterate through top genres in chunks of 3, adjust to fewer than 3 genres used
+//                            
                             VStack (alignment:.leading){
-                                // Iterate through elements in the current chunk
-                                let rows = min(3, genrePieData.count - chunkIndex * 3)
-                                
-                                ForEach(0..<rows, id:\.self) { index in
-                                    let i = index+3*chunkIndex
+//                                // Iterate through elements in the current chunk
+                                ForEach(0..<min(3, count - chunkIndex * 3), id: \.self) { index in
+                                    let i = index + 3 * chunkIndex
                                     HStack(alignment:.center){
                                         ZStack{
                                             Circle().fill(smallDisplayColors[i]).frame(width:infoIconSize,height:infoIconSize)
-                                            Text(String(genrePieData[i].amount)).foregroundStyle(iconWhite)
+                                            Text(String(viewModel.statsViewModel.topGenres[i].amount)).foregroundStyle(iconWhite)
                                         }
-                                        Text(genrePieData[i].genre).foregroundStyle(recordBlack)
+                                        Text(viewModel.statsViewModel.topGenres[i].name).foregroundStyle(recordBlack)
                                     }
                                 }
                             }.padding().frame(width:infoRowWidth,height:geometry.size.height)
                         }
+
+
                     }
                     .id(1)
                     .animation(.easeInOut(duration:0.5),value: true)
@@ -110,8 +110,8 @@ struct GenreInfoView: View {
                 }else{
                     //Expanded Genre Info
                     ScrollView{
-                        ForEach(genreTotalData.indices, id: \.self) {index in
-                            GenreDetailRowView(genreItem:genreTotalData[index],viewModel:viewModel,spotifyController:spotifyController, genreManager: genreManager,  color:fullDisplayColors[index%totalDisplayColors])
+                        ForEach(viewModel.statsViewModel.topGenres.indices, id: \.self) {index in
+                            GenreDetailRowView(genreItem:viewModel.statsViewModel.topGenres[index],viewModel:viewModel,spotifyController:spotifyController, genreManager: genreManager,  color:fullDisplayColors[index%totalDisplayColors])
                         }
                     }.padding(.vertical,30)
                         .id(2)
@@ -133,7 +133,7 @@ struct GenreInfoView: View {
 
 // Individual genre row with interactions, in InfoView when expanded
 struct GenreDetailRowView: View {
-    var genreItem: (genre: String, amount: Int, records: [String])
+    var genreItem: StatsNameItem
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
@@ -164,7 +164,7 @@ struct GenreDetailRowView: View {
                 }){
                     Circle().foregroundColor(color).scaledToFit().padding()
                     HStack {
-                        Text(genreItem.genre).bold()
+                        Text(genreItem.name).bold()
                         Spacer()
                         Text(String(genreItem.amount))
                     }.padding(.all,10.0)

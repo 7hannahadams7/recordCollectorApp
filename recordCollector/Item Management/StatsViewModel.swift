@@ -11,152 +11,74 @@ import FirebaseDatabase
 import MapKit
 
 class StatsViewModel: ObservableObject {
-//    @ObservedObject var viewModel: LibraryViewModel
+    @Published var topArtists: [StatsNameItem] = []
+    @Published var topGenres: [StatsNameItem] = []
+    @Published var topDecades: [StatsValueItem] = []
+    @Published var topYears: [StatsValueItem] = []
     
-    @Published var topArtists: [(artist: String, amount: Int, records: [String])] = []
-    @Published var topGenres: [(genre: String, amount: Int, records: [String])] = []
-    @Published var topDecades: [(decade: Int, amount: Int, records: [String])] = []
-    @Published var topYears: [(year: Int, amount: Int, records: [String])] = []
     @Published var topStores: [RecordStore] = []
+    
     @Published var usedTotal: Int = 0
     @Published var onlineTotal: Int = 0
     
-    func fetchUsedDistribution(){
-        // Firebase query to get top artists and their record counts
-        let recordsRef = Database.database().reference().child("Records")
-
-        recordsRef.observeSingleEvent(of: .value) { snapshot in
-            var usedCount = 0
-
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-
-                let recordID = snap.key
-                if let isUsed = elementDict["isUsed"] as? Bool {
-                    if isUsed{
-                        usedCount += 1
-                    }
-                }
-            }
-            self.usedTotal = usedCount
-        }
-    }
-
-    func fetchTopArtists() {
-        // Firebase query to get top artists and their record counts
-        let recordsRef = Database.database().reference().child("Records")
-
-        recordsRef.observeSingleEvent(of: .value) { snapshot in
-            var artistData: [(String, Int, [String])] = []
-
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-
-                let recordID = snap.key
-                if let artist = elementDict["artist"] as? String {
-                    if let index = artistData.firstIndex(where: { $0.0 == artist }) {
-                        // Artist already exists in the array, update count and add record ID
-                        artistData[index].1 += 1
-                        artistData[index].2.append(recordID)
-                    } else {
-                        // New artist, add to the array
-                        artistData.append((artist, 1, [recordID]))
-                    }
-                }
-            }
-
-            // Sort artists by count in descending order
-            self.topArtists = artistData.sorted { $0.1 > $1.1 }
-        }
-    }
-    
-    func fetchTopGenres(){
-        // Firebase query to get top artists and their record counts
-        let recordsRef = Database.database().reference().child("Records")
-
-        recordsRef.observeSingleEvent(of: .value) { snapshot in
-            var genreData: [(String, Int, [String])] = []
-
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-
-                let recordID = snap.key
-
-                // Check if "genres" key exists in the dictionary
-                if let genresDict = elementDict["genres"] as? [String: Bool] {
-                    // Iterate through the keys of the genres dictionary
-                    for (genre, value) in genresDict {
-                        // Check if the value is true
-                        if value {
-                            if let index = genreData.firstIndex(where: { $0.0 == genre }) {
-                                // Genre already exists in the array, update count and add record ID
-                                genreData[index].1 += 1
-                                genreData[index].2.append(recordID)
-                            } else {
-                                // New artist, add to the array
-                                genreData.append((genre, 1, [recordID]))
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Sort artists by count in descending order
-            self.topGenres = genreData.sorted { $0.1 > $1.1 }
-        }
-
-    }
-    
-    func fetchTopYears(){
-        // Firebase query to get top years and record counts
-        let recordsRef = Database.database().reference().child("Records")
-
-        recordsRef.observeSingleEvent(of: .value) { snapshot in
-            var decadeData: [(Int, Int, [String])] = []
-            var yearlyData: [(Int, Int, [String])] = []
-
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-
-                if let releaseYear = elementDict["releaseYear"] as? Int{
-                    let recordID = snap.key
-                    if let index = yearlyData.firstIndex(where: { $0.0 == releaseYear}){
-//                        Artist already exists in the array, update count and add record ID
-                        yearlyData[index].1 += 1
-                        yearlyData[index].2.append(recordID)
-                    } else {
-                        // New artist, add to the array
-                        yearlyData.append((releaseYear, 1, [recordID]))
-                    }
-                    
-                    let decade = (releaseYear/10)*10
-                    if let index = decadeData.firstIndex(where: { $0.0 == decade}){
-//                         Artist already exists in the array, update count and add record ID
-                        decadeData[index].1 += 1
-                        decadeData[index].2.append(recordID)
-                        //                        artistData[index].2.append(recordID)
-                    } else {
-                        // New artist, add to the array
-                        decadeData.append((decade, 1, [recordID]))
-                    }
-                    
-                }
-
-            }
-
-            // Sort artists by count in descending order
-            self.topDecades = decadeData.sorted { $0.1 > $1.1 }
-            self.topYears = yearlyData.sorted { $0.0 < $1.0 }
-            
-            
-        }
+    func pullStatsFromLibrary(recordLibrary: [RecordItem]){
+        print("FETCHING TOP ARTISTS")
+        var artistData: [StatsNameItem] = []
+        var genreData: [StatsNameItem] = []
+        var decadeData: [StatsValueItem] = []
+        var yearlyData: [StatsValueItem] = []
+        var usedCount = 0
         
+        for record in recordLibrary{
+
+            let recordID = record.id
+            if let index = artistData.firstIndex(where: { $0.name == record.artist }) {
+                // Artist already exists in the array, update count and add record ID
+                artistData[index].amount += 1
+                artistData[index].records.append(recordID)
+            } else {
+                // New artist, add to the array
+                artistData.append(StatsNameItem(id:UUID(),name: record.artist, amount: 1, records: [recordID]))
+            }
+            
+            for genre in record.genres{
+                if let index = genreData.firstIndex(where: {$0.name == genre}){
+                    genreData[index].amount += 1
+                    genreData[index].records.append(recordID)
+                }else{
+                    genreData.append(StatsNameItem(id:UUID(),name:genre,amount:1,records:[recordID]))
+                }
+            }
+            
+            if let index = yearlyData.firstIndex(where: { $0.value == record.releaseYear}){
+                yearlyData[index].amount += 1
+                yearlyData[index].records.append(recordID)
+            } else {
+                yearlyData.append(StatsValueItem(id:UUID(),value:record.releaseYear, amount: 1, records: [recordID]))
+            }
+
+            let decade = (record.releaseYear/10)*10
+            if let index = decadeData.firstIndex(where: { $0.value == decade}){
+                decadeData[index].amount += 1
+                decadeData[index].records.append(recordID)
+            } else {
+                decadeData.append(StatsValueItem(id:UUID(),value:decade, amount: 1, records: [recordID]))
+            }
+            
+            if record.isUsed{
+                usedCount += 1
+            }
+            
+            
+        }
+        self.topArtists = artistData.sorted { $0.amount > $1.amount }
+        self.topGenres = genreData.sorted { $0.amount > $1.amount }
+        self.topDecades = decadeData.sorted { $0.amount > $1.amount }
+        self.topYears = yearlyData.sorted { $0.value < $1.value }
+        self.usedTotal = usedCount
+
     }
-    
+
     func forwardGeocoding(address: String, completion: @escaping (CLLocation?) -> Void) {
         let geocoder = CLGeocoder()
 
@@ -177,18 +99,16 @@ class StatsViewModel: ObservableObject {
         }
     }
     
-    func fetchYearsByDecade(decade: Int) -> [(Int, Int, [String])]{
+    func fetchYearsByDecade(decade: Int) -> [StatsValueItem]{
         // Return all instances of records within the specified decade
          
-        var yearsInDecade: [(Int, Int, [String])] = []
+        var yearsInDecade: [StatsValueItem] = []
         for year in topYears{
-            if (year.0 / 10) * 10 == decade{
+            if (year.value / 10) * 10 == decade{
                 yearsInDecade.append(year)
             }
         }
-
         return yearsInDecade
-
     }
     
     func fetchStoreCoordinates() {
@@ -237,21 +157,9 @@ class StatsViewModel: ObservableObject {
         }
     }
     
-    
-    init() {
-        fetchTopArtists()
-        fetchTopGenres()
-        fetchTopYears()
+    func refreshData(recordLibrary:[RecordItem]){
+        pullStatsFromLibrary(recordLibrary:recordLibrary)
         fetchStoreCoordinates()
-        fetchUsedDistribution()
-    }
-    
-    func refreshData(){
-        fetchTopArtists()
-        fetchTopGenres()
-        fetchTopYears()
-        fetchStoreCoordinates()
-        fetchUsedDistribution()
     }
     
 }
