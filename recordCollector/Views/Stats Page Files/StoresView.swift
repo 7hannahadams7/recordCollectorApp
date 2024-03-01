@@ -118,6 +118,7 @@ struct StoresInfoView: View {
                 }
                 return 0
             }
+            
             // Table Graphic
             VStack{
                 if !isTabExpanded{
@@ -173,32 +174,15 @@ struct StoresInfoView: View {
                     }.padding(10).animation(.easeInOut(duration:0.5),value: true)
                         .transition(.move(edge:.leading))
                 }else{
-                    GeometryReader{geometry in
+                    GeometryReader{geometry2 in
                         ZStack(alignment:.center){
-                            Map(position: $camera) {
-                                ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
-                                    let store = viewModel.storeViewModel.topStores[index]
-                                    if let loc = store.location{
-                                        Annotation(coordinate: loc) {
-                                            ZStack{
-                                                Circle().fill(fullDisplayColors[index%totalDisplayColors])
-                                                Text("\(store.recordIDs.count)").foregroundStyle(iconWhite).padding()
-                                            }.onTapGesture{
-                                                tapped = store.name
-                                                infoExpanded = true
-                                                infoColor = fullDisplayColors[index%totalDisplayColors]
-                                            }
-                                        } label: {
-                                            Text(store.name)
-                                        }
-                                    }
-                                }
-                            }
+                            
+                                MapView(viewModel: viewModel, camera: $camera, tapped: $tapped, infoExpanded: $infoExpanded, infoColor: $infoColor)
                             StoresMenuView(viewModel:viewModel,isMenuExpanded: $menuExpanded, camera: $camera,infoExpanded:$infoExpanded,tapped:$tapped)
                             if infoExpanded{
                                 ZStack(alignment:.topLeading){
                                     LocationInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,infoExpanded:$infoExpanded, storeName:tapped,color:infoColor)
-                                }.padding().frame(width: geometry.size.width, height: 3*geometry.size.height/4)
+                                }.padding().frame(width: geometry2.size.width, height: 3*geometry2.size.height/4)
                             }
                         }.animation(.easeInOut(duration:0.5),value:isTabExpanded)
                     }.padding(30)
@@ -214,6 +198,36 @@ struct StoresInfoView: View {
                 })
         }
 
+    }
+}
+
+struct MapView: View{
+    @ObservedObject var viewModel: LibraryViewModel
+    @Binding var camera: MapCameraPosition
+    @Binding var tapped: String
+    @Binding var infoExpanded: Bool
+    @Binding var infoColor: Color
+    
+    var body: some View{
+        Map(position: $camera) {
+            ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
+                let store = viewModel.storeViewModel.topStores[index]
+                if let loc = store.location{
+                    Annotation(coordinate: loc) {
+                        ZStack{
+                            Circle().fill(fullDisplayColors[index%totalDisplayColors])
+                            Text("\(store.recordIDs.count)").foregroundStyle(iconWhite).padding()
+                        }.onTapGesture{
+                            tapped = store.name
+                            infoExpanded = true
+                            infoColor = fullDisplayColors[index%totalDisplayColors]
+                        }
+                    } label: {
+                        Text(store.name)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -280,13 +294,11 @@ struct LocationInfoView: View{
                     }.padding(.horizontal,5)
                     if displayAddressField{
                         VStack{
-                            ZStack{
-                                TextEditor(text: $address)
-                                .onAppear{
-                                    address = store.addressString
-                                }
+                            TextEditor(text: $address)
+                            .onAppear{
+                                address = store.addressString
                             }
-                        }.padding()
+                        }.padding().background(color.opacity(0.3)).clipShape(RoundedRectangle(cornerRadius: 10))
                     }else{
                         ScrollView{
                             VStack{
@@ -304,7 +316,7 @@ struct LocationInfoView: View{
                                     }
                                 }
                             }.padding(10)
-                        }.background(color.opacity(0.3))
+                        }.background(color.opacity(0.3)).clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                 }.padding()
             }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)

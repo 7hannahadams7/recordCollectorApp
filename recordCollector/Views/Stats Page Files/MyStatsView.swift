@@ -83,6 +83,4 @@ struct MyStatsView_Previews: PreviewProvider {
         MyStatsView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager()).onAppear{testViewModel.refreshData()}
     }
 }
-//let testViewModel = LibraryViewModel()
-//let testStatModel = StatsViewModel(viewModel:testViewModel)
 

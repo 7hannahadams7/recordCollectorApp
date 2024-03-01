@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 // Takes RecordItem and creates interactive cover photo of size: size that triggers a ShowRecordView popup
 struct CoverPhotoToPopupView: View{
     @ObservedObject var viewModel: LibraryViewModel

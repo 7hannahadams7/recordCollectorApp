@@ -222,7 +222,7 @@ struct DecadeBubbleInfoView: View{
                                             }
                                         }
                                     }.padding()
-                                }.background(fullDisplayColors[index%totalDisplayColors].opacity(0.3))
+                                }.background(fullDisplayColors[index%totalDisplayColors].opacity(0.3)).clipShape(RoundedRectangle(cornerRadius: 10))
                             }
                         }
                     }
