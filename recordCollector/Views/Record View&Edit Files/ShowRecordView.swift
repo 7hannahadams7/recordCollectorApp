@@ -132,7 +132,10 @@ struct ShowRecordView: View {
 
                                     // Save Changes Button
                                     Button(action:{
-                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newCoverPhoto: newCoverPhoto, newDiskPhoto: newDiskPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand,isUsed:isUsed,storeName:storeName,location:location)
+                                        viewModel.editRecordEntry(id: id, recordName: recordName, artistName: artistName, releaseYear: releaseYear, newCoverPhoto: newCoverPhoto, newDiskPhoto: newDiskPhoto, genres: genreManager.genres, dateAdded: Date.dateToString(date: dateAdded),isBand:isBand,isUsed:isUsed,storeName:storeName)
+                                        if viewModel.storeViewModel.allStores[storeName] == nil{
+                                            viewModel.storeViewModel.addNewStore(storeName: storeName, address: location,id:id)
+                                        }
                                         viewModel.resetPhoto()
                                         editingMode.toggle()
                                     }){

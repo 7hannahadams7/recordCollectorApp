@@ -12,7 +12,7 @@ import FirebaseDatabase
 class HistoryViewModel: ObservableObject {
     @Published var allHistory = [HistoryItem]()
     
-    let maxEntries = 50 // Maximum allowed history entries
+    let maxEntries = 150 // Maximum allowed history entries
     
     private func addNewHistoryItem(id:String,date:Date,type:String,recordID:String){
         let newItem = HistoryItem(id:id,date:date,type:type,recordID:recordID)
@@ -103,9 +103,9 @@ class HistoryViewModel: ObservableObject {
     // Fetch data from db and store in local library
     func fetchData(completion: @escaping () -> Void) {
         print("PERFORMING HISTORY FETCH")
-        let allRecords = Database.database().reference().child("History")
+        let allHistory = Database.database().reference().child("History")
 
-        allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
+        allHistory.observeSingleEvent(of: .value, with: { [self] snapshot in
             let dispatchGroup = DispatchGroup()
             
             for child in snapshot.children {

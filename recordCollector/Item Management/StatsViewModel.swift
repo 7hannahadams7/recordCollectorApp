@@ -22,7 +22,6 @@ class StatsViewModel: ObservableObject {
     @Published var onlineTotal: Int = 0
     
     func pullStatsFromLibrary(recordLibrary: [RecordItem]){
-        print("FETCHING TOP ARTISTS")
         var artistData: [StatsNameItem] = []
         var genreData: [StatsNameItem] = []
         var decadeData: [StatsValueItem] = []
@@ -111,55 +110,55 @@ class StatsViewModel: ObservableObject {
         return yearsInDecade
     }
     
-    func fetchStoreCoordinates() {
-        let recordsRef = Database.database().reference().child("Records")
-
-        recordsRef.observeSingleEvent(of: .value) { snapshot in
-            var allStores: [RecordStore] = []
-            var onlineCount: Int = 0
-            let group = DispatchGroup()
-
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-
-                if let boughtFromDict = elementDict["boughtFrom"] as? [String: String],
-                   let storeName = boughtFromDict["storeName"],
-                   let location = boughtFromDict["location"] {
-
-                    if location == "Online"{
-                        onlineCount += 1
-                    }
-                    group.enter()
-
-                    self.forwardGeocoding(address: location) { geocodedLocation in
-                        defer {
-                            group.leave()
-                        }
-
-                        // Check if the storeName already exists in allStores
-                        if let existingStoreIndex = allStores.firstIndex(where: { $0.name == storeName }) {
-                            // Store name already exists, append record ID to the existing item
-                            allStores[existingStoreIndex].recordIDs.append(snap.key)
-                        } else {
-                            // Store name doesn't exist, create a new RecordStore item
-                            let recordStore = RecordStore(id: UUID().uuidString, name: storeName, addressString: location, location: geocodedLocation?.coordinate, recordIDs: [snap.key])
-                            allStores.append(recordStore)
-                        }
-                    }
-                }
-            }
-
-            group.notify(queue: .main) {
-                self.topStores = allStores.sorted { $0.recordIDs.count > $1.recordIDs.count }
-                self.onlineTotal = onlineCount
-            }
-        }
-    }
+//    func fetchStoreCoordinates() {
+//        let recordsRef = Database.database().reference().child("Records")
+//
+//        recordsRef.observeSingleEvent(of: .value) { snapshot in
+//            var allStores: [RecordStore] = []
+//            var onlineCount: Int = 0
+//            let group = DispatchGroup()
+//
+//            for child in snapshot.children {
+//                let snap = child as! DataSnapshot
+//                let elementDict = snap.value as! [String: Any]
+//
+//                if let boughtFromDict = elementDict["boughtFrom"] as? [String: String],
+//                   let storeName = boughtFromDict["storeName"],
+//                   let location = boughtFromDict["location"] {
+//
+//                    if location == "Online"{
+//                        onlineCount += 1
+//                    }
+//                    group.enter()
+//
+//                    self.forwardGeocoding(address: location) { geocodedLocation in
+//                        defer {
+//                            group.leave()
+//                        }
+//
+//                        // Check if the storeName already exists in allStores
+//                        if let existingStoreIndex = allStores.firstIndex(where: { $0.name == storeName }) {
+//                            // Store name already exists, append record ID to the existing item
+////                            allStores[existingStoreIndex].recordIDs.append(snap.key)
+//                        } else {
+//                            // Store name doesn't exist, create a new RecordStore item
+//                            let recordStore = RecordStore(id: UUID().uuidString, name: storeName, addressString: location, location: geocodedLocation?.coordinate, recordIDs: [snap.key])
+//                            allStores.append(recordStore)
+//                        }
+//                    }
+//                }
+//            }
+//
+//            group.notify(queue: .main) {
+//                self.topStores = allStores.sorted { $0.recordIDs.count > $1.recordIDs.count }
+//                self.onlineTotal = onlineCount
+//            }
+//        }
+//    }
     
     func refreshData(recordLibrary:[RecordItem]){
         pullStatsFromLibrary(recordLibrary:recordLibrary)
-        fetchStoreCoordinates()
+//        fetchStoreCoordinates()
     }
     
 }

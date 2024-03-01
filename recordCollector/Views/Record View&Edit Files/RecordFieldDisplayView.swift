@@ -35,6 +35,10 @@ struct RecordFieldDisplayView: View{
     
     @State private var isDatePickerVisible: Bool = false
     
+    var locationFieldDisabled: Bool{
+        return viewModel.storeViewModel.allStores[storeName] != nil
+    }
+    
     var showGenreList: Bool {
         // Show genre options to choose from if user is typing and there are genres available
         return !newGenre.isEmpty && !filteredGenres.isEmpty
@@ -60,7 +64,7 @@ struct RecordFieldDisplayView: View{
     var filteredStores: [String] {
         let lowercaseInput = storeName.lowercased()
         
-        let matchingItems = viewModel.fullStores.keys.filter { store in
+        let matchingItems = viewModel.storeViewModel.allStores.keys.filter { store in
             let words = store.lowercased().components(separatedBy: " ")
             return words.contains { $0.hasPrefix(lowercaseInput) }
         }
@@ -247,14 +251,14 @@ struct RecordFieldDisplayView: View{
                         TextField("Store", text: $storeName)
                         Divider()
                         ZStack{
-                            TextField("Location", text: $location)
+                            TextField("Location", text: $location).disabled(locationFieldDisabled).foregroundStyle(locationFieldDisabled ? Color.gray : Color.black)
                             // Dropdown list of selectable genres
                             if showStoreList {
                                 List{
                                     ForEach(filteredStores, id: \.self) { store in
                                         Button(action: {
                                             storeName = store
-                                            location = viewModel.fullStores[store]!
+                                            location = viewModel.storeViewModel.allStores[store]!.addressString
                                         }) {
                                             Text(store).font(.system(size:15)).clipped()
                                         }
@@ -316,8 +320,8 @@ struct RecordFieldDisplayView: View{
                         HStack(alignment:.top){
                             Text("Bought From:").subtitleText().padding(.trailing,5).frame(width:85,alignment:.leading)
                             VStack(alignment:.leading){
-                                Text(record?.store?.0 ?? "").subtitleText()
-                                Text(record?.store?.1 ?? "").italicSubtitleText()
+                                Text(record?.store ?? "").subtitleText()
+                                Text(viewModel.storeViewModel.allStores[record?.store ?? ""]?.addressString ?? "").italicSubtitleText()
                             }
                             Spacer()
                         }
@@ -334,7 +338,8 @@ struct RecordFieldDisplayView: View{
                 isBand = record?.isBand ?? false
                 isUsed = record?.isUsed ?? false
                 genreManager.genres = record?.genres ?? []
-                (storeName,location) = record?.store ?? ("","")
+                storeName = record?.store ?? ""
+                location = viewModel.storeViewModel.allStores[record?.store ?? ""]?.addressString ?? ""
             }
             .onChange(of: editingMode) { _, _ in
                 genreManager.genres = record?.genres ?? []

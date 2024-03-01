@@ -13,5 +13,6 @@ struct RecordStore: Identifiable {
     var name: String
     var addressString: String
     var location: CLLocationCoordinate2D?
-    var recordIDs: [String]
+    var recordIDs: Set<String> = Set<String>()
+//    var recordIDs: [String] = []
 }

@@ -15,12 +15,13 @@ class LibraryViewModel: ObservableObject {
     @Published var recordDictionaryByID: [String: RecordItem] = [:]
     
     @ObservedObject var historyViewModel = HistoryViewModel()
+    @ObservedObject var storeViewModel = StoreViewModel()
     @ObservedObject var statsViewModel = StatsViewModel()
     
     @Published var fullGenres = Set<String>()
     @Published var fullArtists = Set<String>()
-    @Published var fullStores: [String:String] = [:]
-    @Published var fullLocations = Set<String>()
+//    @Published var fullStores: [String:String] = [:]
+//    @Published var fullLocations = Set<String>()
     
     @Published var isImagePickerPresented: Bool = false
     @Published var capturedCoverImage: UIImage? = nil
@@ -69,7 +70,7 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Record Updating/Init
 
     // Upload new entry to database and local library, called via AddRecordView
-    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String, location: String){
+    func uploadRecord(recordName: String, artistName: String, releaseYear: Int, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String){
         // UUID of entry
         let id = UUID().uuidString
         
@@ -87,12 +88,11 @@ class LibraryViewModel: ObservableObject {
             ref.child("Records").child(id).child("genres").child(path).setValue(true)
         }
         if storeName != ""{
-            ref.child("Records").child(id).child("boughtFrom").child("storeName").setValue(storeName)
-            ref.child("Records").child(id).child("boughtFrom").child("location").setValue(location)
+            ref.child("Records").child(id).child("storeName").setValue(storeName)
         }
         
         // Create new item in local library with data (leaves photo empty)
-        addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, isUsed: isUsed, storeName: storeName, location: location)
+        self.addNewRecord(id: id, name: recordName, artist: artistName, releaseYear: releaseYear, genres: genres, dateAdded: dateAdded, isBand: isBand, isUsed: isUsed, storeName: storeName)
 
         // Attempt photo upload, will handle adding to db if photo available
         uploadAddPhoto(id: id, image: self.capturedCoverImage,type:"Cover")
@@ -102,16 +102,20 @@ class LibraryViewModel: ObservableObject {
         
         self.historyViewModel.uploadNewHistoryItem(type: "Add", recordID: id)
         self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
+        self.storeViewModel.refreshStoreDistribution(recordLibrary:self.recordLibrary)
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, isUsed: Bool, storeName: String, location: String) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, isUsed: Bool, storeName: String) {
         // Add New Instance of Record Data to Local Library
         
         
         var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed)
         if storeName != ""{
-            newItem.store = (storeName, location)
+            newItem.store = storeName
+            if self.storeViewModel.allStores[storeName] != nil{
+                self.storeViewModel.allStores[storeName]?.recordIDs.insert(id)
+            }
         }
         
         // Add to array for library sorting, add to dictionary for fetching
@@ -123,11 +127,7 @@ class LibraryViewModel: ObservableObject {
         for genre in genres{
             fullGenres.insert(genre)
         }
-        
-        if storeName != ""{
-            fullStores[storeName] = location
-            fullLocations.insert(location)
-        }
+
     }
     
     // Upload photo to storage, link to db, add to local library entry, called in uploads and edits
@@ -192,7 +192,7 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Edit existing entry in db and local library, called via ShowRecordView
-    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String, location: String){
+    func editRecordEntry(id: String,recordName: String, artistName: String, releaseYear: Int, newCoverPhoto: Bool, newDiskPhoto: Bool, genres: [String], dateAdded: String, isBand: Bool, isUsed: Bool, storeName: String){
 
         print("Editing Entry: ", id)
         let ref: DatabaseReference! = Database.database().reference()
@@ -222,8 +222,8 @@ class LibraryViewModel: ObservableObject {
             self.recordDictionaryByID[id]?.genres = genres
             
             if storeName != ""{
-                self.recordLibrary[recordIndex].store = (storeName,location)
-                self.recordDictionaryByID[id]?.store = (storeName,location)
+                self.recordLibrary[recordIndex].store = storeName
+                self.recordDictionaryByID[id]?.store = storeName
             }
             
             // Re-sort with new edited elements
@@ -264,8 +264,7 @@ class LibraryViewModel: ObservableObject {
         }
         
         if storeName != ""{
-            ref.child("Records").child(id).child("boughtFrom").child("storeName").setValue(storeName)
-            ref.child("Records").child(id).child("boughtFrom").child("location").setValue(location)
+            ref.child("Records").child(id).child("storeName").setValue(storeName)
         }
         
         // Reset and re-gather all filter options when one is edited
@@ -274,6 +273,7 @@ class LibraryViewModel: ObservableObject {
         print("Updated Record, ID #: ", id)
         self.historyViewModel.uploadNewHistoryItem(type: "Edit", recordID: id)
         self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
+        self.storeViewModel.refreshStoreDistribution(recordLibrary:self.recordLibrary)
     }
     
     // Delete entry locally and from db, and images from storage, called via ShowRecordView
@@ -316,137 +316,7 @@ class LibraryViewModel: ObservableObject {
         }
         
         self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
-    }
-    
-    
-    // MARK: - Library Data Initializing (Fetching, Local Libraries, etc.)
-    
-    // Fetch data from db and store in local library
-    private func fetchData(completion: @escaping () -> Void) {
-        print("PERFORMING FETCH")
-        let allRecords = Database.database().reference().child("Records")
-        let storageRef = Storage.storage().reference()
-
-        allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
-            let dispatchGroup = DispatchGroup()
-            
-            // COMMENT THIS FOR FULL BUILD
-            let maxChildrenToFetch = 6
-            var childrenCount = 0
-            
-            for child in snapshot.children {
-                // COMMENT FOR FULL BUILD
-                //                guard childrenCount < maxChildrenToFetch else {
-                //                    // Break the loop if the maximum number of children is reached
-                //                    break
-                //                }
-                
-                let snap = child as! DataSnapshot
-                let elementDict = snap.value as! [String: Any]
-                
-                let artist = elementDict["artist"] as! String
-                
-                let name = elementDict["name"] as! String
-                let releaseYear = elementDict["releaseYear"] as! Int
-                let dateAdded = elementDict["dateAdded"] as! String
-                let isBand = elementDict["isBand"] as! Bool
-                let isUsed = elementDict["isUsed"] as! Bool
-                
-                // Set to default images
-                var coverPhoto = UIImage(named:"TakePhoto")
-                var discPhoto = UIImage(named:"TakePhoto")
-                
-                var genres: [String] = []
-                
-                // Pull genres to array
-                if let genresDict = elementDict["genres"] as? [String: Bool] {
-                    for (genre, value) in genresDict {
-                        if value {
-                            genres.append(genre)
-                        }
-                    }
-                }
-                
-                var storeName: String = ""
-                var location: String = ""
-                //                var boughtFrom: [String: String] = ["storeName": "", "location": ""]
-                
-                if let boughtFromDict = elementDict["boughtFrom"] as? [String: String]{
-                    storeName = boughtFromDict["storeName"]!
-                    location = boughtFromDict["location"]!
-                }
-                
-                // Pull cover image from storage
-                if let im = elementDict["imageURL"] {
-                    let fileRef = storageRef.child(im as! String)
-                    dispatchGroup.enter()
-                    fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
-                        if error == nil, let data = data {
-                            coverPhoto = UIImage(data: data)
-                        }
-                        dispatchGroup.leave()
-                    })
-                }
-                
-                // Pull disk image from storage
-                if let im = elementDict["discImageURL"] {
-                    let fileRef = storageRef.child(im as! String)
-                    dispatchGroup.enter()
-                    fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
-                        if error == nil, let data = data {
-                            discPhoto = UIImage(data: data)
-                        }
-                        dispatchGroup.leave()
-                    })
-                }
-                
-                // Add record to local library
-                dispatchGroup.notify(queue: .main) {
-                    //                    print("IN QUEUE")
-                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName, location: location)
-                }
-                childrenCount += 1
-            }
-            
-            dispatchGroup.notify(queue: .main) {
-                completion()
-            }
-            
-        })
-    }
-    
-    // Reset local libraries and re-fetch and sort data
-    func refreshData(){
-        print("REFRESHING DATA")
-        self.isRefreshing = true
-        self.recordLibrary = []
-        self.recordDictionaryByID = [:]
-        self.fetchData{
-            self.sortRecords()
-            self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)     
-            self.isRefreshing = false
-        }
-        self.historyViewModel.fetchData {
-            print("Fetching history")
-        }
-    }
-    
-    // Iterate through library, gather all Genres and Artists in library for Filters
-    func gatherAllFilterOptions(){
-        for record in self.recordLibrary{
-            self.fullArtists.insert(record.artist)
-            for genre in record.genres{
-                self.fullGenres.insert(genre)
-            }
-        }
-    }
-    
-    // Used to display images in different views via call
-    func fetchPhotoByID(id: String) -> UIImage? {
-        if let recordItem = recordDictionaryByID[id] {
-            return recordItem.coverPhoto
-        }
-        return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
+        self.storeViewModel.refreshStoreDistribution(recordLibrary:self.recordLibrary)
     }
     
     // MARK: - Local Library Sorting and Comparator Functions
@@ -536,6 +406,137 @@ class LibraryViewModel: ObservableObject {
             char = String((record.artist.components(separatedBy: " ").last ?? "z").first!)
         }
         return char == header
+    }
+    
+    // MARK: - Library Data Initializing (Fetching, Local Libraries, etc.)
+    
+    // Fetch data from db and store in local library
+    private func fetchData(completion: @escaping () -> Void) {
+        print("PERFORMING LIBRARY FETCH")
+        let allRecords = Database.database().reference().child("Records")
+        let storageRef = Storage.storage().reference()
+
+        allRecords.observeSingleEvent(of: .value, with: { [self] snapshot in
+            let dispatchGroup = DispatchGroup()
+            
+            // FOR PARTIAL BUILD
+//            let maxChildrenToFetch = 6
+            
+            var childrenCount = 0
+            
+            for child in snapshot.children {
+                // COMMENT FOR FULL BUILD
+                //                guard childrenCount < maxChildrenToFetch else {
+                //                    // Break the loop if the maximum number of children is reached
+                //                    break
+                //                }
+                
+                let snap = child as! DataSnapshot
+                let elementDict = snap.value as! [String: Any]
+                
+                let artist = elementDict["artist"] as! String
+                
+                let name = elementDict["name"] as! String
+                let releaseYear = elementDict["releaseYear"] as! Int
+                let dateAdded = elementDict["dateAdded"] as! String
+                let isBand = elementDict["isBand"] as! Bool
+                let isUsed = elementDict["isUsed"] as! Bool
+                
+                // Set to default images
+                var coverPhoto = UIImage(named:"TakePhoto")
+                var discPhoto = UIImage(named:"TakePhoto")
+                
+                var genres: [String] = []
+                
+                // Pull genres to array
+                if let genresDict = elementDict["genres"] as? [String: Bool] {
+                    for (genre, value) in genresDict {
+                        if value {
+                            genres.append(genre)
+                        }
+                    }
+                }
+                
+                var storeName: String = ""
+                
+                if let store = elementDict["storeName"] as? String{
+                    storeName = store
+                }
+                
+                // Pull cover image from storage
+                if let im = elementDict["imageURL"] {
+                    let fileRef = storageRef.child(im as! String)
+                    dispatchGroup.enter()
+                    fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
+                        if error == nil, let data = data {
+                            coverPhoto = UIImage(data: data)
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+                
+                // Pull disk image from storage
+                if let im = elementDict["discImageURL"] {
+                    let fileRef = storageRef.child(im as! String)
+                    dispatchGroup.enter()
+                    fileRef.getData(maxSize: 1 * 1024 * 1024, completion: { data, error in
+                        if error == nil, let data = data {
+                            discPhoto = UIImage(data: data)
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+                
+                // Add record to local library
+                dispatchGroup.notify(queue: .main) {
+                    //                    print("IN QUEUE")
+                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName)
+                }
+                childrenCount += 1
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                completion()
+            }
+            
+        })
+    }
+    
+    // Reset local libraries and re-fetch and sort data
+    func refreshData(){
+        print("REFRESHING ALL DATA FROM LVM")
+        self.isRefreshing = true
+        self.recordLibrary = []
+        self.recordDictionaryByID = [:]
+        self.storeViewModel.fetchStoreData{
+            self.fetchData{
+                self.sortRecords()
+                self.storeViewModel.refreshStoreDistribution(recordLibrary:self.recordLibrary)
+                self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
+                self.isRefreshing = false
+            }
+        }
+        self.historyViewModel.fetchData {
+            print("Fetched history")
+        }
+    }
+    
+    // Iterate through library, gather all Genres and Artists in library for Filters
+    func gatherAllFilterOptions(){
+        for record in self.recordLibrary{
+            self.fullArtists.insert(record.artist)
+            for genre in record.genres{
+                self.fullGenres.insert(genre)
+            }
+        }
+    }
+    
+    // Used to display images in different views via call
+    func fetchPhotoByID(id: String) -> UIImage? {
+        if let recordItem = recordDictionaryByID[id] {
+            return recordItem.coverPhoto
+        }
+        return UIImage(named:"TakePhoto")  // Return defaultIm if the ID is not found
     }
 
     

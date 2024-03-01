@@ -12,7 +12,7 @@ import Charts
 
 struct StoresInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        StoresInfoView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager(), isTabExpanded: .constant(false)).onAppear{testViewModel.refreshData()}.frame(width:350,height:350)
+        StoresInfoView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager(), isTabExpanded: .constant(true)).onAppear{testViewModel.refreshData()}.frame(width:350,height:350)
     }
 }
 
@@ -20,6 +20,8 @@ struct StoresMenuView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @Binding var isMenuExpanded: Bool
     @Binding var camera: MapCameraPosition
+    @Binding var infoExpanded: Bool
+    @Binding var tapped: String
     
     let radius: CGFloat = 10.0
     
@@ -40,21 +42,39 @@ struct StoresMenuView: View{
                     if isMenuExpanded{
                         ScrollView{
                             VStack(alignment:.leading){
-                                ForEach(viewModel.statsViewModel.topStores.indices, id: \.self) { index in
-                                    let store = viewModel.statsViewModel.topStores[index]
-                                    if let loc = store.location{
-                                        Button{
-                                            camera = .region(MKCoordinateRegion(center: loc, latitudinalMeters: 600, longitudinalMeters: 600))
-                                            isMenuExpanded.toggle()
-                                        }label:{
+                                ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
+                                    HStack{
+                                        let store = viewModel.storeViewModel.topStores[index]
+                                        if let loc = store.location{
+                                            Button{
+                                                camera = .region(MKCoordinateRegion(center: loc, latitudinalMeters: 600, longitudinalMeters: 600))
+                                                isMenuExpanded.toggle()
+                                            }label:{
+                                                HStack(alignment:.center){
+                                                    ZStack{
+                                                        Circle().fill(fullDisplayColors[index%totalDisplayColors])
+                                                        Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
+                                                    }
+                                                    Text(store.name).foregroundStyle(recordBlack)
+                                                }
+                                            }.frame(height:30)
+                                        }else{
                                             HStack(alignment:.center){
                                                 ZStack{
                                                     Circle().fill(fullDisplayColors[index%totalDisplayColors])
                                                     Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
                                                 }
-                                                Text(store.name).foregroundStyle(recordBlack)
-                                            }
-                                        }.frame(height:30)
+                                                Text(store.name  + "º").foregroundStyle(recordBlack)
+                                                
+                                            }.frame(height:30)
+                                        }
+                                        Spacer()
+                                        Button{
+                                            tapped = store.name
+                                            infoExpanded.toggle()
+                                        }label:{
+                                            Image(systemName: "square.and.pencil")
+                                        }.frame(width:15,height:15)
                                     }
                                 }
                             }
@@ -77,7 +97,7 @@ struct StoresInfoView: View {
     @State private var infoExpanded = false
     @State private var infoColor: Color = seaweedGreen
     @State private var menuExpanded = false
-    
+     
     @State var camera: MapCameraPosition = .automatic
     
     var body: some View {
@@ -86,14 +106,14 @@ struct StoresInfoView: View {
 
             var usedPercentage: Int{
                 if viewModel.recordLibrary.count != 0{
-                    let percentage = Double(viewModel.statsViewModel.usedTotal) / Double(viewModel.recordLibrary.count) * 100.0
+                    let percentage = Double(viewModel.storeViewModel.usedTotal) / Double(viewModel.recordLibrary.count) * 100.0
                     return Int(percentage)
                 }
                 return 0
             }
             var onlinePercentage: Int{
                 if viewModel.recordLibrary.count != 0{
-                    let percentage = Double(viewModel.statsViewModel.onlineTotal) / Double(viewModel.recordLibrary.count) * 100.0
+                    let percentage = Double(viewModel.storeViewModel.onlineTotal) / Double(viewModel.recordLibrary.count) * 100.0
                     return Int(percentage)
                 }
                 return 0
@@ -104,12 +124,12 @@ struct StoresInfoView: View {
                     HStack{
                         Chart{
                             SectorMark(
-                                angle: .value("Used", viewModel.statsViewModel.usedTotal),
+                                angle: .value("Used", viewModel.storeViewModel.usedTotal),
                                 innerRadius: .ratio(0.5),
                                 angularInset: 1.5
                             ).foregroundStyle(pinkRed)
                             SectorMark(
-                                angle: .value("New", viewModel.recordLibrary.count - viewModel.statsViewModel.usedTotal),
+                                angle: .value("New", viewModel.recordLibrary.count - viewModel.storeViewModel.usedTotal),
                                 innerRadius: .ratio(0.5)
                             ).foregroundStyle(paleRed)
                         }.padding(10).chartBackground { chartProxy in
@@ -128,12 +148,12 @@ struct StoresInfoView: View {
                         }
                         Chart{
                             SectorMark(
-                                angle: .value("Used", viewModel.statsViewModel.onlineTotal),
+                                angle: .value("Used", viewModel.storeViewModel.onlineTotal),
                                 innerRadius: .ratio(0.5),
                                 angularInset: 1.5
                             ).foregroundStyle(deepBlue)
                             SectorMark(
-                                angle: .value("New", viewModel.recordLibrary.count - viewModel.statsViewModel.onlineTotal),
+                                angle: .value("New", viewModel.recordLibrary.count - viewModel.storeViewModel.onlineTotal),
                                 innerRadius: .ratio(0.5)
                             ).foregroundStyle(grayBlue)
                         }.padding(10).chartBackground { chartProxy in
@@ -156,8 +176,8 @@ struct StoresInfoView: View {
                     GeometryReader{geometry in
                         ZStack(alignment:.center){
                             Map(position: $camera) {
-                                ForEach(viewModel.statsViewModel.topStores.indices, id: \.self) { index in
-                                    let store = viewModel.statsViewModel.topStores[index]
+                                ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
+                                    let store = viewModel.storeViewModel.topStores[index]
                                     if let loc = store.location{
                                         Annotation(coordinate: loc) {
                                             ZStack{
@@ -174,13 +194,10 @@ struct StoresInfoView: View {
                                     }
                                 }
                             }
-                            StoresMenuView(viewModel:viewModel,isMenuExpanded: $menuExpanded, camera: $camera)
+                            StoresMenuView(viewModel:viewModel,isMenuExpanded: $menuExpanded, camera: $camera,infoExpanded:$infoExpanded,tapped:$tapped)
                             if infoExpanded{
                                 ZStack(alignment:.topLeading){
-                                    LocationInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,storeName:tapped,color:infoColor)
-                                    Button(action:{infoExpanded.toggle()}){
-                                        Image(systemName: "xmark").padding()
-                                    }
+                                    LocationInfoView(viewModel:viewModel,spotifyController:spotifyController,genreManager:genreManager,infoExpanded:$infoExpanded, storeName:tapped,color:infoColor)
                                 }.padding().frame(width: geometry.size.width, height: 3*geometry.size.height/4)
                             }
                         }.animation(.easeInOut(duration:0.5),value:isTabExpanded)
@@ -205,6 +222,12 @@ struct LocationInfoView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
     @ObservedObject var genreManager: GenreManager
+    
+    @Binding var infoExpanded: Bool
+    
+    @State private var displayAddressField: Bool = false
+    @State private var address: String = ""
+    
     let storeName: String
     let color: Color
     
@@ -212,7 +235,7 @@ struct LocationInfoView: View{
     let size: Int = 70
     
     var body: some View{
-        let store = viewModel.statsViewModel.topStores.first(where: { $0.name == storeName})!
+        let store = viewModel.storeViewModel.topStores.first(where: { $0.name == storeName})!
         var records: [RecordItem] {
             var output: [RecordItem] = []
             for recordID in store.recordIDs{
@@ -239,24 +262,50 @@ struct LocationInfoView: View{
         GeometryReader{geometry in
             ZStack{
                 VStack{
-                Text(store.name).smallHeadlineText()
-                    ScrollView{
+                    HStack{
+                        Button(action:{infoExpanded.toggle()}){
+                            Image(systemName: "xmark")
+                        }.frame(width:15,height:15)
+                        Spacer()
+                        Text(store.name).smallHeadlineText()
+                        Spacer()
+                        Button(action:{
+                            if displayAddressField{
+                                viewModel.storeViewModel.changeStoreAddress(storeName: store.name, address: address)
+                            }
+                            displayAddressField.toggle()
+                        }){
+                            Image(systemName: displayAddressField ? "checkmark.circle.fill" :  "square.and.pencil")
+                        }.frame(width:15,height:15)
+                    }.padding(.horizontal,5)
+                    if displayAddressField{
                         VStack{
-                            let rows = records.count / 3 + (records.count % 3 == 0 ? 0 : 1)
-                            ForEach(0..<rows, id:\.self) { row in
-                                HStack {
-                                    let cols = min(3, records.count - row * 3)
-                                    ForEach(0..<cols,id:\.self) { column in
-                                        let record = records[row * 3 + column]
-                                        CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:70)
-                                    }
-                                    ForEach(0..<(3-cols), id: \.self) { _ in
-                                        Rectangle().fill(Color.clear).frame(width:70,height:70)
-                                    }
+                            ZStack{
+                                TextEditor(text: $address)
+                                .onAppear{
+                                    address = store.addressString
                                 }
                             }
-                        }.padding(10)
-                    }.background(color.opacity(0.3))
+                        }.padding()
+                    }else{
+                        ScrollView{
+                            VStack{
+                                let rows = records.count / 3 + (records.count % 3 == 0 ? 0 : 1)
+                                ForEach(0..<rows, id:\.self) { row in
+                                    HStack {
+                                        let cols = min(3, records.count - row * 3)
+                                        ForEach(0..<cols,id:\.self) { column in
+                                            let record = records[row * 3 + column]
+                                            CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:70)
+                                        }
+                                        ForEach(0..<(3-cols), id: \.self) { _ in
+                                            Rectangle().fill(Color.clear).frame(width:70,height:70)
+                                        }
+                                    }
+                                }
+                            }.padding(10)
+                        }.background(color.opacity(0.3))
+                    }
                 }.padding()
             }.frame(width:geometry.size.width, height: geometry.size.height).background(iconWhite).clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)).shadow(radius: 5)
         }
