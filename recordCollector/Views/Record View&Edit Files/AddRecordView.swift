@@ -50,10 +50,9 @@ struct AddRecordView: View {
                         
                         Button(action:{
                             if isFormValid{
-                                viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand,isUsed:isUsed,storeName:storeName)
-                                if viewModel.storeViewModel.allStores[storeName] == nil{
-                                    viewModel.storeViewModel.addNewStore(storeName: storeName, address: location)
-                                }
+                                viewModel.storeViewModel.addNewStore(storeName: storeName, address: location, completion:{
+                                    viewModel.uploadRecord(recordName: recordName, artistName: artistName, releaseYear: releaseYear, genres: genreManager.genres,dateAdded:formattedDate, isBand:isBand,isUsed:isUsed,storeName:storeName)
+                                })
 
                                 presentationModeAddItem.wrappedValue.dismiss() // Dismiss the AddItemView
                             }else{

@@ -53,7 +53,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1971,
         dateAdded: "01-01-2020",
         isBand: false,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -66,7 +67,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1977,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -79,7 +81,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1973,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -92,7 +95,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1995,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -105,7 +109,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1970,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -118,7 +123,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1971,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         ),
@@ -131,7 +137,8 @@ let defaultRecordItems: [RecordItem] = [
         releaseYear: 1984,
         dateAdded: "01-01-2020",
         isBand: true,
-        isUsed: true
+        isUsed: true,
+        store: ""
 //        ,
 //        boughtFrom:["storeName":"Unknown","location":"Unknown"]
         )

@@ -44,17 +44,12 @@ class StoreViewModel: ObservableObject {
         var usedCount: Int = 0
         var onlineCount: Int = 0
         for record in recordLibrary{
-            if let storeName = record.store {
-                print(record.name, storeName)
-                if var store = self.allStores[storeName] {
+            if record.store != ""{
+                if var store = self.allStores[record.store] {
                     // Optional binding to safely unwrap the optional value
 
                     store.recordIDs.insert(record.id)
-                    self.allStores[storeName] = store
-
-                    if storeName == "Joe's Record Paradise" {
-                        print("HERE: ", store.recordIDs)
-                    }
+                    self.allStores[record.store] = store
 
                     if store.addressString == "Online" {
                         onlineCount += 1
@@ -73,47 +68,59 @@ class StoreViewModel: ObservableObject {
 
         // Update topStores
         self.topStores = self.allStores.values.sorted { $0.recordIDs.count > $1.recordIDs.count }
-        print(self.topStores)
     }
 
 
-func removeEmptyStores() {
-    for (storeName,recordStore) in self.allStores{
-        if recordStore.recordIDs.isEmpty{
-            print("Removing: ", storeName)
-            removeStoreFromFirebase(storeName: storeName)
+    func removeEmptyStores() {
+        for (storeName,recordStore) in self.allStores{
+            if recordStore.recordIDs.isEmpty{
+                print("Removing: ", storeName)
+                removeStoreFromFirebase(storeName: storeName)
+            }
         }
+
     }
 
-}
+    func removeStoreFromFirebase(storeName: String) {
+        let ref: DatabaseReference! = Database.database().reference()
 
-func removeStoreFromFirebase(storeName: String) {
-    let ref: DatabaseReference! = Database.database().reference()
+        // Remove the store locally
+        self.allStores[storeName] = nil
 
-    // Remove the store locally
-    self.allStores[storeName] = nil
-
-    // Remove the store from Firebase
-    ref.child("Stores").child(storeName).removeValue()
-}
+        // Remove the store from Firebase
+        ref.child("Stores").child(storeName).removeValue()
+    }
     
-    func addNewStore(storeName:String, address: String, id: String? = nil){
+    func addNewStore(storeName:String, address: String, completion: @escaping () -> Void){
+
+        // Do nothing if no location available
+        if storeName == ""{
+            return
+        }
+        
+        // Do nothing if already a valid location
+        if allStores[storeName] != nil{
+            // Don't do anything if already exists
+            print("Name in all stores, ", allStores[storeName]!.id)
+            return
+        }
+        
+        // Add local library element for UI update before location available
+        let recordStore = RecordStore(id: storeName, addressString: address)
+        self.allStores[storeName] = recordStore
+        
+        // Add new location to db
         let ref: DatabaseReference! = Database.database().reference()
         ref.child("Stores").child(storeName).setValue(address)
         
+        // Add new location to library
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         self.forwardGeocoding(address: address) { geocodedLocation in
-            if self.allStores[storeName] != nil {
-                // Store name already exists, overwrite location
-                self.allStores[storeName]!.location = geocodedLocation?.coordinate
-            } else {
-                // Store name doesn't exist, create a new RecordStore item
-                let recordStore = RecordStore(id: UUID().uuidString, name: storeName, addressString: address, location: geocodedLocation?.coordinate, recordIDs: (id != nil) ? [id!] : [])
-                self.allStores[storeName] = recordStore
-                
-            }
-
+            
+            // Add address to current store
+            self.allStores[storeName]!.location = geocodedLocation?.coordinate
+            
             dispatchGroup.leave()
         }
         
@@ -124,6 +131,7 @@ func removeStoreFromFirebase(storeName: String) {
                 let count2 = value2.recordIDs.count
                 return count1 > count2
             }
+            completion()
         }
     }
     
@@ -168,7 +176,7 @@ func removeStoreFromFirebase(storeName: String) {
                         self.allStores[storeName]!.location = geocodedLocation?.coordinate
                     } else {
                         // Store name doesn't exist, create a new RecordStore item
-                        let recordStore = RecordStore(id: UUID().uuidString, name: storeName, addressString: address, location: geocodedLocation?.coordinate, recordIDs: [])
+                        let recordStore = RecordStore(id: storeName, addressString: address, location: geocodedLocation?.coordinate, recordIDs: [])
                         self.allStores[storeName] = recordStore
                     }
 

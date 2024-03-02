@@ -10,7 +10,6 @@ import MapKit
 
 struct RecordStore: Identifiable {
     var id: String
-    var name: String
     var addressString: String
     var location: CLLocationCoordinate2D?
     var recordIDs: Set<String> = Set<String>()

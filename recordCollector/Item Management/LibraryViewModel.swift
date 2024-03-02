@@ -110,7 +110,7 @@ class LibraryViewModel: ObservableObject {
         // Add New Instance of Record Data to Local Library
         
         
-        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed)
+        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed, store: storeName)
         if storeName != ""{
             newItem.store = storeName
             if self.storeViewModel.allStores[storeName] != nil{
@@ -221,10 +221,8 @@ class LibraryViewModel: ObservableObject {
             self.recordLibrary[recordIndex].genres = genres
             self.recordDictionaryByID[id]?.genres = genres
             
-            if storeName != ""{
-                self.recordLibrary[recordIndex].store = storeName
-                self.recordDictionaryByID[id]?.store = storeName
-            }
+            self.recordLibrary[recordIndex].store = storeName
+            self.recordDictionaryByID[id]?.store = storeName
             
             // Re-sort with new edited elements
             sortRecords()
@@ -265,6 +263,8 @@ class LibraryViewModel: ObservableObject {
         
         if storeName != ""{
             ref.child("Records").child(id).child("storeName").setValue(storeName)
+        }else{
+            ref.child("Records").child(id).child("storeName").removeValue()
         }
         
         // Reset and re-gather all filter options when one is edited

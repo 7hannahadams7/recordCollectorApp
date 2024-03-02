@@ -55,7 +55,7 @@ struct StoresMenuView: View{
                                                         Circle().fill(fullDisplayColors[index%totalDisplayColors])
                                                         Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
                                                     }
-                                                    Text(store.name).foregroundStyle(recordBlack)
+                                                    Text(store.id).foregroundStyle(recordBlack)
                                                 }
                                             }.frame(height:30)
                                         }else{
@@ -64,13 +64,13 @@ struct StoresMenuView: View{
                                                     Circle().fill(fullDisplayColors[index%totalDisplayColors])
                                                     Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
                                                 }
-                                                Text(store.name  + "º").foregroundStyle(recordBlack)
+                                                Text(store.id  + "º").foregroundStyle(recordBlack)
                                                 
                                             }.frame(height:30)
                                         }
                                         Spacer()
                                         Button{
-                                            tapped = store.name
+                                            tapped = store.id
                                             infoExpanded.toggle()
                                         }label:{
                                             Image(systemName: "square.and.pencil")
@@ -218,12 +218,12 @@ struct MapView: View{
                             Circle().fill(fullDisplayColors[index%totalDisplayColors])
                             Text("\(store.recordIDs.count)").foregroundStyle(iconWhite).padding()
                         }.onTapGesture{
-                            tapped = store.name
+                            tapped = store.id
                             infoExpanded = true
                             infoColor = fullDisplayColors[index%totalDisplayColors]
                         }
                     } label: {
-                        Text(store.name)
+                        Text(store.id)
                     }
                 }
             }
@@ -249,7 +249,7 @@ struct LocationInfoView: View{
     let size: Int = 70
     
     var body: some View{
-        let store = viewModel.storeViewModel.topStores.first(where: { $0.name == storeName})!
+        let store = viewModel.storeViewModel.topStores.first(where: { $0.id == storeName})!
         var records: [RecordItem] {
             var output: [RecordItem] = []
             for recordID in store.recordIDs{
@@ -281,11 +281,11 @@ struct LocationInfoView: View{
                             Image(systemName: "xmark")
                         }.frame(width:15,height:15)
                         Spacer()
-                        Text(store.name).smallHeadlineText()
+                        Text(store.id).smallHeadlineText()
                         Spacer()
                         Button(action:{
                             if displayAddressField{
-                                viewModel.storeViewModel.changeStoreAddress(storeName: store.name, address: address)
+                                viewModel.storeViewModel.changeStoreAddress(storeName: store.id, address: address)
                             }
                             displayAddressField.toggle()
                         }){
