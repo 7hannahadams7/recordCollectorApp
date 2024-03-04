@@ -103,6 +103,8 @@ class LibraryViewModel: ObservableObject {
         self.historyViewModel.uploadNewHistoryItem(type: "Add", recordID: id)
         self.statsViewModel.refreshData(recordLibrary:self.recordLibrary)
         self.storeViewModel.refreshStoreDistribution(recordLibrary:self.recordLibrary)
+        
+        self.sortRecords()
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()

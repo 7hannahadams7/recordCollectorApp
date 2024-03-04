@@ -30,7 +30,7 @@ struct DecadeTopGraphic: View {
                     let popup: CoverPhotoToPopupView
                     var record = defaultRecordItems[index]
                     if index < decadeBarData.count {
-                        let recordID = decadeBarData[index].records.first
+                        let recordID = decadeBarData[index].records.randomElement()
                         record = viewModel.recordDictionaryByID[recordID!]!
                     }
                     popup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)

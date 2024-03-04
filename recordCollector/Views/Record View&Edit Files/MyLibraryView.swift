@@ -20,6 +20,7 @@ struct MyLibraryView: View {
     
     @ObservedObject var genreManager: GenreManager
     
+    @State private var searchBarItem = ""
 
     @State private var filteredGenres: [String] = []
     @State private var filteredArtists: [String] = []
@@ -150,38 +151,27 @@ struct MyLibraryView: View {
                     }.frame(height: 50).padding(5)
                     
                     //Library Listing
-                    ScrollViewReader { scrollProxy in
-                        ZStack{
-                            List {
-                                // Apply direction change here, library instances are called according to headers anyway
-                                ForEach(sortingDirection ? sortingHeaders : sortingHeaders.reversed(), id:\.self) {
-                                    char in
-                                    Section(header: Text(String(char))) {
-                                        ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
-                                            record in
-                                            NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager).onDisappear(){
-                                                filteredGenres = []
-                                            }) {
-                                                PersonRowView(record:record)
-                                            }/*.padding(.trailing,20)*/
-                                        }
-                                    }
+                    List {
+                        // Apply direction change here, library instances are called according to headers anyway
+                        HStack{
+                            Image(systemName: "magnifyingglass.circle").resizable().frame(width:20,height:20).foregroundStyle(decorBlack)
+                            TextField("Search Records", text: $searchBarItem)
+                        }.padding(5)
+
+                        ForEach(sortingDirection ? sortingHeaders : sortingHeaders.reversed(), id:\.self) {
+                            char in
+                            Section(header: Text(String(char))) {
+                                ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
+                                    record in
+                                    NavigationLink(destination: ShowRecordView(viewModel:viewModel,spotifyController:spotifyController, record:record, genreManager: genreManager).onDisappear(){
+                                        filteredGenres = []
+                                    }) {
+                                        PersonRowView(record:record)
+                                    }/*.padding(.trailing,20)*/
                                 }
-                            }.listStyle(.inset).cornerRadius(10).padding(5).preferredColorScheme(.light)
-//                            HStack{
-//                                Spacer()
-//                                VStack{
-//                                    ForEach(sortingHeaders, id:\.self){header in
-//                                        Button{
-//                                            scrollProxy.scrollTo(header)
-//                                        }label:{
-//                                            Text(header)
-//                                        }
-//                                    }
-//                                }.padding()
-//                            }
+                            }
                         }
-                    }
+                    }.listStyle(.inset).cornerRadius(10).padding(5).preferredColorScheme(.light)
                     
                 }.padding().padding(.top,35)
                 
@@ -200,7 +190,6 @@ struct MyLibraryView: View {
         }.onAppear{
             // Reset and redefine library view when navigated to
             filteredGenres = []
-//            viewModel.refreshData()
         }
     }
     
@@ -219,14 +208,19 @@ struct MyLibraryView: View {
             return output
         }
         
-        if filteredGenres.isEmpty && filteredArtists.isEmpty && usedFilters.isEmpty{
+        if filteredGenres.isEmpty && filteredArtists.isEmpty && usedFilters.isEmpty && searchBarItem.isEmpty{
             filteredRecords = viewModel.recordLibrary
         } else {
             filteredRecords = viewModel.recordLibrary.filter { record in
                 let genresMatch = filteredGenres.isEmpty || record.genres.contains { Set(filteredGenres).contains($0) }
                 let artistsMatch = filteredArtists.isEmpty || filteredArtists.contains(record.artist)
                 let usedMatch = usedFilter.isEmpty || usedFilter.contains(record.isUsed)
-                return genresMatch && artistsMatch && usedMatch
+                
+                // Check if either record.artist or record.name contains the searchBarItem
+                let searchMatch = searchBarItem.isEmpty ||
+                                  record.artist.lowercased().contains(searchBarItem.lowercased()) ||
+                                  record.name.lowercased().contains(searchBarItem.lowercased())
+                return genresMatch && artistsMatch && usedMatch && searchMatch
             }
         }
         return filteredRecords

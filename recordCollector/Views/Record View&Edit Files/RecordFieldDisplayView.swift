@@ -50,25 +50,24 @@ struct RecordFieldDisplayView: View{
     }
     
     var filteredGenres: [String] {
-        // Filter previous genres to include only those with words that start with text input and that aren't already included in genre list for current item
         let lowercasedInput = newGenre.lowercased()
 
         return viewModel.fullGenres
             .filter { genre in
                 let words = genre.lowercased().components(separatedBy: " ")
-                return words.contains { $0.hasPrefix(lowercasedInput) }
+                return words.contains { $0.hasPrefix(lowercasedInput) } || genre.lowercased().hasPrefix(lowercasedInput)
             }
             .filter { !genreManager.genres.contains($0) }
     }
-    
+
     var filteredStores: [String] {
         let lowercaseInput = storeName.lowercased()
-        
+
         let matchingItems = viewModel.storeViewModel.allStores.keys.filter { store in
             let words = store.lowercased().components(separatedBy: " ")
-            return words.contains { $0.hasPrefix(lowercaseInput) }
+            return words.contains { $0.hasPrefix(lowercaseInput) } || store.lowercased().hasPrefix(lowercaseInput)
         }
-        
+
         // Check if there's only one item left and it matches the input exactly
         if matchingItems.count == 1, matchingItems.first?.lowercased() == lowercaseInput {
             return [] // Return an empty list
@@ -76,6 +75,7 @@ struct RecordFieldDisplayView: View{
             return matchingItems
         }
     }
+
     
     var body: some View{
         
