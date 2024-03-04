@@ -96,7 +96,7 @@ struct ArtistInfoView: View {
     @State private var offset = 0.0
     
     var body: some View {
-        let artistBarData = viewModel.statsViewModel.topArtists.prefix(6)
+//        let artistBarData = viewModel.statsViewModel.topArtists.prefix(6)
 //        let artistTotalData = viewModel.statsViewModel.topArtists
 //        let totalArtists = artistTotalData.count
         
@@ -164,7 +164,7 @@ struct ArtistCollapsedBarView: View{
     var body: some View{
         GeometryReader{geometry in
 
-            let proportionalSize = CGFloat(artist.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.width - 100) + 100
+            let proportionalSize = CGFloat(artist.amount - minAmount + 1) / CGFloat(maxAmount - minAmount + 1) * (geometry.size.width - 150) + 150
             
             HStack{
                 HStack{
@@ -217,7 +217,7 @@ struct ArtistDetailRowView: View {
                                 Text(artistItem.name).bold().foregroundStyle(iconWhite).padding()
                             }
                         }
-                        Text(String(artistItem.amount)).padding()
+                        Text(String(artistItem.amount)).frame(width:40,height:40).padding()
                         Spacer()
                     }.padding(5).frame(width:screenWidth*0.75+100*positionProportion,height:75).offset(x:-30)
                     Spacer()

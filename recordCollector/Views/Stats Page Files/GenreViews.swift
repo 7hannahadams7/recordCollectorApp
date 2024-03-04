@@ -24,11 +24,15 @@ struct GenrePieChart: View {
                     Circle().fill(iconWhite).shadow(color:recordBlack,radius: 3)
                     Circle().fill(recordBlack).padding(5)
                     Circle().fill(iconWhite).padding(10)
+                    VStack{
+                        Text("\(viewModel.recordLibrary.count)").largeHeadlineText()
+                        Text("Records").subtitleText()
+                    }
                     Chart{
                         ForEach(genrePieData.indices, id: \.self) { index in
                             SectorMark(
                                 angle: .value("Count", genrePieData[index].amount),
-                                innerRadius: .ratio(0.3)
+                                innerRadius: .ratio(0.4)
                             ).foregroundStyle(smallDisplayColors[index])
                         }
                     }.padding(10)

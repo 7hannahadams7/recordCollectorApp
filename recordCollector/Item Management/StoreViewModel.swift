@@ -91,7 +91,7 @@ class StoreViewModel: ObservableObject {
         ref.child("Stores").child(storeName).removeValue()
     }
     
-    func addNewStore(storeName:String, address: String, completion: @escaping () -> Void){
+    func addNewStore(storeName:String, address: String){
 
         // Do nothing if no location available
         if storeName == ""{
@@ -131,7 +131,6 @@ class StoreViewModel: ObservableObject {
                 let count2 = value2.recordIDs.count
                 return count1 > count2
             }
-            completion()
         }
     }
     

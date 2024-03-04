@@ -30,58 +30,61 @@ struct StoresMenuView: View{
             HStack(spacing:-2*radius){
                 Spacer()
                 ZStack(alignment:.leading){
-                    RoundedRectangle(cornerRadius: radius).foregroundStyle(lightWoodBrown).shadow(radius: 3)
+                    RoundedRectangle(cornerRadius: radius).foregroundStyle(decorWhite).shadow(radius: 3)
                     Button{
                         isMenuExpanded.toggle()
                     }label:{
-                        Image(systemName: isMenuExpanded ? "chevron.compact.right" :  "chevron.compact.left").resizable().frame(width:8).aspectRatio(contentMode:.fit).foregroundStyle(woodAccent).padding(5)
+                        Image(systemName: isMenuExpanded ? "chevron.compact.right" :  "chevron.compact.left").resizable().frame(width:8).aspectRatio(contentMode:.fit).foregroundStyle(decorBlack).padding(5)
                     }
-                }.frame(width:30,height:60)
-                ZStack{
-                    RoundedRectangle(cornerRadius: radius).foregroundStyle(lightWoodBrown).shadow(radius: 3)
-                    if isMenuExpanded{
-                        ScrollView{
-                            VStack(alignment:.leading){
-                                ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
-                                    HStack{
-                                        let store = viewModel.storeViewModel.topStores[index]
-                                        if let loc = store.location{
-                                            Button{
-                                                camera = .region(MKCoordinateRegion(center: loc, latitudinalMeters: 600, longitudinalMeters: 600))
-                                                isMenuExpanded.toggle()
-                                            }label:{
+                }.frame(width:33,height:60)
+                ZStack(){
+                    ZStack{
+                        RoundedRectangle(cornerRadius: radius).foregroundStyle(decorWhite).shadow(radius: 3)
+//                        if isMenuExpanded{
+                            ScrollView{
+                                VStack(alignment:.leading){
+                                    ForEach(viewModel.storeViewModel.topStores.indices, id: \.self) { index in
+                                        HStack{
+                                            let store = viewModel.storeViewModel.topStores[index]
+                                            if let loc = store.location{
+                                                Button{
+                                                    camera = .region(MKCoordinateRegion(center: loc, latitudinalMeters: 600, longitudinalMeters: 600))
+                                                    isMenuExpanded.toggle()
+                                                }label:{
+                                                    HStack(alignment:.center){
+                                                        ZStack{
+                                                            Circle().fill(fullDisplayColors[index%totalDisplayColors])
+                                                            Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
+                                                        }
+                                                        Text(store.id).foregroundStyle(recordBlack)
+                                                    }
+                                                }.frame(height:30)
+                                            }else{
                                                 HStack(alignment:.center){
                                                     ZStack{
                                                         Circle().fill(fullDisplayColors[index%totalDisplayColors])
                                                         Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
                                                     }
-                                                    Text(store.id).foregroundStyle(recordBlack)
-                                                }
-                                            }.frame(height:30)
-                                        }else{
-                                            HStack(alignment:.center){
-                                                ZStack{
-                                                    Circle().fill(fullDisplayColors[index%totalDisplayColors])
-                                                    Text(String(store.recordIDs.count)).foregroundStyle(iconWhite)
-                                                }
-                                                Text(store.id  + "º").foregroundStyle(recordBlack)
-                                                
-                                            }.frame(height:30)
+                                                    Text(store.id  + "º").foregroundStyle(recordBlack)
+                                                    
+                                                }.frame(height:30)
+                                            }
+                                            Spacer()
+                                            Button{
+                                                tapped = store.id
+                                                infoExpanded.toggle()
+                                            }label:{
+                                                Image(systemName: "ellipsis")
+                                            }.frame(width:15,height:15)
                                         }
-                                        Spacer()
-                                        Button{
-                                            tapped = store.id
-                                            infoExpanded.toggle()
-                                        }label:{
-                                            Image(systemName: "square.and.pencil")
-                                        }.frame(width:15,height:15)
                                     }
                                 }
-                            }
-                        }.padding()
-                    }
-                }.frame(width: isMenuExpanded ? 3*geometry.size.width/4 : 15,height:geometry.size.height).offset(x:radius/2+1)
-            }.clipped()
+                            }.padding().padding(.trailing,radius)
+
+//                        }
+                    }.padding(.vertical,radius)
+                }.frame(width: 3*geometry.size.width/4,height:geometry.size.height).offset(x:radius/2+1)
+            }.offset(x:isMenuExpanded ? radius : 3*geometry.size.width/4 - 2*radius).clipped().animation(.easeInOut(duration:0.3),value:isMenuExpanded)
         }
     }
 }
