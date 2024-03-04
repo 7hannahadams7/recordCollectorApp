@@ -31,7 +31,7 @@ struct ArtistRecordShelf: View {
                     let popup: CoverPhotoToPopupView
                     var record = defaultRecordItems[index]
                     if index < artistBarData.count {
-                        let recordID = artistBarData[index].records.first
+                        let recordID = artistBarData[index].records.randomElement()
                         record = viewModel.recordDictionaryByID[recordID!]!
                     }
                     popup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)

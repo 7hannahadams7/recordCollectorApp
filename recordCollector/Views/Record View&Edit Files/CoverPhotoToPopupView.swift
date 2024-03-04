@@ -34,9 +34,9 @@ struct CoverPhotoToPopupView: View{
             NavigationLink(destination: ShowRecordView(viewModel: viewModel, spotifyController: spotifyController, record: record, genreManager: genreManager)) {
                 Image(uiImage: record.coverPhoto).resizable().frame(width:size, height:size).scaledToFill().clipped()
                     .onAppear{
-                        presentingListener = true
-                    }.onDisappear{
                         presentingListener = false
+                    }.onDisappear{
+                        presentingListener = true
                     }
             }
     }

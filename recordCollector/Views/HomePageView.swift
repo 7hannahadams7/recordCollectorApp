@@ -90,7 +90,7 @@ struct HomePageView: View {
             }
             
         }.onChange(of: presentingListener, { _, presenting in
-            if presenting{
+            if presentingListener{
                 // Pause timer when a ShowRecordView instance displayed
                 timer?.invalidate()
             } else {
@@ -140,6 +140,8 @@ struct HomePageView: View {
             
 struct HomePageView_Previews: PreviewProvider {
     static var previews: some View {
-        HomePageView(viewModel:LibraryViewModel(),spotifyController:SpotifyController(),genreManager:GenreManager())
+        HomePageView(viewModel:testViewModel,spotifyController:SpotifyController(),genreManager:GenreManager()).onAppear{
+            testViewModel.refreshData()
+        }
     }
 }
