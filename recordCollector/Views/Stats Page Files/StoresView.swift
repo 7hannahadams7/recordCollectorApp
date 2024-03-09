@@ -12,10 +12,11 @@ import Charts
 
 struct StoresInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        StoresInfoView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager(), isTabExpanded: .constant(true)).onAppear{testViewModel.refreshData()}.frame(width:350,height:350)
+        StoresInfoView(viewModel:testViewModel,spotifyController:SpotifyController(), genreManager:GenreManager(), isTabExpanded: .constant(false)).onAppear{testViewModel.refreshData()}.frame(width:350,height:350)
     }
 }
 
+// Sidebar menu with all stores, camera panning, and window toggling
 struct StoresMenuView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @Binding var isMenuExpanded: Bool
@@ -89,6 +90,7 @@ struct StoresMenuView: View{
     }
 }
 
+// Stores infographic and map view with windows and sidebar
 struct StoresInfoView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
@@ -162,7 +164,6 @@ struct StoresInfoView: View {
                             ).foregroundStyle(grayBlue)
                         }.padding(10).chartBackground { chartProxy in
                             GeometryReader { geometry in
-                                let frame = geometry[chartProxy.plotAreaFrame]
                                 VStack {
                                     Text("Online")
                                         .font(.callout)
@@ -171,7 +172,7 @@ struct StoresInfoView: View {
                                         .font(.title2.bold())
                                         .foregroundColor(.primary)
                                 }
-                                .position(x: frame.midX, y: frame.midY)
+                                .position(x: geometry.size.width/2, y: geometry.size.height/2)
                             }
                         }
                     }.padding(10).animation(.easeInOut(duration:0.5),value: true)
@@ -179,8 +180,7 @@ struct StoresInfoView: View {
                 }else{
                     GeometryReader{geometry2 in
                         ZStack(alignment:.center){
-                            
-                                MapView(viewModel: viewModel, camera: $camera, tapped: $tapped, infoExpanded: $infoExpanded, infoColor: $infoColor)
+                            MapView(viewModel: viewModel, camera: $camera, tapped: $tapped, infoExpanded: $infoExpanded, infoColor: $infoColor)
                             StoresMenuView(viewModel:viewModel,isMenuExpanded: $menuExpanded, camera: $camera,infoExpanded:$infoExpanded,tapped:$tapped)
                             if infoExpanded{
                                 ZStack(alignment:.topLeading){
@@ -204,6 +204,7 @@ struct StoresInfoView: View {
     }
 }
 
+// Interactive Map of all Stores
 struct MapView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @Binding var camera: MapCameraPosition

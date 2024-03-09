@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+// Displays all history items and allows sorting between. Can interact with record in history item
 struct HistoryInfoView: View {
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController
@@ -94,6 +95,8 @@ struct HistoryInfoView: View {
 
     }
 }
+
+// History Item display view
 struct HistoryItemDetailView: View{
     @ObservedObject var viewModel: LibraryViewModel
     @ObservedObject var spotifyController: SpotifyController

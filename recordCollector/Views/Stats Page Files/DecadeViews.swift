@@ -92,23 +92,19 @@ struct DecadeBottomChart: View{
     @State private var infoExpanded = false
         
         var body: some View {
-            let decadeBarData = viewModel.statsViewModel.topDecades.prefix(4)
             let decadeSortedData = viewModel.statsViewModel.topDecades.sorted(by: { $0.value > $1.value })
             GeometryReader{geometry in
                 VStack{
                     if !isTabExpanded{
                         HStack{
-
                             HStack{
                                 let total = min(4,viewModel.statsViewModel.topDecades.count)
                                 let minAmount = Array(viewModel.statsViewModel.topDecades.prefix(4)).map { $0.amount }.min() ?? 1
                                 let maxAmount = Array(viewModel.statsViewModel.topDecades.prefix(4)).map { $0.amount }.max() ?? 1
                                 ForEach(Array(viewModel.statsViewModel.topDecades.prefix(4)).indices, id:\.self){index in
-//                                    let item = decadeBarData[index]
                                     DecadeCollapsedBarView(decade: viewModel.statsViewModel.topDecades[index].value, amount: viewModel.statsViewModel.topDecades[index].amount, color: smallDisplayColors[index], total: total, minAmount: minAmount, maxAmount: maxAmount)
                                 }
                             }
-//                            Spacer()
                         }.padding().frame(width:geometry.size.width,height:geometry.size.height)
                             .background(isTabExpanded ? Color.clear: decorWhite)
                             .id(1)
@@ -156,7 +152,6 @@ struct DecadeBottomChart: View{
 
 // Decade bubbles, sizes and offsets adjust to create flowing display, in InfoView when expanded
 struct DecadeBubbleView: View {
-//    let decadeItem: (decade: Int, amount: Int, records: [String])
     let decadeItem: StatsValueItem
     var color: Color
     var index: Int

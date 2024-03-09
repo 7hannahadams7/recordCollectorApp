@@ -108,7 +108,6 @@ struct MyLibraryView: View {
                                     // Favorite Filter
                                     Button{
                                         favoriteFilter = ["Favorites"]
-                                        print("Favorite Filter On")
                                     }label:{
                                         HStack{
                                             Image(systemName: "star.fill").resizable().frame(width:20,height:20)
@@ -221,6 +220,9 @@ struct MyLibraryView: View {
         }.onAppear{
             // Reset and redefine library view when navigated to
             filteredGenres = []
+            filteredArtists = []
+            usedFilters = []
+            favoriteFilter = []
         }
     }
     
