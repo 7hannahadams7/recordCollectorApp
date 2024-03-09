@@ -38,10 +38,10 @@ class LibraryViewModel: ObservableObject {
     
     // MyLibrary sorting factors
     enum SortingFactor: String, CaseIterable {
-        case dateAdded = "Date Added"
         case artist = "Artist"
-        case releaseYear = "Release Year"
         case album = "Album"
+        case releaseYear = "Release Year"
+        case dateAdded = "Date Added"
     }
     
     // MARK: - Photo Actions
@@ -424,16 +424,16 @@ class LibraryViewModel: ObservableObject {
             let dispatchGroup = DispatchGroup()
             
             // FOR PARTIAL BUILD
-            let maxChildrenToFetch = 10
+//            let maxChildrenToFetch = 10
             
             var childrenCount = 0
             
             for child in snapshot.children {
                 // COMMENT FOR FULL BUILD
-                guard childrenCount < maxChildrenToFetch else {
-                    // Break the loop if the maximum number of children is reached
-                    break
-                }
+//                guard childrenCount < maxChildrenToFetch else {
+//                    // Break the loop if the maximum number of children is reached
+//                    break
+//                }
                 
                 let snap = child as! DataSnapshot
                 let elementDict = snap.value as! [String: Any]

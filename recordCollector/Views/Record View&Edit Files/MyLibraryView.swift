@@ -175,7 +175,7 @@ struct MyLibraryView: View {
                             TextField("Search Records", text: $searchBarItem)
                         }.padding(5)
 
-                        ForEach(sortingDirection ? sortingHeaders : sortingHeaders.reversed(), id:\.self) {
+                        ForEach(sortingHeaders, id:\.self) {
                             char in
                             Section(header: Text(String(char))) {
                                 ForEach(recordLibrary.filter({viewModel.headerToItemMatch(sortingFactor:sortingFactor, header:char, record: $0)})){
@@ -297,6 +297,7 @@ struct MyLibraryView: View {
                 }
             }
         }
+        // No sorting on headers because pulled from sorted and directional library
         return headers
     }
     
