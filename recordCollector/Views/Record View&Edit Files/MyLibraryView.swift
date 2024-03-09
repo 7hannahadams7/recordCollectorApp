@@ -25,6 +25,7 @@ struct MyLibraryView: View {
     @State private var filteredGenres: [String] = []
     @State private var filteredArtists: [String] = []
     @State private var usedFilters: [String] = []
+    @State private var favoriteFilter: [String] = []
     
     var body: some View {
         
@@ -77,7 +78,7 @@ struct MyLibraryView: View {
                                 // Display Current Filters
                                 ScrollView(.horizontal){
                                     HStack{
-                                        ForEach((filteredArtists + filteredGenres + usedFilters), id:\.self){item in
+                                        ForEach((filteredArtists + filteredGenres + usedFilters + favoriteFilter), id:\.self){item in
                                             ZStack{
                                                 HStack{
                                                     Text(item).subtitleText()
@@ -91,6 +92,9 @@ struct MyLibraryView: View {
                                                         if let index = usedFilters.firstIndex(of: item){
                                                             usedFilters.remove(at: index)
                                                         }
+                                                        if let index = favoriteFilter.firstIndex(of: item){
+                                                            favoriteFilter.remove(at:index)
+                                                        }
                                                     }label:{
                                                         Image(systemName: "xmark").foregroundColor(recordBlack)
                                                     }
@@ -101,6 +105,18 @@ struct MyLibraryView: View {
                                 }
                                 Spacer()
                                 Menu {
+                                    // Favorite Filter
+                                    Button{
+                                        favoriteFilter = ["Favorites"]
+                                        print("Favorite Filter On")
+                                    }label:{
+                                        HStack{
+                                            Image(systemName: "star.fill").resizable().frame(width:20,height:20)
+                                            Text("Favorites")
+                                        }
+                                    }
+                                    
+                                    // Genre Filter
                                     Menu {
                                         ForEach(viewModel.fullGenres.sorted(), id:\.self){genre in
                                             Button{
@@ -115,6 +131,7 @@ struct MyLibraryView: View {
                                         Text("Genres")
                                     }
                                     
+                                    // Artist Filter
                                     Menu {
                                         ForEach(viewModel.fullArtists.sorted(), id:\.self){artist in
                                             Button{
@@ -129,9 +146,9 @@ struct MyLibraryView: View {
                                         Text("Artists")
                                     }
                                     
+                                    // Condition Filter
                                     Menu{
                                         ForEach(["Used","New"], id:\.self){label in
-//                                            let value = (label=="Used") ? true : false
                                             Button{
                                                 if !usedFilters.contains(label){
                                                     usedFilters.append(label)
@@ -143,6 +160,7 @@ struct MyLibraryView: View {
                                     }label:{
                                         Text("Condition")
                                     }
+        
                                 } label: {
                                     Image(systemName: "line.3.horizontal.decrease.circle").resizable().padding(3).frame(width:30,height:30).foregroundStyle(recordBlack)
                                         .aspectRatio(contentMode: .fit)
@@ -167,7 +185,20 @@ struct MyLibraryView: View {
                                         filteredGenres = []
                                     }) {
                                         PersonRowView(record:record)
-                                    }/*.padding(.trailing,20)*/
+                                    }.swipeActions {
+                                        Button {
+                                            // Call your favorite action function here
+                                            Task{
+                                                await viewModel.toggleFavorite(id:record.id)
+                                            }// Assuming you have a function to toggle the favorite status
+                                        } label: {
+                                            VStack{
+                                                Image(systemName: record.favorite ? "star.slash.fill" : "star.fill").resizable().frame(width:20,height:20)
+                                                Text(record.favorite ? "Unfavorite" : "Favorite").subtitleText()
+                                            }
+                                        }
+                                        .tint(yellowOrange) // Customize the color as needed
+                                    }
                                 }
                             }
                         }
@@ -196,7 +227,7 @@ struct MyLibraryView: View {
     private func filteredLibrary() -> [RecordItem] {
         var filteredRecords: [RecordItem]
         
-        var usedFilter: [Bool] {
+        var usedFiltering: [Bool] {
             var output: [Bool] = []
             for filter in usedFilters{
                 if filter == "Used"{
@@ -207,23 +238,32 @@ struct MyLibraryView: View {
             }
             return output
         }
+        var favoriteFiltering: Bool{
+            if favoriteFilter.isEmpty{
+                return false
+            }else{
+                return true
+            }
+        }
         
-        if filteredGenres.isEmpty && filteredArtists.isEmpty && usedFilters.isEmpty && searchBarItem.isEmpty{
+        if filteredGenres.isEmpty && filteredArtists.isEmpty && usedFilters.isEmpty && searchBarItem.isEmpty && !favoriteFiltering{
             filteredRecords = viewModel.recordLibrary
         } else {
             filteredRecords = viewModel.recordLibrary.filter { record in
                 let genresMatch = filteredGenres.isEmpty || record.genres.contains { Set(filteredGenres).contains($0) }
                 let artistsMatch = filteredArtists.isEmpty || filteredArtists.contains(record.artist)
-                let usedMatch = usedFilter.isEmpty || usedFilter.contains(record.isUsed)
+                let usedMatch = usedFiltering.isEmpty || usedFiltering.contains(record.isUsed)
+                let favoriteMatch = !favoriteFiltering || record.favorite
                 
                 // Check if either record.artist or record.name contains the searchBarItem
                 let searchMatch = searchBarItem.isEmpty ||
                                   record.artist.lowercased().contains(searchBarItem.lowercased()) ||
                                   record.name.lowercased().contains(searchBarItem.lowercased())
-                return genresMatch && artistsMatch && usedMatch && searchMatch
+                
+                return genresMatch && artistsMatch && usedMatch && searchMatch && favoriteMatch
             }
         }
-        return filteredRecords
+        return sortingDirection ? filteredRecords : filteredRecords.reversed()
     }
 
     
@@ -255,22 +295,7 @@ struct MyLibraryView: View {
                 }
             }
         }
-        
-        if sortingFactor == "Date Added"{
-            let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MM-dd-yyyy"
-            headers.sort {
-                // Sort chronologically by actual date
-                guard let date1 = String.stringToDate(from: $0),
-                      let date2 = String.stringToDate(from: $1) else {
-                    return false // Handle invalid date strings as needed
-                }
-                return date1 > date2
-            }
-            return headers
-        }else{
-            return headers.sorted(by: {$0 < $1})
-        }
+        return headers
     }
     
 }
@@ -297,6 +322,9 @@ struct PersonRowView: View {
                 Text(record.dateAdded).subtitleText()
             }.padding(.all,10.0)
             Spacer()
+            if record.favorite{
+                Image(systemName: "star.fill").resizable().frame(width:20,height:20).foregroundColor(yellowOrange)
+            }
         }.padding(.horizontal, 10.0).frame(height:75)
     }
 }

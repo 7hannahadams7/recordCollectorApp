@@ -30,7 +30,7 @@ struct DecadeTopGraphic: View {
                     let popup: CoverPhotoToPopupView
                     var record = defaultRecordItems[index]
                     if index < decadeBarData.count {
-                        let recordID = decadeBarData[index].records.randomElement()
+                        let recordID = decadeBarData[index].records.first
                         record = viewModel.recordDictionaryByID[recordID!]!
                     }
                     popup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
@@ -215,7 +215,7 @@ struct DecadeBubbleInfoView: View{
                             VStack(alignment:.leading){
                                 Text(String(yearsInDecade[index].value))
                                 ScrollView(.horizontal){
-                                    HStack{
+                                    LazyHStack{
                                         ForEach(yearsInDecade[index].records, id:\.self){recordID in
                                             if let record = viewModel.recordDictionaryByID[recordID]{
                                                 CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)

@@ -27,7 +27,7 @@ struct GenrePieChart: View {
                     VStack{
                         Text("\(viewModel.recordLibrary.count)").largeHeadlineText()
                         Text("Records").subtitleText()
-                    }
+                    }.opacity(isTabExpanded ? 0.0 : 1.0)
                     Chart{
                         ForEach(genrePieData.indices, id: \.self) { index in
                             SectorMark(
@@ -151,7 +151,7 @@ struct GenreDetailRowView: View {
             VStack{
                 Spacer()
                 ScrollView(.horizontal){
-                    HStack{
+                    LazyHStack{
                         ForEach(genreItem.records, id:\.self){recordID in
                             if let record = viewModel.recordDictionaryByID[recordID]{
                                 CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)

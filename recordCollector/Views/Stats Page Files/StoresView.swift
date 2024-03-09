@@ -304,7 +304,7 @@ struct LocationInfoView: View{
                         }.padding().background(color.opacity(0.3)).clipShape(RoundedRectangle(cornerRadius: 10))
                     }else{
                         ScrollView{
-                            VStack{
+                            LazyVStack{
                                 let rows = records.count / 3 + (records.count % 3 == 0 ? 0 : 1)
                                 ForEach(0..<rows, id:\.self) { row in
                                     HStack {

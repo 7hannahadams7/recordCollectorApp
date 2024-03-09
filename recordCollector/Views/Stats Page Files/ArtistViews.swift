@@ -31,7 +31,7 @@ struct ArtistRecordShelf: View {
                     let popup: CoverPhotoToPopupView
                     var record = defaultRecordItems[index]
                     if index < artistBarData.count {
-                        let recordID = artistBarData[index].records.randomElement()
+                        let recordID = artistBarData[index].records.first
                         record = viewModel.recordDictionaryByID[recordID!]!
                     }
                     popup = CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager: genreManager, record:record, size: recordStack)
@@ -196,7 +196,7 @@ struct ArtistDetailRowView: View {
             VStack{
                 Spacer()
                 ScrollView(.horizontal){
-                    HStack{
+                    LazyHStack{
                         ForEach(artistItem.records, id:\.self){recordID in
                             if let record = viewModel.recordDictionaryByID[recordID]{
                                 CoverPhotoToPopupView(viewModel: viewModel, spotifyController: spotifyController, genreManager:genreManager, record: record,size:50)

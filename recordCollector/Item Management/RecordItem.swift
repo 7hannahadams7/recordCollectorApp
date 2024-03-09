@@ -21,7 +21,6 @@ struct RecordItem: Identifiable {
     var dateAdded: String
     var isBand: Bool
     var isUsed: Bool
-    var store: String/*(String, String)?*/
-//    var boughtFrom: [String:String]
-    // Add other properties as needed
+    var store: String
+    var favorite: Bool = false
 }

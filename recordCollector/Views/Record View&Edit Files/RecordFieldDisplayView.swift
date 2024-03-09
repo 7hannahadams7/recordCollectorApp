@@ -58,6 +58,7 @@ struct RecordFieldDisplayView: View{
                 return words.contains { $0.hasPrefix(lowercasedInput) } || genre.lowercased().hasPrefix(lowercasedInput)
             }
             .filter { !genreManager.genres.contains($0) }
+            .sorted()
     }
 
     var filteredStores: [String] {
@@ -72,7 +73,7 @@ struct RecordFieldDisplayView: View{
         if matchingItems.count == 1, matchingItems.first?.lowercased() == lowercaseInput {
             return [] // Return an empty list
         } else {
-            return matchingItems
+            return matchingItems.sorted()
         }
     }
 

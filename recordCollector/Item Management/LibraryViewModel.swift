@@ -20,8 +20,6 @@ class LibraryViewModel: ObservableObject {
     
     @Published var fullGenres = Set<String>()
     @Published var fullArtists = Set<String>()
-//    @Published var fullStores: [String:String] = [:]
-//    @Published var fullLocations = Set<String>()
     
     @Published var isImagePickerPresented: Bool = false
     @Published var capturedCoverImage: UIImage? = nil
@@ -108,11 +106,11 @@ class LibraryViewModel: ObservableObject {
     }
     
     // Adds new entry to local library, called via AddRecordView and in self.fetch()
-    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, isUsed: Bool, storeName: String) {
+    func addNewRecord(id: String, name: String, artist: String, releaseYear: Int, coverPhoto: UIImage? = UIImage(named:"TakePhoto"), discPhoto: UIImage? = UIImage(named:"TakePhoto"),genres:[String],dateAdded:String, isBand:Bool, isUsed: Bool, storeName: String, favorite: Bool = false) {
         // Add New Instance of Record Data to Local Library
         
         
-        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed, store: storeName)
+        var newItem = RecordItem(id: id, name: name, artist: artist, coverPhoto:coverPhoto!, discPhoto: discPhoto!, releaseYear: releaseYear,genres:genres, dateAdded: dateAdded, isBand:isBand, isUsed: isUsed, store: storeName, favorite: favorite)
         if storeName != ""{
             newItem.store = storeName
             if self.storeViewModel.allStores[storeName] != nil{
@@ -336,7 +334,11 @@ class LibraryViewModel: ObservableObject {
                       let date2 = String.stringToDate(from: $1.dateAdded) else {
                     return false // Handle invalid date strings as needed
                 }
-                return date1 > date2
+                if date1 != date2{
+                    return date1 > date2
+                }else{
+                    return $0.name < $1.name
+                }
             }
         case .artist:
             // Sort with consideration for band vs person and exclude leading The
@@ -361,23 +363,23 @@ class LibraryViewModel: ObservableObject {
                     name2 = $1.artist.components(separatedBy: " ").last ?? ""
                 }
 
-                return name1 < name2
+                if name1 != name2 {
+                    return name1 < name2
+                } else {
+                    return $0.name < $1.name // Sort by album name if artists are the same
+                }
             }
         case .releaseYear:
             recordLibrary.sort {
                 if $0.releaseYear != $1.releaseYear {
-                    return $0.releaseYear < $1.releaseYear
+                    return $0.releaseYear > $1.releaseYear // Sort in descending order
                 } else {
-                    return $0.artist < $1.artist
+                    return $0.name < $1.name
                 }
             }
         case .album:
             recordLibrary.sort {
-                if $0.name != $1.name {
-                    return $0.name < $1.name
-                } else {
-                    return $0.releaseYear < $1.releaseYear
-                }
+                return $0.name < $1.name
             }
         }
     }
@@ -465,6 +467,12 @@ class LibraryViewModel: ObservableObject {
                     storeName = store
                 }
                 
+                var favorite: Bool = false
+                
+                if let favoriteTag = elementDict["favorite"] as? Bool{
+                    favorite = favoriteTag
+                }
+                
                 // Pull cover image from storage
                 if let im = elementDict["imageURL"] {
                     let fileRef = storageRef.child(im as! String)
@@ -492,7 +500,7 @@ class LibraryViewModel: ObservableObject {
                 // Add record to local library
                 dispatchGroup.notify(queue: .main) {
                     //                    print("IN QUEUE")
-                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName)
+                    self.addNewRecord(id: snap.key, name: name , artist: artist , releaseYear: releaseYear , coverPhoto: coverPhoto, discPhoto: discPhoto, genres: genres,dateAdded:dateAdded ,isBand: isBand, isUsed: isUsed, storeName: storeName, favorite: favorite)
                 }
                 childrenCount += 1
             }
@@ -502,6 +510,35 @@ class LibraryViewModel: ObservableObject {
             }
             
         })
+    }
+    
+    func toggleFavorite(id: String) async{
+        let ref: DatabaseReference! = Database.database().reference()
+        if recordDictionaryByID[id]!.favorite{
+            
+            do{
+                try await ref.child("Records").child(id).child("favorite").removeValue()
+            } catch{
+                print("Error removing favorite \(id)")
+            }
+            
+            if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
+                self.recordLibrary[recordIndex].favorite = false
+            }
+            recordDictionaryByID[id]!.favorite = false
+            
+        }else{
+            
+            do{
+                try await ref.child("Records").child(id).child("favorite").setValue(true)
+            }catch{
+                print("Error adding favorite \(id)")
+            }
+
+            if let recordIndex = self.recordLibrary.firstIndex(where: { $0.id == id }){
+                self.recordLibrary[recordIndex].favorite = true            }
+            recordDictionaryByID[id]!.favorite = true
+        }
     }
     
     // Reset local libraries and re-fetch and sort data
