@@ -38,7 +38,7 @@ struct SpotifyResultsView: View {
                     ScrollView{
                         // Pull Playlist items from Search Results
                         if let playlists = playlistSearchResult?.playlists.items {
-                            ForEach(playlists, id: \.id) { playlist in
+                            ForEach(playlists.compactMap { $0 }, id: \.id) { playlist in
                                 SpotifyDisplayRow(viewModel:viewModel,spotifyController: spotifyController,record:record,playlist: playlist)
                             }
                         }

@@ -19,7 +19,7 @@ struct AlbumResponse: Codable {
     let items: [Album]
 }
 struct PlaylistResponse: Codable {
-    let items: [Playlist]
+    let items: [Playlist?]   // some items may be null
 }
 
 struct Album: Codable, Identifiable, Hashable {

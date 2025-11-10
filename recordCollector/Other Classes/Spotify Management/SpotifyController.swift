@@ -13,6 +13,12 @@ class SpotifyController: NSObject, ObservableObject {
     let spotifyClientID = SpotifyConfiguration.spotifyClientID
     let spotifyRedirectURL = SpotifyConfiguration.spotifyRedirectURL
     
+    lazy var sessionManager: SPTSessionManager = {
+        let mgr = SPTSessionManager(configuration: configuration, delegate: self)
+        return mgr
+    }()
+
+    
     @Published var accessToken: String? = nil
     
     @Published var currentPlaying: String = ""
@@ -59,27 +65,37 @@ class SpotifyController: NSObject, ObservableObject {
     }()
     
     func setAccessToken(from url: URL) {
-        print("SETTING TOKEN")
-        let parameters = appRemote.authorizationParameters(from: url)
-        
-        if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
-            appRemote.connectionParameters.accessToken = accessToken
-            self.accessToken = accessToken
-            self.connect() // reconnect with new set token
-        } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
-            print(errorDescription)
-        }
-        
+        // Forward the redirect to the modern Session Manager.
+        // This replaces the legacy `authorizationParameters(from:)` flow.
+        sessionManager.application(UIApplication.shared, open: url, options: [:])
     }
     
+//    func connect() {
+//        guard let _ = self.appRemote.connectionParameters.accessToken else {
+//            print("No access token?")
+//            self.appRemote.authorizeAndPlayURI("")
+//            return
+//        }
+//        appRemote.connect()
+//    }
     func connect() {
-        guard let _ = self.appRemote.connectionParameters.accessToken else {
-            print("No access token?")
-            self.appRemote.authorizeAndPlayURI("")
+        if let token = self.accessToken, !token.isEmpty {
+            appRemote.connectionParameters.accessToken = token
+            appRemote.connect()
             return
         }
-        appRemote.connect()
+
+        // Start modern auth (no deprecated openURL). We’ll wire the delegate in Step D.
+        let scopes: SPTScope = [
+            .appRemoteControl,
+            .userReadPlaybackState,
+            .userModifyPlaybackState,
+            .userReadCurrentlyPlaying
+        ]
+        sessionManager.initiateSession(with: scopes, options: .default)
     }
+
+    
     
     func disconnect() {
         if appRemote.isConnected {
@@ -87,6 +103,17 @@ class SpotifyController: NSObject, ObservableObject {
             connectionFailure = true
         }
     }
+    
+    private func wakeSpotifyApp(completion: (() -> Void)? = nil) {
+        guard let url = URL(string: "spotify://") else { completion?(); return }
+        UIApplication.shared.open(url, options: [:]) { _ in
+            // Give Spotify a brief moment to spin up its local server
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                completion?()
+            }
+        }
+    }
+
 }
 
 extension SpotifyController: SPTAppRemoteDelegate {
@@ -190,4 +217,31 @@ extension SpotifyController: SPTAppRemotePlayerStateDelegate {
 //        print("playbackPosition", playerState.playbackPosition)
     }
     
+}
+
+extension SpotifyController: SPTSessionManagerDelegate {
+
+    // ✅ Correct labels/signature
+    func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+        self.accessToken = session.accessToken
+        self.appRemote.connectionParameters.accessToken = session.accessToken
+
+        // Wake Spotify so the local socket (127.0.0.1:9095) is ready
+        wakeSpotifyApp { [weak self] in
+            self?.appRemote.connect()
+        }
+    }
+
+
+    // ✅ Correct labels/signature (uses Swift Error, not NSError)
+    func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
+        debugPrint("Spotify auth failed: \(error)")
+        self.connectionFailure = true
+    }
+
+    // (optional but nice)
+    func sessionManager(manager: SPTSessionManager, didRenew session: SPTSession) {
+        self.accessToken = session.accessToken
+        self.appRemote.connectionParameters.accessToken = session.accessToken
+    }
 }
